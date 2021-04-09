@@ -19,6 +19,8 @@ NULL
 
 library(rbacon)
 
+
+
 # to enable running important functions from within rplum
 events <- utils::getFromNamespace("events", "rbacon")
 bacon <- utils::getFromNamespace("bacon", "rbacon")
