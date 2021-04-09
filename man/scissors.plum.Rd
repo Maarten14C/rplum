@@ -2,15 +2,16 @@
 % Please edit documentation in R/MCMC.R
 \name{scissors.plum}
 \alias{scissors.plum}
+\alias{overlap}
 \title{Remove the first n iterations.}
 \usage{
-scissors.plum(burnin, set = get("info"))
+overlap(set = get("info"), digits = 0, verbose = TRUE)
 }
 \arguments{
+\item{set}{Detailed information of the current run, stored within this session's memory as variable \code{info}.}
+
 \item{burnin}{Number of iterations to remove  of the iterative time series. If this value is higher than the amount of remaining iterations,
 a warning is given and the iterations are not removed. If the provided number is negative, the iterations will be removed from the end of the run, not from the start. If a range is given, this range of iterations is removed.}
-
-\item{set}{Detailed information of the current run, stored within this session's memory as variable \code{info}.}
 }
 \value{
 NA

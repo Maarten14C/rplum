@@ -2,44 +2,53 @@
 
 #################### functions for post-run checks and adaptations ####################
 
-# #' @name scissors
-# #' @title Remove the first n iterations.
-# #' @description Removes iterations of the MCMC time series, and then updates the output file.
-# #' @details Bacon will perform millions of MCMC iterations for each age-model run by default, although only a fraction
-# #' of these will be stored. In most cases the remaining MCMC iterations will be well mixed (the upper left panel
-# #' of the fit of the iterations shows no undesirable features such as trends or sudden systematic drops or rises).
-# #' If the run has a visible remaining burn-in, scissors can be used to remove them.
-# #' To remove, e.g., the first 300 iterations, type \code{scissors(300)}. To remove the last 300 iterations, type \code{scissors(-300)}. To remove iterations 300 to 600, type \code{scissors(300:600)}.
-# #'
-# #' @param burnin Number of iterations to remove  of the iterative time series. If this value is higher than the amount of remaining iterations,
-# #' a warning is given and the iterations are not removed. If the provided number is negative, the iterations will be removed from the end of the run, not from the start. If a range is given, this range of iterations is removed.
-# #' @param set Detailed information of the current run, stored within this session's memory as variable \code{info}.
-# #' @author Maarten Blaauw, J. Andres Christen
-# #' @return NA
-# #' @references
-# #' Blaauw, M. and Christen, J.A., Flexible paleoclimate age-depth models using an autoregressive
-# #' gamma process. Bayesian Anal. 6 (2011), no. 3, 457--474.
-# #' @export
-# scissors <- function(burnin, set=get('info')) {
-#   output <- read.table(paste(set$prefix, ".out", sep=""))
-#   if(length(burnin) > 1) {
-#     if(length(burnin) >= nrow(output))
-#       stop("cannot remove that many iterations, there would be none left!", call.=FALSE)
-# 	output <- output[-burnin,]
-#   } else {
-#       if(abs(burnin) >= nrow(output))
-#         stop("cannot remove that many iterations, there would be none left!", call.=FALSE)
-# 	  if(burnin > 0)
-# 	    output <- output[-(1:burnin),] else
-#           output <- output[-((nrow(output)-abs(burnin)):nrow(output)),]
-# 	  }
-# 
-#   write.table(output, paste(set$prefix, ".out", sep=""), col.names=FALSE, row.names=FALSE)
-# 
-#   info <- get('info')
-#   info$output <- output
-#   .assign_to_global ("info", info)
-# }
+#' @name scissors
+#' @title Remove the first n iterations.
+#' @description Removes iterations of the MCMC time series, and then updates the output file.
+#' @details Bacon will perform millions of MCMC iterations for each age-model run by default, although only a fraction
+#' of these will be stored. In most cases the remaining MCMC iterations will be well mixed (the upper left panel
+#' of the fit of the iterations shows no undesirable features such as trends or sudden systematic drops or rises).
+#' If the run has a visible remaining burn-in, scissors can be used to remove them.
+#' To remove, e.g., the first 300 iterations, type \code{scissors(300)}. To remove the last 300 iterations, type \code{scissors(-300)}. To remove iterations 300 to 600, type \code{scissors(300:600)}.
+#'
+#' @param burnin Number of iterations to remove  of the iterative time series. If this value is higher than the amount of remaining iterations,
+#' a warning is given and the iterations are not removed. If the provided number is negative, the iterations will be removed from the end of the run, not from the start. If a range is given, this range of iterations is removed.
+#' @param set Detailed information of the current run, stored within this session's memory as variable \code{info}.
+#' @author Maarten Blaauw, J. Andres Christen
+#' @return NA
+#' @references
+#' Blaauw, M. and Christen, J.A., Flexible paleoclimate age-depth models using an autoregressive
+#' gamma process. Bayesian Anal. 6 (2011), no. 3, 457--474.
+#' @export
+scissors <- function(burnin, set=get('info')) {
+  output <- read.table(paste(set$prefix, ".out", sep=""))
+  plumout <- read.table(paste(set$prefix, "_plum.out", sep=""))
+  if(length(burnin) > 1) {
+    if(length(burnin) >= nrow(output))
+      stop("cannot remove that many iterations, there would be none left!", call.=FALSE)
+    output <- output[-burnin,]
+    plumout <- plumout[-burnin,]
+  } else {
+      if(abs(burnin) >= nrow(output))
+        stop("cannot remove that many iterations, there would be none left!", call.=FALSE)
+      if(burnin > 0) {
+        output <- output[-(1:burnin),]
+        plumout <- plumout[-(1:burnin),]
+      } else {
+          output <- output[-((nrow(output)-abs(burnin)):nrow(output)),]
+          plumout <- plumout[-((nrow(plumout)-abs(burnin)):nrow(plumout)),]
+        }
+    }
+
+  write.table(output, paste(set$prefix, ".out", sep=""), col.names=FALSE, row.names=FALSE)
+  write.table(plumout, paste(set$prefix, "_plum.out", sep=""), col.names=FALSE, row.names=FALSE)
+
+  info <- get('info')
+  info$output <- output
+  info$phi <- plumout[,1]
+  info$ps <- plumout[,2]
+  assign_to_global("info", info)
+}
 
 #' @name scissors.plum
 #' @title Remove the first n iterations.
@@ -58,52 +67,56 @@
 #' Blaauw, M. and Christen, J.A., Flexible paleoclimate age-depth models using an autoregressive
 #' gamma process. Bayesian Anal. 6 (2011), no. 3, 457--474.
 #' @export
-scissors.plum <- function(burnin, set=get('info')) {
-  output <- read.table(paste0(set$prefix, "_plum", ".out"))
-  if(length(burnin) > 1) {
-    if(length(burnin) >= nrow(output))
-      stop("cannot remove that many iterations, there would be none left!", call.=FALSE)
-	output <- output[-burnin,]
-  } else {
-      if(abs(burnin) >= nrow(output))
-        stop("cannot remove that many iterations, there would be none left!", call.=FALSE)
-	  if(burnin > 0)
-	    output <- output[-(1:burnin),] else
-          output <- output[-((nrow(output)-abs(burnin)):nrow(output)),]
-	  }
-
-  write.table(output, paste0(set$prefix, "_plum", ".out"), col.names=FALSE, row.names=FALSE)
-
-  info <- get('info')
-  #info$output <- output
-  assign_to_global ("info", info)
-}
-
-
-
-# #' @name thinner
-# #' @title Thin iterations.
-# #' @description Randomly thin iterations by a given proportion, for example if autocorrelation is visible within the MCMC series.
-# #' @details From all iterations, a proportion is removed with to-be-removed iterations sampled randomly among all iterations.
-# #' @param proportion Proportion of iterations to remove. Should be between 0 and 1. Default \code{proportion=0.1}.
-# #' @param set Detailed information of the current run, stored within this session's memory as variable \code{info}.
-# #' @return NA
-# #' @references
-# #' Blaauw, M. and Christen, J.A., Flexible paleoclimate age-depth models using an autoregressive
-# #' gamma process. Bayesian Anal. 6 (2011), no. 3, 457--474.
-# #' @export
-# thinner <- function(proportion=0.1, set=get('info')) {
-#   output <- read.table(paste(set$prefix, ".out", sep=""))
-#   if(proportion >= 1)
-#     stop("cannot remove that many iterations, there would be none left!", call.=FALSE)
-#   proportion <- sample(nrow(output), proportion*nrow(output))
-#   output <- output[-proportion,]
-#   write.table(output, paste(set$prefix, ".out", sep=""), col.names=FALSE, row.names=FALSE)
-# 
+# scissors.plum <- function(burnin, set=get('info')) {
+#   output <- read.table(paste0(set$prefix, "_plum", ".out"))
+#   if(length(burnin) > 1) {
+#     if(length(burnin) >= nrow(output))
+#       stop("cannot remove that many iterations, there would be none left!", call.=FALSE)
+# 	output <- output[-burnin,]
+#   } else {
+#       if(abs(burnin) >= nrow(output))
+#         stop("cannot remove that many iterations, there would be none left!", call.=FALSE)
+# 	  if(burnin > 0)
+# 	    output <- output[-(1:burnin),] else
+#           output <- output[-((nrow(output)-abs(burnin)):nrow(output)),]
+# 	  }
+#
+#   write.table(output, paste0(set$prefix, "_plum", ".out"), col.names=FALSE, row.names=FALSE)
+#
 #   info <- get('info')
-#   info$output <- output
-#   .assign_to_global ("info", info)
+#   #info$output <- output
+#   assign_to_global ("info", info)
 # }
+
+
+
+#' @name thinner
+#' @title Thin iterations.
+#' @description Randomly thin iterations by a given proportion, for example if autocorrelation is visible within the MCMC series.
+#' @details From all iterations, a proportion is removed with to-be-removed iterations sampled randomly among all iterations.
+#' @param proportion Proportion of iterations to remove. Should be between 0 and 1. Default \code{proportion=0.1}.
+#' @param set Detailed information of the current run, stored within this session's memory as variable \code{info}.
+#' @return NA
+#' @references
+#' Blaauw, M. and Christen, J.A., Flexible paleoclimate age-depth models using an autoregressive
+#' gamma process. Bayesian Anal. 6 (2011), no. 3, 457--474.
+#' @export
+thinner <- function(proportion=0.1, set=get('info')) {
+  output <- read.table(paste(set$prefix, ".out", sep=""))
+  plumout <- read.table(paste(set$prefix, "_plum.out", sep=""))
+  if(proportion >= 1)
+    stop("cannot remove that many iterations, there would be none left!", call.=FALSE)
+  proportion <- sample(nrow(output), proportion*nrow(output))
+  output <- output[-proportion,]
+  plumout <- plumout[-proportion,]
+  write.table(output, paste(set$prefix, ".out", sep=""), col.names=FALSE, row.names=FALSE)
+  write.table(plumout, paste(set$prefix, "_plum.out", sep=""), col.names=FALSE, row.names=FALSE)
+
+  set$output <- output
+  set$phi <- plumout[,1]
+  set$ps <- plumout[,2]
+  assign_to_global("info", set)
+}
 
 
 

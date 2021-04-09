@@ -7,6 +7,7 @@
 #' @param rotate.axes The default of plotting age on the horizontal axis and event probability on the vertical one can be changed with \code{rotate.axes=TRUE}.
 #' @param rev.d The direction of the depth axis can be reversed from the default (\code{rev.d=TRUE}).
 #' @param rev.age The direction of the calendar age axis can be reversed from the default (\code{rev.age=TRUE})
+#' @param BCAD The calendar scale of graphs and age output-files is in cal BP (calendar or calibrated years before the present, where the present is AD 1950) by default, but can be changed to BC/AD using \code{BCAD=TRUE}.
 #' @param pb.lim Minimum and maximum of the 210Pb axis ranges, calculated automatically by default (\code{pb.lim=c()}).
 #' @param age.lim Minimum and maximum of the age ranges to be used to plot 210Pb values. Calculated automatically by default (\code{age.lim=c()}).
 #' @param d.lim Minimum and maximum depths to plot; calculated automatically by default (\code{d.lim=c()}).
@@ -15,10 +16,12 @@
 #' @param pbmeasured.col The label for the measured 210Pb data. \code{pbmeasured.col="blue"}.
 #' @param pb.log Use a log scale for the 210Pb-axis (default \code{pb.log=FALSE}).
 #' @param supp.col Colour of the supported 210Pb data. Defaults to red: \code{supp.col="red"}.
+#' @param newplot make new plot (default TRUE)
+#' @param on.agescale Plot the Pb-210 on the cal BP scale. Defaults to FALSE.
 #' @author Maarten Blaauw, J. Andres Christen, Marco Aquino-Lopez
 #' @return A plot of the measured 210Pb values
 #' @export
-draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, pb.lim=c(), age.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmeasured.col="blue", pb.log=FALSE, supp.col="red") {
+draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, BCAD=set$BCAD, pb.lim=c(), age.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmeasured.col="blue", pb.log=FALSE, supp.col="purple", newplot=TRUE, on.agescale=FALSE) {
   depths <- set$detsOrig[,2]
   dns <- set$detsOrig[,3]
   Pb <- set$detsOrig[,4]
@@ -26,48 +29,59 @@ draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev
   thickness <- set$detsOrig[,6]
   n <- nrow(set$detsOrig)
 
- # if(ncol(set$detsPlum) > 6) {
- #   supp <- set$detsOrig[,7]
- #   supperr <- set$detsOrig[,8]
- # }
-
-  if(length(d.lab) == 0)
-    d.lab <- paste0("depth (", set$depth.unit, ")")
-  if(length(pb.lab) == 0)
-    pb.lab <- ifelse(set$Bqkg, "210Pb (Bq/kg)", "210Pb (dpm/g)")    
-
-  if(length(d.lim) == 0)
-    d.lim <- range(depths)
-  if(rev.d)
-    d.lim <- d.lim[2:1]
-   
   if(length(pb.lim) == 0) 
-    pb.lim <- extendrange(c(0, Pb-2*err, Pb+2*err), f=c(0,0.05))
+    pb.lim <- extendrange(c(0, Pb+2*err), f=c(0,0.05))
  
   # translate pb values to cal BP values for plotting on the age axis
-  pb2bp <- function(pb, pb.min=pb.lim[1], pb.max=pb.lim[2], agemin=age.lim[1], agemax=age.lim[2]) {
+  pb2bp <- function(pb, pb.min=pb.lim[1], pb.max=pb.lim[2], agemin=min(age.lim), agemax=max(age.lim)) {
     ex <- (agemax-agemin) / (pb.max - pb.min)
     agemin + ex*pb
-  }      
-  
-  if(rotate.axes)
-    plot(0, type="n", ylim=d.lim, ylab=d.lab, xlim=pb.lim, xlab=pb.lab) else
-      plot(0, type="n", xlim=d.lim, xlab=d.lab, ylim=pb.lim, ylab=pb.lab)
-    
-  if(rotate.axes)
-    rect(Pb-err, depths-thickness, Pb+err, depths, border=pbmeasured.col, lty=3) else
-      rect(depths-thickness, Pb-err, depths, Pb+err, lty=3, border=pbmeasured.col)
-    
-  if(ncol(set$detsOrig) > 6) {
-    supp <- set$detsOrig[,7]
-    supperr <- set$detsOrig[,8]
-    if(rotate.axes)
-      rect(supp-supperr, depths-thickness, supp+supperr, depths,
-        border=supp.col, lty=3) else
-        rect(depths-thickness, supp-supperr, depths, supp+supperr, 
-          border=supp.col, lty=3) 
-       }  
   }
+
+  # ... and for AD
+  pb2ad <- function(pb, pb.min=pb.lim[1], pb.max=pb.lim[2], agemin=max(age.lim), agemax=min(age.lim)) {
+    ex <- (agemin-agemax) / (pb.max - pb.min)
+    agemin - ex*pb
+  }
+
+  if(BCAD)
+    pb2bp <- pb2ad
+
+  if(!on.agescale)
+    pb2bp <- function(x) {x} # dummy, 1:1
+  
+  if(newplot) {
+    if(length(d.lab) == 0)
+      d.lab <- paste0("depth (", set$depth.unit, ")")
+    if(length(pb.lab) == 0)
+      pb.lab <- ifelse(set$Bqkg, "210Pb (Bq/kg)", "210Pb (dpm/g)")
+
+    if(length(d.lim) == 0)
+      d.lim <- range(depths, set$supportedData[,3])
+    if(rev.d)
+      d.lim <- d.lim[2:1]
+    if(rotate.axes)
+      plot(0, type="n", ylim=d.lim, ylab=d.lab, xlim=pb2bp(pb.lim), xlab=pb.lab) else
+        plot(0, type="n", xlim=d.lim, xlab=d.lab, ylim=pb2bp(pb.lim), ylab=pb.lab)
+  }
+
+  if(rotate.axes)
+    rect(pb2bp(Pb-err), depths-thickness, pb2bp(Pb+err), depths, border=pbmeasured.col, lty=3) else
+      rect(depths-thickness, pb2bp(Pb-err), depths, pb2bp(Pb+err), lty=3, border=pbmeasured.col)
+    
+  if(length(set$supportedData) > 0) {
+    supp <- set$supportedData[,1]
+    supperr <- set$supportedData[,2]
+    suppd <- set$supportedData[,3]
+    suppthick <- set$supportedData[,4]
+
+    if(rotate.axes)
+      rect(pb2bp(supp-supperr), suppd-suppthick, pb2bp(supp+supperr), suppd,
+        border=supp.col, lty=3) else
+        rect(suppd-suppthick, pb2bp(supp-supperr), suppd, pb2bp(supp+supperr),
+          border=supp.col, lty=3) 
+  }
+}
 
 
 

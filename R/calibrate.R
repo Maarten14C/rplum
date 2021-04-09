@@ -445,7 +445,7 @@ calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, firs
 #' @author Maarten Blaauw, J. Andres Christen, Marco Aquino-Lopez
 #' @return A plot of the modelled (and optionally the measured) 210Pb values
 #' @export
-draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, pb.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmodelled.col=function(x) rgb(0,0,1,x), pbmeasured.col="blue", supp.col="red", plot.measured=TRUE, draw.background=TRUE, age.lim=c()) {
+draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, pb.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmodelled.col=function(x) rgb(0,0,1,x), pbmeasured.col="blue", supp.col="purple", plot.measured=TRUE, draw.background=TRUE, age.lim=c()) {
   depths <- set$detsOrig[,2] # was detsOrig
   dns <- set$detsOrig[,3]
   Pb <- set$detsOrig[,4]
@@ -456,6 +456,11 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
   if(ncol(set$detsPlum) > 6) {
     supp <- set$detsOrig[,7]
     supperr <- set$detsOrig[,8]
+  } else {
+    supp <- set$supportedData[,1]
+    supperr <- set$supportedData[,2]
+    suppd <- set$supportedData[,3]
+    suppthick <- set$supportedData[,4]
   }
 
   if(length(d.lab) == 0)
@@ -538,28 +543,35 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
     set$background <- bg
     assign_to_global("info", set, .GlobalEnv)
     if(rotate.axes)
-      abline(h=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,0,bg), lty=3, lwd=bg) else
-        abline(v=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,0,bg), lty=3, lwd=bg)
+      abline(h=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg) else
+        abline(v=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg)
   }
 
   if(BCAD)
     pb2bp <- pb2ad
 
-  if(plot.measured) 
-    if(ncol(set$detsOrig) == 6) {
-      if(rotate.axes)
-        rect(Pb-2*err, depths-thickness, Pb+2*err, depths, 
-          border=c(rep(pbmeasured.col, n), rep(2, n)), lty=3) else
-            rect(depths-thickness, pb2bp(Pb-2*err), depths, pb2bp(Pb+2*err), border=c(rep(pbmeasured.col, n), rep(2, n)), lty=3)
-      } else {
-          if(rotate.axes)
-            rect(pb2bp(c(Pb-2*err,supp-2*supperr)), c(depths-thickness,depths), 
-              pb2bp(c(Pb+2*err,supp+2*supperr)), c(depths-thickness, depths),
-                border=c(rep(pbmeasured.col, n), rep(supp.col, n)), lty=3) else
-                rect(c(depths-thickness,depths), pb2bp(c(Pb-2*err,supp-2*supperr)), 
-                  c(depths-thickness, depths), pb2bp(c(Pb+2*err,supp+2*supperr)), 
-                  border=c(rep(pbmeasured.col, n), rep(supp.col, n)), lty=3)
-        }
+  if(plot.measured)
+    draw.pbmeasured(newplot=FALSE, BCAD=BCAD, on.agescale=TRUE, pb.lim=pb.lim, age.lim=age.lim, supp.col=supp.col)
+
+#   if(plot.measured)
+#     if(ncol(set$detsOrig) == 6) {
+#       if(rotate.axes) {
+#         rect(pb2bp(Pb-2*err), depths-thickness, pb2bp(Pb+2*err), depths,
+#           border=pbmeasured.col, lty=3)
+#         rect(pb2bp(supp-2*supperr), suppd-suppthick, pb2bp(supp+2*supperr), suppd, border=supp.col, lty=3)
+#       } else {
+#           rect(depths-thickness, pb2bp(Pb-2*err), depths, pb2bp(Pb+2*err), border=pbmeasured.col, lty=3)
+#           rect(suppd-suppthick, pb2bp(supp-2*supperr), suppd, pb2bp(supp+2*supperr), border=supp.col, lty=3)
+#         }
+#       } else {
+#           if(rotate.axes)
+#             rect(pb2bp(c(Pb-2*err,supp-2*supperr)), c(depths-thickness,depths),
+#               pb2bp(c(Pb+2*err,supp+2*supperr)), c(depths-thickness, depths),
+#                 border=c(rep(pbmeasured.col, n), rep(supp.col, n)), lty=3) else
+#                 rect(c(depths-thickness,depths), pb2bp(c(Pb-2*err,supp-2*supperr)),
+#                   c(depths-thickness, depths), pb2bp(c(Pb+2*err,supp+2*supperr)),
+#                   border=c(rep(pbmeasured.col, n), rep(supp.col, n)), lty=3)
+#         }
 }
 
 

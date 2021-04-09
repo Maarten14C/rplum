@@ -9,7 +9,7 @@
 #' @author Maarten Blaauw <maarten.blaauw@qub.ac.uk> J. Andres Christen <jac@cimat.mx> Marco Aquino-Lopez <Marco.AquinoLopez@mu.ie>
 #' @importFrom grDevices dev.cur dev.off pdf dev.copy2pdf grey rgb dev.list extendrange
 #' @importFrom graphics abline box curve hist image layout legend lines par plot points polygon segments rect axis mtext
-#' @importFrom stats approx dbeta density dgamma dnorm dunif lm quantile rnorm weighted.mean coef
+#' @importFrom stats approx dbeta density dgamma dnorm dunif lm quantile rnorm weighted.mean coef median
 #' @importFrom utils read.csv read.table write.table packageName txtProgressBar setTxtProgressBar
 #' @importFrom Rcpp evalCpp
 #' @importFrom coda gelman.diag mcmc.list as.mcmc
@@ -19,20 +19,15 @@ NULL
 
 library(rbacon)
 
-
-
-# to enable running important functions from within rplum
-events <- utils::getFromNamespace("events", "rbacon")
-bacon <- utils::getFromNamespace("bacon", "rbacon")
-#agedepth <- rbacon::agedepth # is this a good idea?
-proxy.ghost <- rbacon::proxy.ghost # is this a good idea?
-#agedepth <- Agedepth # because this one has some updates over the one in rbacon
-
 # rbacon should adapt draw.pbmodelled so that Pb data are plotted also when BCAD=T. Perhaps a var which is 0 when cal BP and -1950 when BCAD. Currently BCAD=T throws an error. Update these functions in rbacon: agedepth, draw.pbmodelled
 
 # no need for accrate.R, Bacon.R, plots.R, calc.R and calibrate.R since they duplicate all functions from rbacon. Would be very hard to keep both up to date with bug repairs etc. Removed these files
 
 # Removed lines 1-17 in Bacon.R since replicated in Plum.R, agedepth() now works as expected after a run, rev.age works as expected, changed order of initial options to be more bacon-like (core name, section thickness), renamed option core2 (filename of other dates) to otherdates
+
+# adapt rbacon's scissors and thinner to read and write plumout if info$isplum
+
+# ensure supported data are always plotted
 
 # check a range of scenarios: Pb data without supported info and no further info provided within the .csv file, Pb without supported info but with information provided in .csv file, Pb data with supported info, and those two cases with and without additional dates - C14 or cal BP (e.g. historical 137Cs)
 
@@ -41,8 +36,7 @@ proxy.ghost <- rbacon::proxy.ghost # is this a good idea?
 # Plum("SAMO14-1", radon.case=1) results in a 0 B output file (or at least one with just one line or so). With radon.case=2 same, but if I choose, e.g., n.supp=3, then it runs OK. Has to do with formatting of .plum file? That file is NA NA when n.supp is not given. If n.supp set to 2, OK. n.supp=1, ?
 # Additionally, do you want to set a number of tail measurements for supported Pb-210? (y/n) if n, goes wrong
 
-
-# it seems that depths.file=T doesn't work
+# it seems that depths.file=T doesn't work. Same for scissors()
 
 # when running Plum(), all input looks fine. When running Plum('LL14'), the .bacon file looks fine, but the terminal reports strange numbers for 210Pb and supported. Check. Are these simply the numbers for estimating supported? This has to do, somehow, with the numbers of lines in the .out files being different if rbacon:::bacon() is run vs rplum:::bacon(), even though the src files of the two packages are now EXACTLY the same. Apparently this is solved using the getFromNamespace approach, but perhaps check again if LL14 works better using internal src code...
 
@@ -51,7 +45,7 @@ proxy.ghost <- rbacon::proxy.ghost # is this a good idea?
 
 # we need to explain clearly the radon cases and n.supp. Current explanations are confusing. Also, explain how to make the relevant files (in case of constant supported, individual supported, 210Pb and other data, ...)
 
-# do plum: add prior settings in red to upper panels, check if ResCor is done correctly if using a C14-file, consider replacing bluescales with blobs, check if age.max etc. work, separate rbacon and rplum (#' @import rbacon), A.rng and Ai (in calibrate.plum.plot() somehow don't want to be saved to info (needed to provide post-run info on fit 210Pb data), remove Bacon.R (so that no need for running long-lasting examples)? build note that package is large (remove MSB2K and RLGH3?), why does HP1C return only 30 cm if the core is 50 cm long (bottom 4 measurements removed and not even included in the run), is it OK that d.min is set at 0 by default?, check and adapt confusing description and default of n.supp, add a red line showing the depths and mean value of the supported measurements if info$supportedData used
+# do plum: add prior settings in red to upper panels, check if ResCor is done correctly if using a C14-file, consider replacing bluescales with blobs, check if age.max etc. work, A.rng and Ai (in calibrate.plum.plot() somehow don't want to be saved to info (needed to provide post-run info on fit 210Pb data), remove Bacon.R (so that no need for running long-lasting examples)? why does HP1C return only 30 cm if the core is 50 cm long (bottom 4 measurements removed and not included in the run), is it OK that d.min is set at 0 by default?, check and adapt confusing description and default of n.supp, add a red line showing the depths and mean value of the supported measurements if info$supportedData used
 
 #' @name Plum
 #' @title  Main 210Pb age-depth modelling function
@@ -223,6 +217,8 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   # read in the data, adapt settings from defaults if needed
   tmp <- read.dets.plum(core=core, coredir=coredir, n.supp=n.supp, date.sample=date.sample, sep=sep, dec=dec, cc=cc, Bqkg=Bqkg, radon.case=radon.case, suggest=suggest) # was read.dets.plum
 
+  #core, coredir, n.supp=c(), date.sample, set=get('info'), sep=",", dec=".", cc=1, Bqkg=TRUE, radon.case=c(), suggest=TRUE
+
   dets <- tmp[[1]]
   supportedData <- tmp[[2]]
   radon.case <- tmp[[3]]
@@ -248,7 +244,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
       Al <- Al*500./3.
     }
 
-  # we make full dets
+    # we make full dets
   if(!is.na(otherdates)) {
     detsBacon <- .read.dets.plumbacon(core, otherdates, coredir, sep=sep, dec=dec, cc=cc)
     detsPlum <- dets
@@ -314,7 +310,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
       acc.mean <- rep(acc.mean, length(hiatus.depths)+1)
   }
 
-  
   info <- .plum.settings(core=core, coredir=coredir, dets=dets, thick=thick, remember=remember,
     d.min=d.min, d.max=d.max, d.by=d.by, depths.file=depths.file, slump=slump, acc.mean=acc.mean,
     acc.shape=acc.shape, mem.mean=mem.mean, mem.strength=mem.strength, boundary=boundary,
@@ -429,7 +424,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
       info$thick = thick
       info$elbows <- seq(floor(info$d.min), ceiling(info$d.max), by=thick)
       if(length(info$slump) > 0) # why here, and not a few lines later?
-        info$elbows <- seq(floor(info$d.min), rbacon:::toslump(ceiling(info$d.max), info$slump), by=thick)
+        info$elbows <- seq(floor(info$d.min), toslump(ceiling(info$d.max), info$slump), by=thick)
       info$K <- length(info$elbows)
       info$cK <- info$d.min+(info$thick*info$K) # the maximum depth to be used by the bacon model
     }
@@ -441,23 +436,22 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     slump <- matrix(sort(slump), ncol=2, byrow=TRUE)
     info$slump <- slump
 
-    slumpdmax <- rbacon:::toslump(ceiling(info$d.max), slump)
+    slumpdmax <- toslump(ceiling(info$d.max), slump)
     info$elbows <- seq(floor(info$d.min), slumpdmax, by=thick)
     info$K <- length(info$elbows)
     info$cK <- info$d.min+(info$thick*info$K) # the maximum depth to be used by the bacon model
 
-    info$slumpfree <- rbacon:::toslump(depths, slump)
-    info$slumphiatus <- rbacon:::toslump(info$hiatus.depths, slump) # check
+    info$slumpfree <- toslump(depths, slump)
+    info$slumphiatus <- toslump(info$hiatus.depths, slump) # check
     if(!is.na(info$boundary[1])) {
-      info$slumpboundary <- rbacon:::toslump(info$boundary, slump) # check
+      info$slumpboundary <- toslump(info$boundary, slump) # check
       info$slumphiatus <- info$slumpboundary
     }
     slumpdets <- info$dets
-    slumpdets[,4] <- rbacon:::toslump(slumpdets[,4], slump, remove=FALSE) # dates within slumps are not removed
+    slumpdets[,4] <- toslump(slumpdets[,4], slump, remove=FALSE) # dates within slumps are not removed
     info$slumpdets <- slumpdets[!is.na(slumpdets[,4]),]
   }
 
- 
   ### produce files
   info$prefix <- paste0(coredir, core, "/", core, runname, "_", info$K)
   info$coredir <- coredir
@@ -503,15 +497,15 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
       layout(matrix(pn, nrow=2, byrow=TRUE), heights=c(.3,.7))
     }
 
-    rbacon:::PlotAccPrior(info$acc.shape, info$acc.mean, depth.unit=depth.unit, age.unit=age.unit)
-    rbacon:::PlotMemPrior(info$mem.strength, info$mem.mean, thick)
+    PlotAccPrior(info$acc.shape, info$acc.mean, info, depth.unit=depth.unit, age.unit=age.unit)
+    PlotMemPrior(info$mem.strength, info$mem.mean, thick, info)
 
     if(!is.na(info$hiatus.depths)[1])
       if(is.na(info$boundary)[1])
-        rbacon:::PlotHiatusPrior(info$hiatus.max, info$hiatus.depths)
+        PlotHiatusPrior(info$hiatus.max, info$hiatus.depths, info)
 
-    rbacon:::PlotPhiPrior()
-    rbacon:::PlotSuppPrior()
+    PlotPhiPrior(, , info)
+    PlotSuppPrior(info)
 
     if(info$hasBaconData)
       calib.plumbacon.plot(info, BCAD=BCAD, new.plot=TRUE) else {
@@ -529,8 +523,8 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     bacon <- utils::getFromNamespace("bacon", "rbacon")
     bacon(txt, outfile, ssize, ccdir)
 
-    rbacon::scissors(burnin, info)
-    scissors.plum(burnin, info)
+    rplum::scissors(burnin, info) # scissors adapted to cut iterations from both output files
+    #scissors.plum(burnin, info)
 
     agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # using rplum's agedepth for now, until rbacon's is updated and on CRAN
 
