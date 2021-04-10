@@ -446,7 +446,7 @@ calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, firs
 #' @return A plot of the modelled (and optionally the measured) 210Pb values
 #' @export
 draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, pb.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmodelled.col=function(x) rgb(0,0,1,x), pbmeasured.col="blue", supp.col="purple", plot.measured=TRUE, draw.background=TRUE, age.lim=c()) {
-  depths <- set$detsOrig[,2] # was detsOrig
+  depths <- set$detsOrig[,2]
   dns <- set$detsOrig[,3]
   Pb <- set$detsOrig[,4]
   err <- set$detsOrig[,5]
@@ -472,11 +472,12 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
     d.lim <- range(depths)
   if(rev.d)
     d.lim <- d.lim[2:1]
-   
+
   if(length(set$phi) > 0) {
     Ai <- list(x=NULL, y=NULL)
     hght <- 0; pbmin <- c(); pbmax <- 0
     A.rng <- array(0, dim=c(n,2))
+
     for(i in 1:length(depths)) {
       A <- A.modelled(depths[i]-thickness[i], depths[i], dns[i], set)
       tmp <- density(A)
@@ -487,7 +488,7 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
       pbmax <- max(pbmax, Ai$x[[i]])
       A.rng[i,] <- quantile(A, c((1-set$prob)/2, 1-(1-set$prob)/2))
     } 
- 
+
     if(length(pb.lim) == 0) 
       pb.lim <- extendrange(c(0, Pb-2*err, Pb+2*err, pbmax), f=c(0,0.05))
  
@@ -501,7 +502,7 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
       ex <- (agemin-agemax) / (pb.max - pb.min)
       agemin - ex*pb
     }
-      
+
     # save the values for later
     set$Ai <- Ai
     set$A.rng <- A.rng
@@ -531,21 +532,23 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
     if(BCAD)
       z <- t(rev(Ai$y[[i]]))/hght else
         z <- t(Ai$y[[i]])/hght
+
     if(rotate.axes)
       image(ages, c(depths[i]-thickness[i], depths[i]), z, col=pbmodelled.col(seq(0, 1-max(z), length=50)), add=TRUE) else
         image(c(depths[i]-thickness[i], depths[i]), ages, z, col=pbmodelled.col(seq(0, 1-max(z), length=50)), add=TRUE)
     }  
   }
 
-  # indicate in redscale which Pb-210 data have most likely reached background
-  if(draw.background) {
-    bg <- background(set)
-    set$background <- bg
-    assign_to_global("info", set, .GlobalEnv)
-    if(rotate.axes)
-      abline(h=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg) else
-        abline(v=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg)
-  }
+  # indicate in 'purplescale' which Pb-210 data have most likely reached background. Requires assumption of constant background, so radon.case < 2
+  if(draw.background)
+    if(radon.case < 2) {
+      bg <- background(set)
+      set$background <- bg
+      assign_to_global("info", set, .GlobalEnv)
+      if(rotate.axes)
+        abline(h=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg) else
+          abline(v=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg)
+    }
 
   if(BCAD)
     pb2bp <- pb2ad
@@ -592,6 +595,13 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
 A.modelled <- function(d.top, d.bottom, dens, set=get('info'), phi=set$phi, sup=set$ps) {
   if(d.top >= d.bottom)
     stop("\n d.top should be above d.bottom", call.=FALSE)
+  dd <- 1
+  if(ncol(cbind(sup)) > 1) { # then multiple, varying estimates of supported, find the one belonging to the specified depth interval
+    dd <- set$supportedData[,3] # bottom depths
+    dd <- max(1, which(dd < d.bottom))
+    sup <- sup[,dd]
+  }
+
   t.top <- Bacon.Age.d(d.top, BCAD=F) - set$theta0
   t.bottom <- Bacon.Age.d(d.bottom, BCAD=F) - set$theta0
   multiply <-  ifelse(set$Bqkg, 10, 500)

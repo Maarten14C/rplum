@@ -440,7 +440,7 @@ supportedData <<- supportedData
         if(n.supp > 0) {
           radonColumn <- 4
           sdRadonColumn <- 5
-          tmp <- detsOrig[(nrow(detsOrig)-n.supp+1):(nrow(detsOrig)),c(radonColumn, sdRadonColumn)]
+          tmp <- detsOrig[(nrow(detsOrig)-n.supp+1):(nrow(detsOrig)),c(radonColumn, sdRadonColumn, depthColumn, deltaColumn)]
           names(tmp) <- colnames(supportedData)
           supportedData <- rbind(supportedData, tmp) # combine radon data with tail of Pb-210 data
           detsOrig <- detsOrig[1:(nrow(detsOrig)-n.supp),]
@@ -452,9 +452,9 @@ supportedData <<- supportedData
         #   radon.case <- 1
         radonColumn <- 4
         sdRadonColumn <- 5
-        tmp <- detsOrig[(nrow(detsOrig)-n.supp+1):(nrow(detsOrig)),c(radonColumn, sdRadonColumn)]
+        tmp <- detsOrig[(nrow(detsOrig)-n.supp+1):(nrow(detsOrig)),c(radonColumn, sdRadonColumn, depthColumn, deltaColumn)]
         names(tmp) <- colnames(supportedData)
-        supportedData <- rbind( supportedData,  tmp)
+        supportedData <- rbind(supportedData, tmp)
         detsOrig <- detsOrig[1:(nrow(detsOrig)-n.supp),]
       } else
        # if(suggest) { # was !provided

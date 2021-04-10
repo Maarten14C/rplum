@@ -27,6 +27,8 @@ library(rbacon)
 
 # adapt rbacon's scissors and thinner to read and write plumout if info$isplum
 
+# the background function does not work if there are multiple radon entries. Then not between 0 and 1
+
 # ensure supported data are always plotted
 
 # check a range of scenarios: Pb data without supported info and no further info provided within the .csv file, Pb without supported info but with information provided in .csv file, Pb data with supported info, and those two cases with and without additional dates - C14 or cal BP (e.g. historical 137Cs)

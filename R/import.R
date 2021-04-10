@@ -22,3 +22,5 @@ agedepth.ghost <- utils::getFromNamespace("agedepth.ghost", "rbacon")
 Bacon.rng <- utils::getFromNamespace("Bacon.rng", "rbacon")
 hiatus.slopes <- utils::getFromNamespace("hiatus.slopes", "rbacon")
 assign_to_global <- utils::getFromNamespace("assign_to_global", "rbacon")
+thinner <- rplum:::thinner # because this is rplum-specific
+scissors <- rplum:::scissors # this one too

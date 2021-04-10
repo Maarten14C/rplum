@@ -243,11 +243,10 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
         calib.plumbacon.plot(set, BCAD=BCAD, cc=cc, rotate.axes=rotate.axes, height=height, calheight=calheight, mirror=mirror, up=up, date.res=date.res, cutoff=cutoff, C14.col=C14.col, C14.border=C14.border, cal.col=cal.col, cal.border=cal.border, dates.col=dates.col,  new.plot=FALSE, normalise.dists=normalise.dists, same.heights=same.heights)
       if(plot.pb)
         draw.pbmodelled(set, BCAD=BCAD, rotate.axes=rotate.axes, age.lim=age.lim, d.lim=d.lim, pbmodelled.col=pbmodelled.col, pbmeasured.col=pbmeasured.col, pb.lim=pb.lim, draw.background=draw.background, supp.col=supp.col)
-  }
+    }
 
   legend(title.location, title, bty="n", cex=title.size)
   box(bty=bty)
-
   hiatus.depths <- set$hiatus.depths
   if(!is.na(set$boundary[1]))
     hiatus.depths <- set$boundary
@@ -279,7 +278,7 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
           lines(d[h], ranges[h,4], col=mn.col, lty=mn.lty) # mean
         }
     }
-
+cat(6)
 
   if(length(rounded) == 0)
     rounded <- ifelse(set$isplum, 1, 0)
