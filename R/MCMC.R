@@ -1,4 +1,4 @@
-### this is a copy of an .R file of the 'rbacon' package by the same authors as those of 'rplum'. Both packages are distributed under the GPL (>= 2) license
+### this is a copy of an .R file of the 'rbacon' package by the same authors as those of 'rplum'. It has been adapted for rplum. Both packages are distributed under the GPL (>= 2) license
 
 #################### functions for post-run checks and adaptations ####################
 

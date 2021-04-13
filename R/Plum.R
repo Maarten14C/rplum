@@ -23,8 +23,6 @@ library(rbacon)
 
 # no need for accrate.R, Bacon.R, plots.R, calc.R and calibrate.R since they duplicate all functions from rbacon. Would be very hard to keep both up to date with bug repairs etc. Removed these files
 
-# Removed lines 1-17 in Bacon.R since replicated in Plum.R, agedepth() now works as expected after a run, rev.age works as expected, changed order of initial options to be more bacon-like (core name, section thickness), renamed option core2 (filename of other dates) to otherdates
-
 # adapt rbacon's scissors and thinner to read and write plumout if info$isplum
 
 # the background function does not work if there are multiple radon entries. Then not between 0 and 1
@@ -510,13 +508,12 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     PlotSuppPrior(info)
 
     if(info$hasBaconData)
-      calib.plumbacon.plot(info, BCAD=BCAD, new.plot=TRUE) else {
-    #    draw.pbmodelled(info, BCAD=BCAD, plot.modelled=FALSE, plot.measured=TRUE)
-        draw.pbmeasured(info)
-      }
-
+      calib.plumbacon.plot(info, BCAD=BCAD, new.plot=T, plot.dists=T)
+    draw.pbmeasured(info)
     legend("top", core, bty="n", cex=1.5)
   }
+
+
 
   cook <- function() {
     txt <- paste0(info$prefix, ".bacon")

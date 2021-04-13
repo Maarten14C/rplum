@@ -54,7 +54,7 @@ Plum_runs <- function(coredir=get('info')$coredir)
 #' @param Al The detection limit. Default \code{Al=0.1}.
 #' @export
 background <- function(set=get('info'), Al=set$Al) {
-  if(set$isplum) { # works with Pb-210 data only
+  if(set$isplum) { # works with Pb-210 data only, and only if supported (ps) is assumed to be constant
     pb <- 0
     its <- nrow(set$output)
     dets <- set$dets[,4:6] # we need maxdepth, mindepth, density
@@ -62,7 +62,6 @@ background <- function(set=get('info'), Al=set$Al) {
       As <- A.modelled(dets[i,1]-dets[i,2], dets[i,1], dets[i,3])
       bg <- which((As - set$ps) <= Al) # which modelled data are below the detection limit?
       pb[i] <- length(bg) / its
-      As <<- As; bg <<- bg; pb <<- pb
     }
     return(pb)
   }
@@ -177,7 +176,6 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
   nas <- which(is.na(dets[,ncol(dets)]))
   if(length(nas) > 0)
     dets[nas,ncol(dets)] <- "" # replace NAs with empty cells
-
   # relations between the names of columns and their positions in the .csv file
   idColumn       <- 1 # ID
   depthColumn    <- 2 # depth
@@ -194,35 +192,36 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
     dets <- dets[ order(dets[,depthColumn]),]
     changed <- TRUE
   }
-
-  date.infile <- c(); nsupp.infile <- c(); radoncase.infile <- c(); Bqkg.infile <- c()
+  date.infile <- NA; nsupp.infile <- NA; radoncase.infile <- NA; Bqkg.infile <- NA
   if(ncol(dets) == 6 || ncol(dets) == 8) # no additional information in file
     detsOrig <- dets else
       if(ncol(dets) == 7 || ncol(dets) == 9) { # additional information in file
         n <- ifelse(ncol(dets) == 7, 7, 9)
         detsOrig <- dets[,-n]
-      if(length(dets[1,n]) > 0)
-        if(!is.na(dets[1,n])) # first entry is sampling date (in AD, e.g., 2019.4)
-          date.infile <- dets[1,n]
-      if(length(dets[2,n]) > 0)
-        if(!is.na(dets[2,n])) # second entry is how many 'tail-dates' to use to estimate supported
-          nsupp.infile <- dets[2,n]
-      if(length(dets[3,n]) > 0)
-        if(!is.na(dets[3,n])) # third, which radon case to use to estimate supported. 0 no radon, 1 constant, 2 varying
-          radoncase.infile <- dets[3,n]
-      if(length(dets[4,n]) > 0)
-        if(!is.na(dets[4,n])) { # fourth, which units to use. Bqkg or dpmg
-          pb.units <- dets[4,n]
-          if(isTRUE(pb.units) || pb.units == 1)
-            Bqkg.infile <- TRUE else
-              if(isFALSE(pb.units) || pb.units == 0)
-                Bqkg.infile <- FALSE else
-                  stop("Unclear entry in .csv file for units. For Bq/kg use 1, for dpm/g 0", call.=TRUE)
+        if(length(dets[1,n]) > 0) # first entry is sampling date (in AD, e.g., 2019.4)
+          if(!is.na(dets[1,n]))
+            if(dets[1,n] != "")
+              date.infile <- dets[1,n]
+        if(length(dets[2,n]) > 0) # 2nd, how many 'tail-dates' to use to estimate supported
+          if(!is.na(dets[2,n]))
+            if(dets[2,n] != "")
+              nsupp.infile <- dets[2,n]
+        if(length(dets[3,n]) > 0) # 3rd, which radon case to use to estimate supported
+          if(!is.na(dets[3,n]))
+            if(dets[3,n] != "")
+              radoncase.infile <- dets[3,n]
+        if(length(dets[4,n]) > 0) # 4th, which units to use. Bqkg or dpmg
+          if(!is.na(dets[4,n])) {
+            pb.units <- dets[4,n]
+            if(isTRUE(pb.units) || pb.units == 1)
+              Bqkg.infile <- TRUE else
+                if(isFALSE(pb.units) || pb.units == 0)
+                  Bqkg.infile <- FALSE else
+                    stop("Unclear entry in .csv file for units. For Bq/kg use 1, for dpm/g 0", call.=TRUE)
           }
       } else
         stop(paste(csv.file, "should have between 6 and 9 columns. Please check."), call.=TRUE)
 
-  # now check if any options were provided within the Plum command. If so, check for consistency with possible options and with what's in the .csv file
   date.asoption <- date.sample
   nsupp.asoption <- n.supp
   radoncase.asoption <- radon.case
@@ -230,7 +229,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
 
   # now decide which options to use
   choice <- function(infile, asoption, string1, string2, testnumeric=TRUE, test=c()) {
-    if(length(infile) == 0 || is.na(infile)) {
+    if(length(infile) == 0 || is.na(infile) || infile == "") {
       if(length(asoption) == 0) {
         if(length(test) > 0)
           ans <- test else
@@ -258,11 +257,11 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
   } else
     date.sample <- choice(date.infile, date.asoption, "sampling date", "Please provide a date (in AD) for when the Pb210 samples were measured: ")
 
-  # Now test different radon scenarios. Only check n.supp if radon.case < 2?
+  # Now test different scenarios. Only check n.supp if radon.case < 2?
   if(ncol(dets) == 6) { # no radon, no information provided
     if(length(radoncase.asoption) == 0)
-      message("No radon data provided, setting radon.case to 0, using tail data to estimate supported Pb-210") else {
-        if(radoncase.asoption > 0)
+      message("No radon data, setting radon.case to 0, using tail data to estimate supported Pb-210") else {
+        if(radoncase.asoption != 0)
           message("Setting radon.case to 0 as no radon data provided, using tail data to estimate supported Pb-210") else
             message("No radon data, setting radon.case to 0")
         }
@@ -271,13 +270,13 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
 
   if(ncol(dets) == 7) { # no radon, information provided (thanks!)
     if(length(radoncase.asoption) == 0) {
-      if(radoncase.infile > 0)
-        message("Setting radon.case to 0 as no radon data provided, using tail data to estimate supported Pb-210") else
-          message("No radon data provided, using tail data to estimate supported Pb-210")
+      if(length(radoncase.infile) == 0 || is.na(radoncase.infile) || radoncase.infile > 0)
+        message("Setting radon.case to 0 as no radon data provided, using tail data to estimate supported Pb-210 (radon.case 0)") else
+          message("No radon data, using tail data to estimate supported Pb-210 (radon.case 0)")
       } else {
-          if(radoncase.asoption > 0)
-            message("Setting radon.case to 0 as no radon data provided, using tail data to estimate supported Pb-210") else
-              message("No radon data provided, using tail data to estimate supported Pb-210")
+          if(radoncase.asoption != 0)
+            message("Setting radon.case to 0 as no radon data provided, using tail data to estimate supported Pb-210 (radon.case 0)") else
+              message("No radon data, using tail data to estimate supported Pb-210 (radon.case 0)")
         }
     radon.case <- 0
   }
@@ -290,7 +289,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
         radon.case <- 1 else
         if(ans == 2)
           radon.case <- 2 else
-          stop("I do not understand this answer. Please adapt the settings", call.=TRUE)
+          stop("I do not understand this value for radon.case (should be 1 or 2). Please adapt the settings", call.=TRUE)
     } else {
         if(radoncase.asoption == 1)
           radon.case <- 1 else
@@ -302,15 +301,15 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
                 radon.case <- 1 else
                 if(ans == 2)
                   radon.case <- 2 else
-                    stop("I do not understand this answer. Please adapt the settings", call.=TRUE)
+                    stop("I do not understand this value for radon.case (should be 1 or 2). Please adapt the settings", call.=TRUE)
             }
       }
   }
 
   if(ncol(dets) == 9) { # radon, information provided (fun!)
     if(length(radoncase.asoption) == 0) {
-      if(radoncase.infile == 0) {
-        message("Radon data provided so radon.case cannot be 0. Should I assume constant (radon.case 1) or varying (radon.case 2) supported Pb-210? Note that using radon.case 2 will greatly increase the computing time and should only be used when clear patterns are observed in the radon data. ")
+      if(length(radoncase.infile) == 0 || is.na(radoncase.infile) || radoncase.infile == 0 || radoncase.infile == "") {
+        message("Radon data provided so radon.case cannot be 0 or empty. Should I assume constant (radon.case 1) or varying (radon.case 2) supported Pb-210? Note that using radon.case 2 will greatly increase the computing time and should only be used when clear patterns are observed in the radon data. ")
         ans <- readline("Use radon.case (1 or 2):")
         if(ans == 1)
           radon.case <- 1 else
@@ -322,7 +321,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
           radon.case <- 1 else
           if(radoncase.infile == 2)
             radon.case <- 2 else
-              stop("I do not understand this answer. Please adapt the settings", call.=TRUE)
+              stop("I do not understand the radon case value in the .csv file. Please adapt", call.=TRUE)
     } else {
       if(radoncase.asoption == 0) {
         message("Radon data provided so radon.case cannot be 0. Should I assume constant (radon.case 1) or varying (radon.case 2) supported Pb-210? Note that using radon.case 2 will greatly increase the computing time and should only be used when clear patterns are observed in the radon data.")
@@ -331,7 +330,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
           radon.case <- 1 else
           if(ans == 2)
             radon.case <- 2 else
-              stop("I do not understand this answer. Please adapt the settings", call.=TRUE)
+              stop("I do not understand this value for radon.case (should be 1 or 2). Please adapt the settings", call.=TRUE)
       } else
         if(radoncase.asoption == 1) {
           message("radon.case 1")
@@ -341,7 +340,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
             message("radon.case 2")
             radon.case <- 2
           } else
-            stop("I do not understand this answer. Please adapt the settings", call.=TRUE)
+            stop("I do not understand this value for radon.case (should be 1 or 2). Please adapt the settings", call.=TRUE)
     }
   }
 
@@ -349,30 +348,32 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
     if(radon.case == 1)
       message("Besides using the radon data, the tail Pb-210 data can also be used to estimate supported Pb-210. ")
     n.supp <- choice(nsupp.infile, nsupp.asoption, "number of supported data", "",, check.equi(dets))
-    }
+  }
+  if(radon.case == 2)
+    n.supp <- 0
 
   Bqkg <- choice(Bqkg.infile, Bqkg.asoption, "radiation units (1 for Bq/kg, 0 for dpm/g)", "Please provide the units (1 for Bq/kg, 0 for dpm/g): ")
   #ifelse(Bqkg == 1, Bqkg <- TRUE, Bqkg <- FALSE)
 
-  date.sample <<- date.sample # tmp
-  radon.case <<- radon.case # tmp
-  n.supp <<- n.supp # tmp
-  Bqkg <<- Bqkg # tmp
-
   # now put the chosen options into the .csv file if they differ from what's in there already
   choices <- c(date.sample, n.supp, radon.case, Bqkg, rep("", nrow(dets)-4)) # empty after line 4
-  suggested.names <- c("labID","depth(cm)","density(g/cm^3)","210Pb(Bq/kg)","sd(210Pb)","thickness(cm)", "226Ra(Bq/kg)", "sd(226Ra)")
-  if(ncol(dets) %in% c(6,8)) # no data provided in the .csv file
-    changed <- 1 else {
+  suggested.names <- c("labID", "depth(cm)","density(g/cm^3)","210Pb(Bq/kg)","sd(210Pb)","thickness(cm)", "226Ra(Bq/kg)", "sd(226Ra)", "settings")
+  if(radon.case == 0) # then no radon columns
+   suggested.names <- suggested.names[-(7:8)]
+
+  if(ncol(dets) %in% c(6,8)) { # no data provided in the .csv file
+    changed <- TRUE
+    dets <- cbind(dets, choices)
+  } else {
       current <- c(date.infile, nsupp.infile, radoncase.infile, Bqkg.infile)
-      if(length(choices[1:4] == current) < 4) # then some changes should be written
+      if(length(is.na(current)) > 0 || length(choices[1:4] == current) < 4) # then update .csv file
         changed <- TRUE
+      dets[,ncol(dets)] <- choices
     }
 
   if(changed) {
     message("Writing changes to ", csv.file)
-    dets <<- cbind(dets, choices) # tmp
-    write.table(cbind(dets, choices), csv.file, sep=paste0(sep, "\t"), dec=dec, row.names=FALSE, col.names=c(suggested.names[1:ncol(dets)], "settings"), quote=FALSE)
+    write.table(dets, csv.file, sep=paste0(sep, "\t"), dec=dec, row.names=FALSE, col.names=suggested.names, quote=FALSE)
   }
 
 #   if(core == "HP1C") {
@@ -390,35 +391,14 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
   if(ncol(detsOrig) == 6) { # then repeat the Pb210 columns again
     radonColumn <- 4
     sdRadonColumn <- 5
-#    if(radon.case == 0)
-#      supportedData <- c()
-#    if(length(n.supp) == 0 || is.na(n.supp) || n.supp == 0 ) { # the number of supported data
-#      if(radon.case < 0)
-#        radon.case <- 0 # no radon, estimate supported data from the tail where 210Pb reaches equilibrium
-#      supportedData <- c()
-#    } else if(n.supp > 0) {
-#      if(radon.case < 0)
-#        radon.case <- 1 # assuming constant supported radon
-      supportedData <- detsOrig[(nrow(detsOrig)-n.supp+1):nrow(detsOrig),c(radonColumn, sdRadonColumn, depthColumn, deltaColumn)]
-      # n.supp <<- n.supp
-      detsOrig <- detsOrig[1:(nrow(detsOrig)-n.supp),]
-#    } else { # estimate supported Pb210 from the tail measurements, using linear regression
-#      tmp <- check.equi(detsOrig)
-#      n.supp <- tmp[1]
-
-#      supportedData <- detsOrig[(nrow(detsOrig)-n.supp+1):nrow(detsOrig),c(radonColumn, sdRadonColumn)]
-  #    dets = dets[1:(nrow(dets)-n.supp),]
-#      if( radon.case < 0 )
-#        radon.case <- 1
-#    }
+    supportedData <- detsOrig[(nrow(detsOrig)-n.supp+1):nrow(detsOrig),c(radonColumn, sdRadonColumn, depthColumn, deltaColumn)]
+    detsOrig <- detsOrig[1:(nrow(detsOrig)-n.supp),]
   } else
     if(ncol(detsOrig) == 8) { # columns 7 and 8 are supported data
-      radonColumn    <- 7
-      sdRadonColumn  <- 8
+      radonColumn <- 7
+      sdRadonColumn <- 8
       supportedData <- detsOrig[,c(radonColumn, sdRadonColumn, depthColumn, deltaColumn)]
       detsOrig <- detsOrig[,-c(radonColumn,sdRadonColumn)]
-
-supportedData <<- supportedData
 
       if(length(supportedData[is.na(supportedData)]) > 0) {
         message("Missing values are detected; the radon case is set to 1.")
@@ -428,14 +408,8 @@ supportedData <<- supportedData
           if(length(is.na(supportedData[i,])) > 0)
             elim <- c(elim, i)
         supportedData <- supportedData[-elim,]
-        # supportedData <<- supportedData
       }
 
-      #radon.case <- 1
-      #ans <- readline(message("Additionally, do you want to set a number of tail measurements for supported Pb-210? (y/n)"))
-      #if(tolower(substr(ans, 1, 1)) == "y") {
-      #  ans <- readline(message("Ok, n.supp="))
-      #  n.supp <- as.integer(ans)
       if(length(n.supp) > 0)
         if(n.supp > 0) {
           radonColumn <- 4
@@ -448,8 +422,6 @@ supportedData <<- supportedData
 
     } else
       if( n.supp > 0 ) { # 9 columns, so radon data and information provided, and n.supp to be added
-        # if( radon.case < 0 )
-        #   radon.case <- 1
         radonColumn <- 4
         sdRadonColumn <- 5
         tmp <- detsOrig[(nrow(detsOrig)-n.supp+1):(nrow(detsOrig)),c(radonColumn, sdRadonColumn, depthColumn, deltaColumn)]
@@ -457,33 +429,13 @@ supportedData <<- supportedData
         supportedData <- rbind(supportedData, tmp)
         detsOrig <- detsOrig[1:(nrow(detsOrig)-n.supp),]
       } else
-       # if(suggest) { # was !provided
-       #   message("Plum can assume constant supported 210Pb and use the 226Ra data to infer this one value.")
-       #   message(" Alternatively, we can also assume individual supported 210Pb values per measured depth.")
-       #   message(" It is important to consider that this will greatly increase the computing time and it should only be used when clear patterns are observed in the 226Ra data.")
-       #   ans <- readline(message(" Do you want to use the individual supported 210Pb? (y/n) "))
-       #   if( !tolower(substr(ans, 1, 1)) == "y") {
-       #     message(" OK, assuming constant supported 210Pb\n")
-       #    radon.case <- 1
-       #  } else {
-       #    message(" OK, using individual supported 210Pb per data point.")
-       #    radon.case <- 2
-       # }
-   # }
-  #} else {
-    stop("Unexpected column names, order or values in dets file. \nPlease check the manual for how to produce a correct dets file.", call.=FALSE)
-  #}
+          stop("Unexpected column names, order or values in dets file. \nPlease check the manual for how to produce a correct dets file.", call.=FALSE)
 
   # more sanity checks
   if(!is.numeric(dets[,plumdataColumn]) || !is.numeric(dets[,stdColumn]) || !is.numeric(dets[,depthColumn]))
     stop("unexpected values in dets file, I expected numbers. Check the manual.", call.=FALSE)
   if(!is.numeric(dets[,deltaColumn]) || !is.numeric(dets[,rhoColumn]) )
     stop("unexpected values in dets file, I expected numbers. Check the manual.", call.=FALSE)
-
-
-  # if current dets differ from original .csv file, rewrite it
-#  if(changed > 0)
-#    write.table(dets, csv.file, sep=paste0(sep, "\t"), dec=dec, row.names=FALSE, col.names=suggested.names[1:ncol(dets)], quote=FALSE)
 
   dets <- dets[,c(idColumn, plumdataColumn, stdColumn, depthColumn, deltaColumn, rhoColumn)]
 
@@ -506,8 +458,6 @@ supportedData <<- supportedData
   ylab <- ifelse(Bqkg, '210Pb (Bq/kg)', '210Pb (dpm/g)')
   plot(0, type='n', pch=16,col=c(rep('red',nrow(detsOrig)),rep('red',nrow(detsOrig))),
     cex=.3, ylab=ylab, xlab='depth(cm)', xlim=dlim, ylim=age.lim )
-
- #detsOrig <<- detsOrig
 
   rect(detsOrig[,2]-detsOrig[,6], detsOrig[,4]-detsOrig[,5],
     detsOrig[,2], detsOrig[,4]+detsOrig[,5],

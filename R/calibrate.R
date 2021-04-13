@@ -302,7 +302,6 @@ bacon.calib <- function(dat, set=get('info'), date.res=100, cutoff=0.005, postbo
 #' @param set Detailed information of the current run, stored within this session's memory as variable \code{info}.
 #' @param BCAD The calendar scale of graphs is in \code{cal BP} by default, but can be changed to BC/AD using \code{BCAD=TRUE}.
 #' @param cc Calibration curve to be used (defaults to info$cc)
-#' @param firstPlot description
 #' @param rotate.axes The default of plotting age on the horizontal axis and event probability on the vertical one can be changed with \code{rotate.axes=TRUE}.
 #' @param rev.d The direction of the depth axis can be reversed from the default (\code{rev.d=TRUE}).
 #' @param rev.age The direction of the calendar age axis can be reversed from the default (\code{rev.age=TRUE})
@@ -335,8 +334,8 @@ bacon.calib <- function(dat, set=get('info'), date.res=100, cutoff=0.005, postbo
 #'   calib.plot()
 #' @export
 ### produce plots of the calibrated distributions
-calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, firstPlot = FALSE, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, rev.yr=rev.age, age.lim=c(), yr.lim=age.lim, date.res=100, d.lab=c(), age.lab=c(), yr.lab=age.lab, height=15, calheight=1, mirror=TRUE, up=TRUE, cutoff=.001, C14.col=rgb(0,0,1,.5), C14.border=rgb(0,0,1,.75), cal.col=rgb(0,.5,.5,.5), cal.border=rgb(0,.5,.5,.75), dates.col=c(), slump.col=grey(0.8), new.plot=TRUE, plot.dists=TRUE, same.heights=FALSE, normalise.dists=TRUE) {
-  height <- length(set$d.min:set$d.max) * height/50
+calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, rev.yr=rev.age, age.lim=c(), yr.lim=age.lim, date.res=100, d.lab=c(), age.lab=c(), yr.lab=age.lab, height=1, calheight=1, mirror=TRUE, up=TRUE, cutoff=.001, C14.col=rgb(0,0,1,.5), C14.border=rgb(0,0,1,.75), cal.col=rgb(0,.5,.5,.5), cal.border=rgb(0,.5,.5,.75), dates.col=c(), slump.col=grey(0.8), new.plot=TRUE, plot.dists=TRUE, same.heights=FALSE, normalise.dists=TRUE) {
+  #height <- length(set$d.min:set$d.max) * height/50
   if(length(age.lim) == 0)
     lims <- c()
   for(i in 1:length(set$calib$probs))
@@ -370,7 +369,6 @@ calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, firs
 
   if(plot.dists)
     for(i in 1:length(set$calib$probs)) {
-      if( set$dets[i,9] != 5 ){
         cal <- cbind(set$calib$probs[[i]])
         d <- set$calib$d[[i]]
         if(BCAD)
@@ -381,7 +379,8 @@ calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, firs
           cal[,2] <- cal[,2]/max(cal[,2])
         if(normalise.dists)
           cal[,2] <- cal[,2]/sum(cal[,2])
-        cal <- cal[cal[,2] >= cutoff,]
+        cal[,2] <- (height * cal[,2])/1 * (max(dlim) - min(dlim)) # 1 is just a scaling factor that looks nice in the examples I tested. Adapt by changing parameter height
+        cal <- cal[cal[,2] >= cutoff*max(cal[,2]),]
         cal[,2] <- height*cal[,2]
         if(ncol(set$dets) > 4 && set$dets[i,9] == 0) # cal BP date
           cal[,2] <- calheight*cal[,2]
@@ -395,14 +394,13 @@ calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, firs
         cal <- approx(x, y, seq(min(x), max(x), length= 100 ) ) # tmp
 
         if(mirror)
-          pol <- cbind(c(d-cal$y, d+rev(cal$y)), c(cal$x, rev(cal$x)))
-        else if(up)
-          pol <- cbind(d-c(0, cal$y, 0), c(min(cal$x), cal$x, max(cal$x)))
-        else
-          pol <- cbind(d+c(0, cal$y, 0), c(min(cal$x), cal$x, max(cal$x)))
+          pol <- cbind(c(d-cal$y, d+rev(cal$y)), c(cal$x, rev(cal$x))) else
+            if(up)
+              pol <- cbind(d-c(0, cal$y, 0), c(min(cal$x), cal$x, max(cal$x))) else
+                pol <- cbind(d+c(0, cal$y, 0), c(min(cal$x), cal$x, max(cal$x)))
         if(rotate.axes)
           pol <- cbind(pol[,2], pol[,1])
-        if(ncol(set$dets)==4 && cc > 0 || (ncol(set$dets) > 4 && set$dets[i,9] > 0)) {
+        if(cc > 0 || set$dets[i,9] > 0) {
           col <- C14.col
           border <- C14.border
         } else {
@@ -415,8 +413,6 @@ calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, firs
         }
         polygon(pol, col=col, border=border)
       }
-    }
-
 }
 
 
