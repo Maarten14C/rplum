@@ -534,15 +534,15 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
   }
 
   # indicate in 'purplescale' which Pb-210 data have most likely reached background. Requires assumption of constant background, so radon.case < 2
-  if(draw.background)
-    if(set$radon.case < 2) {
-      bg <- background(set)
-      set$background <- bg
-      assign_to_global("info", set, .GlobalEnv)
-      if(rotate.axes)
-        abline(h=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg) else
-          abline(v=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg)
-    }
+#   if(draw.background)
+#     if(set$radon.case < 2) {
+#       bg <- background(set)
+#       set$background <- bg
+#       assign_to_global("info", set, .GlobalEnv)
+#       if(rotate.axes)
+#         abline(h=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg) else
+#           abline(v=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg)
+#     }
 
   if(BCAD)
     pb2bp <- pb2ad

@@ -188,6 +188,10 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
   for(i in set$slump)
     d <- sort(unique(c(i+after, i, d)))
 
+  if(set$isplum)
+    if(set$radon.case == 0)
+      d <- d[which(d <= max(set$detsOrig[,2]))]
+
   if(verbose)
     message("Calculating age ranges...\n")
   modelranges <- c()
@@ -220,11 +224,6 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
   if(rev.d)
     d.lim <- d.lim[2:1]
 
-#  if(set$radon.case == 0) # or should this also be for radon.case = 2?
-  #  if(length(d.min) == 0) {
-#      d.lim[max(d.lim)] <- max(set$dets[,4]) # until the deepest Pb-210 datapoint
-  #}
-
   if(length(d.lab) == 0)
     d.lab <- paste0("Depth (", depth.unit, ")")
   if(length(age.lab) == 0)
@@ -238,6 +237,14 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
       plot(0, type="n", xlim=d.lim[2:1], ylim=age.lim, xlab=d.lab, ylab=age.lab, bty="n", xaxt=xaxt, yaxt=yaxt, mar=mar.main)
   if(kcal)
     axis(ifelse(rotate.axes, 1, 2), pretty(age.lim), pretty(age.lim/1e3))
+
+#    if(set$isplum)
+#  if(set$radon.case == 0) # or should this also be for radon.case = 2?
+  #  if(length(d.min) == 0) {
+#      d.lim[d.lim==max(d.lim)] <- max(set$detsOrig[,2]) # until the deepest Pb-210 datapoint
+#      cat(d.lim)
+  #}
+
 
   if(!dates.only) {
     if(verbose)
@@ -269,6 +276,11 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
       abline(h=hiatus.depths, col=hiatus.col, lty=hiatus.lty) else
         abline(v=hiatus.depths, col=hiatus.col, lty=hiatus.lty)
 
+#  if(set$isplum) {
+#    ranges <- ranges[which(ranges[,1] <= max(set$detsOrig[,2])),]
+#    d <- d[which(d <= max(set$detsOrig[,2])),]
+#  }
+
   th <- rbind(1, nrow(ranges))
   if(!is.na(set$hiatus.depths[1])) {
     hi.d <- c()
@@ -292,7 +304,6 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
           lines(d[h], ranges[h,4], col=mn.col, lty=mn.lty) # mean
         }
     }
-cat(6)
 
   if(length(rounded) == 0)
     rounded <- ifelse(set$isplum, 1, 0)

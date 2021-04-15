@@ -219,7 +219,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   # default_settings.txt is located within system.file
   defaults <- system.file("extdata", defaults, package=packageName())
   # read in the data, adapt settings from defaults if needed
-  tmp <- read.dets.plum(core=core, coredir=coredir, n.supp=n.supp, date.sample=date.sample, sep=sep, dec=dec, cc=cc, Bqkg=Bqkg, radon.case=radon.case, suggest=suggest) # was read.dets.plum
+  tmp <- read.dets.plum(core=core, coredir=coredir, n.supp=n.supp, date.sample=date.sample, sep=sep, dec=dec, cc=cc, Bqkg=Bqkg, radon.case=radon.case, suggest=suggest)
 
   #core, coredir, n.supp=c(), date.sample, set=get('info'), sep=",", dec=".", cc=1, Bqkg=TRUE, radon.case=c(), suggest=TRUE
 
@@ -529,7 +529,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     rplum::scissors(burnin, info) # scissors adapted to cut iterations from both output files
     #scissors.plum(burnin, info)
 
-    agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # using rplum's agedepth for now, until rbacon's is updated and on CRAN
+    agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # using rplum's agedepth for now, until rbacon's is updated and dandy and on CRAN
 
     if(plot.pdf)
       if(interactive())

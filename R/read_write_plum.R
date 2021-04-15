@@ -876,7 +876,8 @@ Plum.cleanup <- function(set=get('info')) {
   if(is.na(d.min) || d.min=="NA")
     d.min <- min(dets[,4])
   if(is.na(d.max) || d.max=="NA")
-    d.max <- max(dets[,4])
+    #d.max <- max(dets[,4])
+    d.max <- max(dets[,4]) # tmp
   if(length(acc.shape) < length(acc.mean))
     acc.shape <- rep(acc.shape, length(acc.mean)) else
       if(length(acc.shape) > length(acc.mean))
