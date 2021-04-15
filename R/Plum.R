@@ -19,6 +19,10 @@ NULL
 
 library(rbacon)
 
+# background: pon parenteses de los datos que fueron usados p background, o un x rojo. Poner la prob de quales son los background, como mensaje, pero no en la grafica (que ya esta muy llena). Corta la cronologia en el ultimo dato antes de llegar a la cola
+
+# LL14 es de Lysanne, Marco va a contactala, tambien a Nicole p pedir un nucleo con radon
+
 # rbacon should adapt draw.pbmodelled so that Pb data are plotted also when BCAD=T. Perhaps a var which is 0 when cal BP and -1950 when BCAD. Currently BCAD=T throws an error. Update these functions in rbacon: agedepth, draw.pbmodelled
 
 # no need for accrate.R, Bacon.R, plots.R, calc.R and calibrate.R since they duplicate all functions from rbacon. Would be very hard to keep both up to date with bug repairs etc. Removed these files

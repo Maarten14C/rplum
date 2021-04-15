@@ -159,6 +159,8 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
     par(mar=mar.main)
   }
 
+
+
   # calculate and plot the ranges and 'best' estimates for each required depth
   if(length(d.min) == 0)
     d.min <- set$d.min
@@ -218,6 +220,11 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
   if(rev.d)
     d.lim <- d.lim[2:1]
 
+#  if(set$radon.case == 0) # or should this also be for radon.case = 2?
+  #  if(length(d.min) == 0) {
+#      d.lim[max(d.lim)] <- max(set$dets[,4]) # until the deepest Pb-210 datapoint
+  #}
+
   if(length(d.lab) == 0)
     d.lab <- paste0("Depth (", depth.unit, ")")
   if(length(age.lab) == 0)
@@ -249,7 +256,7 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
       if(set$hasBaconData)
         calib.plumbacon.plot(set, BCAD=BCAD, cc=cc, rotate.axes=rotate.axes, height=height, calheight=calheight, mirror=mirror, up=up, date.res=date.res, cutoff=cutoff, C14.col=C14.col, C14.border=C14.border, cal.col=cal.col, cal.border=cal.border, dates.col=dates.col,  new.plot=FALSE, normalise.dists=normalise.dists, same.heights=same.heights)
       if(plot.pb)
-        draw.pbmodelled(set, BCAD=BCAD, rotate.axes=rotate.axes, age.lim=age.lim, d.lim=d.lim, pbmodelled.col=pbmodelled.col, pbmeasured.col=pbmeasured.col, pb.lim=pb.lim, draw.background=draw.background, supp.col=supp.col)
+        draw.pbmodelled(set, BCAD=BCAD, rotate.axes=rotate.axes, age.lim=age.lim, d.lim=d.lim, pbmodelled.col=pbmodelled.col, pbmeasured.col=pbmeasured.col, pb.lim=pb.lim, draw.background=draw.background, supp.col=supp.col, mgp=mgp)
     }
 
   legend(title.location, title, bty="n", cex=title.size)
@@ -315,5 +322,5 @@ cat(6)
       overlap()
     message("\n")  
   }
-  on.exit(par(oldpar))
+#   on.exit(par(oldpar))
 }

@@ -438,10 +438,11 @@ calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, rota
 #' @param plot.measured Plot the measured 210Pb values (default \code{plot.measured=TRUE}).
 #' @param draw.background Whether or not to identify Pb-210 data that have probably reached background levels. Redscale indicates the probability (0-1).
 #' @param age.lim values of the age axis. Used to calculate where to plot the pb values on the secondary axis
+#' @param mgp Axis text margins (where should titles, labels and tick marks be plotted). Defaults to \code{mgp=c(1.7, .7, .0)}.
 #' @author Maarten Blaauw, J. Andres Christen, Marco Aquino-Lopez
 #' @return A plot of the modelled (and optionally the measured) 210Pb values
 #' @export
-draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, pb.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmodelled.col=function(x) rgb(0,0,1,x), pbmeasured.col="blue", supp.col="purple", plot.measured=TRUE, draw.background=TRUE, age.lim=c()) {
+draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, pb.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmodelled.col=function(x) rgb(0,0,1,x), pbmeasured.col="blue", supp.col="purple", plot.measured=TRUE, draw.background=TRUE, age.lim=c(), mgp=mgp) {
   depths <- set$detsOrig[,2]
   dns <- set$detsOrig[,3]
   Pb <- set$detsOrig[,4]
@@ -504,21 +505,18 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
     set$A.rng <- A.rng
     assign_to_global("info", set, .GlobalEnv)
   
-    if(rotate.axes) # add a secondary axis for the Pb values
-      { # todo
-      } else {
-         pretty.pb <- pretty(c(pbmin, pbmax))
-         if(BCAD) {
-           onad <- pb2ad(pretty.pb)
-           axis(4, rev(onad), rev(pretty.pb), col=pbmeasured.col, col.axis=pbmeasured.col, col.lab=pbmeasured.col)
-         } else
-         {
-           onbp <- pb2bp(pretty.pb)
-           axis(4, onbp, pretty.pb, col=pbmeasured.col, col.axis=pbmeasured.col, col.lab=pbmeasured.col)
-         }
-         pb.lab <- ifelse(set$Bq, "Bq/kg", "dpm/g")
-         mtext(pb.lab, 4, 1.4, col=pbmeasured.col, cex=.8)
-       }
+    this <- ifelse(rotate.axes, 3, 4)
+    pretty.pb <- pretty(c(pbmin, pbmax))
+    if(BCAD) {
+      onad <- pb2ad(pretty.pb)
+      axis(this, rev(onad), rev(pretty.pb), col=pbmeasured.col, col.axis=pbmeasured.col, col.lab=pbmeasured.col)
+    } else
+      {
+        onbp <- pb2bp(pretty.pb)
+        axis(this, onbp, pretty.pb, col=pbmeasured.col, col.axis=pbmeasured.col, col.lab=pbmeasured.col)
+      }
+    pb.lab <- ifelse(set$Bqkg, "Bq/kg", "dpm/g")
+    mtext(pb.lab, this, 1.4, col=pbmeasured.col, cex=.8)
 
     for(i in 1:length(depths)) {
       if(BCAD)
@@ -530,14 +528,14 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
         z <- t(Ai$y[[i]])/hght
 
     if(rotate.axes)
-      image(ages, c(depths[i]-thickness[i], depths[i]), z, col=pbmodelled.col(seq(0, 1-max(z), length=50)), add=TRUE) else
+      image(ages, c(depths[i]-thickness[i], depths[i]), t(z), col=pbmodelled.col(seq(0, 1-max(z), length=50)), add=TRUE) else
         image(c(depths[i]-thickness[i], depths[i]), ages, z, col=pbmodelled.col(seq(0, 1-max(z), length=50)), add=TRUE)
     }  
   }
 
   # indicate in 'purplescale' which Pb-210 data have most likely reached background. Requires assumption of constant background, so radon.case < 2
   if(draw.background)
-    if(radon.case < 2) {
+    if(set$radon.case < 2) {
       bg <- background(set)
       set$background <- bg
       assign_to_global("info", set, .GlobalEnv)
@@ -550,7 +548,7 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
     pb2bp <- pb2ad
 
   if(plot.measured)
-    draw.pbmeasured(newplot=FALSE, BCAD=BCAD, on.agescale=TRUE, pb.lim=pb.lim, age.lim=age.lim, supp.col=supp.col)
+    draw.pbmeasured(newplot=FALSE, rotate.axes=rotate.axes, BCAD=BCAD, on.agescale=TRUE, pb.lim=pb.lim, age.lim=age.lim, supp.col=supp.col)
 
 #   if(plot.measured)
 #     if(ncol(set$detsOrig) == 6) {

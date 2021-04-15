@@ -192,7 +192,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
     dets <- dets[ order(dets[,depthColumn]),]
     changed <- TRUE
   }
-  date.infile <- NA; nsupp.infile <- NA; radoncase.infile <- NA; Bqkg.infile <- NA
+  date.infile <- NA; nsupp.infile <- NA; radoncase.infile <- NA #; Bqkg.infile <- NA
   if(ncol(dets) == 6 || ncol(dets) == 8) # no additional information in file
     detsOrig <- dets else
       if(ncol(dets) == 7 || ncol(dets) == 9) { # additional information in file
@@ -210,15 +210,15 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
           if(!is.na(dets[3,n]))
             if(dets[3,n] != "")
               radoncase.infile <- dets[3,n]
-        if(length(dets[4,n]) > 0) # 4th, which units to use. Bqkg or dpmg
-          if(!is.na(dets[4,n])) {
-            pb.units <- dets[4,n]
-            if(isTRUE(pb.units) || pb.units == 1)
-              Bqkg.infile <- TRUE else
-                if(isFALSE(pb.units) || pb.units == 0)
-                  Bqkg.infile <- FALSE else
-                    stop("Unclear entry in .csv file for units. For Bq/kg use 1, for dpm/g 0", call.=TRUE)
-          }
+#         if(length(dets[4,n]) > 0) # 4th, which units to use. Bqkg or dpmg
+#           if(!is.na(dets[4,n])) {
+#             pb.units <- dets[4,n]
+#             if(isTRUE(pb.units) || pb.units == 1)
+#               Bqkg.infile <- 1 else
+#                 if(isFALSE(pb.units) || pb.units == 0)
+#                   Bqkg.infile <- 0 else
+#                     stop("Unclear entry in .csv file for units. For Bq/kg use 1, for dpm/g 0", call.=TRUE)
+#           }
       } else
         stop(paste(csv.file, "should have between 6 and 9 columns. Please check."), call.=TRUE)
 
@@ -352,11 +352,15 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
   if(radon.case == 2)
     n.supp <- 0
 
-  Bqkg <- choice(Bqkg.infile, Bqkg.asoption, "radiation units (1 for Bq/kg, 0 for dpm/g)", "Please provide the units (1 for Bq/kg, 0 for dpm/g): ")
+  if(length(Bqkg) == 0 || !(Bqkg %in% c(0, 1))) {
+    message("Assuming that the Pb units are in Bq/kg, Bqkg=1")
+    Bqkg <- 1
+  }
+  #   Bqkg <- choice(Bqkg.infile, Bqkg.asoption, "radiation units (1 for Bq/kg, 0 for dpm/g)", "Please provide the units (1 for Bq/kg, 0 for dpm/g): ")
   #ifelse(Bqkg == 1, Bqkg <- TRUE, Bqkg <- FALSE)
 
   # now put the chosen options into the .csv file if they differ from what's in there already
-  choices <- c(date.sample, n.supp, radon.case, Bqkg, rep("", nrow(dets)-4)) # empty after line 4
+  choices <- c(date.sample, n.supp, radon.case, rep("", nrow(dets)-3)) # empty after line 4
   suggested.names <- c("labID", "depth(cm)","density(g/cm^3)","210Pb(Bq/kg)","sd(210Pb)","thickness(cm)", "226Ra(Bq/kg)", "sd(226Ra)", "settings")
   if(radon.case == 0) # then no radon columns
    suggested.names <- suggested.names[-(7:8)]
@@ -365,7 +369,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
     changed <- TRUE
     dets <- cbind(dets, choices)
   } else {
-      current <- c(date.infile, nsupp.infile, radoncase.infile, Bqkg.infile)
+      current <- c(date.infile, nsupp.infile, radoncase.infile)
       if(length(is.na(current)) > 0 || length(choices[1:4] == current) < 4) # then update .csv file
         changed <- TRUE
       dets[,ncol(dets)] <- choices
@@ -914,7 +918,7 @@ Plum.cleanup <- function(set=get('info')) {
 
   theta0 <- 1950 - date.sample
 
-  list(core=core, thick=thick, dets=dets, d.min=d.min, d.max=d.max, coredir=core,
+  list(core=core, thick=thick, dets=dets, d.min=d.min, d.max=d.max, coredir=coredir, # was coredir=core
     d.by=d.by, depths.file=depths.file, slump=slump,
     acc.mean=acc.mean, acc.shape=acc.shape, mem.mean=mem.mean,
     mem.strength=mem.strength, boundary=boundary,
