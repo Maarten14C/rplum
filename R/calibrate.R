@@ -38,12 +38,6 @@
 #' @param ccdir Directory where the calibration curves for C14 dates \code{cc} are located. By default \code{ccdir=""}.
 #' @author Maarten Blaauw, J. Andres Christen
 #' @return A date's distribution, added to an age-depth plot.
-#' @examples
-#' \donttest{
-#'   Bacon(run=FALSE, coredir=tempfile())
-#'   agedepth()
-#'   add.dates(5000, 100, 60)
-#' }
 #' @export
 add.dates <- function(mn, sdev, depth, cc=1, set=get('info'), above=1e-6, postbomb=0, normal=TRUE, delta.R=set$delta.R, delta.STD=set$delta.STD, t.a=set$t.a, t.b=set$t.b, date.res=100, height=1, calheight=1, agesteps=1, cutoff=0.005, col=rgb(1,0,0,.5), border=rgb(1,0,0,.5), rotate.axes=FALSE, mirror=TRUE, up=TRUE, BCAD=FALSE, pch=4, ccdir="") {
   if(ccdir == "")
@@ -122,9 +116,6 @@ add.dates <- function(mn, sdev, depth, cc=1, set=get('info'), above=1e-6, postbo
 #' @param same.heights Plot the distributions of the dates all at the same maximum height (default \code{same.height=FALSE}), which instead normalises the distributions (all have an area of 1).
 #' @author Maarten Blaauw, J. Andres Christen
 #' @return NA
-#' @examples
-#'   Bacon(run=FALSE, coredir=tempfile())
-#'   calib.plot()
 #' @export
 ### produce plots of the calibrated distributions
 calib.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, rev.yr=rev.age, age.lim=c(), yr.lim=age.lim, date.res=100, d.lab=c(), age.lab=c(), yr.lab=age.lab, height=1, calheight=1, mirror=TRUE, up=TRUE, cutoff=.1, C14.col=rgb(0,0,1,.5), C14.border=rgb(0,0,1,.75), cal.col=rgb(0,.5,.5,.5), cal.border=rgb(0,.5,.5,.75), dates.col=c(), slump.col=grey(0.8), new.plot=TRUE, plot.dists=TRUE, same.heights=FALSE) {
@@ -329,9 +320,6 @@ bacon.calib <- function(dat, set=get('info'), date.res=100, cutoff=0.005, postbo
 #' @param normalise.dists By default, the distributions of more precise dates will cover less time and will thus peak higher than less precise dates. This can be avoided by specifying \code{normalise.dists=FALSE}.
 #' @author Maarten Blaauw, J. Andres Christen
 #' @return NA
-#' @examples
-#'   Bacon(run=FALSE, coredir=tempfile())
-#'   calib.plot()
 #' @export
 ### produce plots of the calibrated distributions
 calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, rev.yr=rev.age, age.lim=c(), yr.lim=age.lim, date.res=100, d.lab=c(), age.lab=c(), yr.lab=age.lab, height=1, calheight=1, mirror=TRUE, up=TRUE, cutoff=.001, C14.col=rgb(0,0,1,.5), C14.border=rgb(0,0,1,.75), cal.col=rgb(0,.5,.5,.5), cal.border=rgb(0,.5,.5,.75), dates.col=c(), slump.col=grey(0.8), new.plot=TRUE, plot.dists=TRUE, same.heights=FALSE, normalise.dists=TRUE) {

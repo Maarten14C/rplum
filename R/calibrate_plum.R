@@ -46,18 +46,6 @@ draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev
         return(pb)
   }
 
-#  # ... and for AD
-#  pb2ad <- function(pb, pb.min=pb.lim[1], pb.max=pb.lim[2], agemin=max(age.lim), agemax=min(age.lim)) {
-#    ex <- (agemin-agemax) / (pb.max - pb.min)
-#    agemin - ex*pb
-#  }
-
-#  if(BCAD)
-#    pb2bp <- pb2ad
-
-#  if(!on.agescale)
-#    pb2bp <- function(x) {x} # dummy, 1:1
-  
   if(newplot) {
     if(length(d.lab) == 0)
       d.lab <- paste0("depth (", set$depth.unit, ")")

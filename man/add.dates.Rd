@@ -98,13 +98,6 @@ Add dated depths to plots, e.g. to show dates that weren't used in the age-depth
 \details{
 Sometimes it is useful to add additional dating information to age-depth plots, e.g., to show outliers or how dates calibrate with different estimated offsets.
 }
-\examples{
-\donttest{
-  Bacon(run=FALSE, coredir=tempfile())
-  agedepth()
-  add.dates(5000, 100, 60)
-}
-}
 \author{
 Maarten Blaauw, J. Andres Christen
 }

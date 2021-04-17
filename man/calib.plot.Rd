@@ -99,10 +99,6 @@ Produce a plot of the dated depths and their dates
 This function is generally called internally to produce the age-depth graph.
 It can be used to produce custom-built graphs.
 }
-\examples{
-  Bacon(run=FALSE, coredir=tempfile())
-  calib.plot()
-}
 \author{
 Maarten Blaauw, J. Andres Christen
 }

@@ -19,8 +19,6 @@ NULL
 
 library(rbacon)
 
-# LL14 es de Lysanne, Marco la va a contactar, tambien a Nicole p pedirle un nucleo con radon
-
 # rbacon should adapt draw.pbmodelled so that Pb data are plotted also when BCAD=T. Perhaps a var which is 0 when cal BP and -1950 when BCAD. Currently BCAD=T throws an error. Update these functions in rbacon: agedepth, draw.pbmodelled
 
 # no need for accrate.R, Bacon.R, plots.R, calc.R and calibrate.R since they duplicate all functions from rbacon. Would be very hard to keep both up to date with bug repairs etc. Removed these files
@@ -29,7 +27,7 @@ library(rbacon)
 
 # we need to explain clearly the radon cases and n.supp. Current explanations are confusing. Also, explain how to make the relevant files (in case of constant supported, individual supported, 210Pb and other data, ...)
 
-# do plum: check if ResCor is done correctly if using a C14-file, consider replacing bluescales with blobs, check if age.max etc. work, A.rng and Ai (in calibrate.plum.plot() somehow don't want to be saved to info (needed to provide post-run info on fit 210Pb data), remove Bacon.R (so that no need for running long-lasting examples)? is it OK that d.min is set at 0 by default?, add a red line showing the depths and mean value of the supported measurements if info$supportedData used
+# do plum: check if ResCor is done correctly if using a C14-file, A.rng and Ai (in calibrate.plum.plot() cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
 
 #' @name Plum
 #' @title  Main 210Pb age-depth modelling function
