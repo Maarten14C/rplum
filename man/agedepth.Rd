@@ -277,14 +277,8 @@ After loading a previous run, or after running either the \link{scissors} or \li
 again using the command \code{agedepth()}.
 }
 \examples{
-\dontshow{
-  Bacon(run=FALSE, ask=FALSE, coredir=tempfile())
-  agedepth(yr.res=50, d.res=50, d.by=10)
- }
-\donttest{
-  Bacon(ask=FALSE, coredir=tempfile())
-  agedepth()
-}
+  Plum(run=FALSE, ask=FALSE, coredir=tempfile())
+  agedepth(age.res=50, d.res=50, d.by=1)
 }
 \author{
 Maarten Blaauw, J. Andres Christen

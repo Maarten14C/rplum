@@ -94,26 +94,21 @@
 #' @author Maarten Blaauw, J. Andres Christen
 #' @return A plot of the age-depth model, and estimated ages incl. confidence ranges for each depth.
 #' @examples
-#' \dontshow{
-#'   Bacon(run=FALSE, ask=FALSE, coredir=tempfile())
-#'   agedepth(yr.res=50, d.res=50, d.by=10)
-#'  }
-#' \donttest{
-#'   Bacon(ask=FALSE, coredir=tempfile())
-#'   agedepth()
-#' }
+#'   Plum(run=FALSE, ask=FALSE, coredir=tempfile())
+#'   agedepth(age.res=50, d.res=50, d.by=1)
 #' @export
 agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, age.unit="yr", unit=depth.unit, d.lab=c(), age.lab=c(), yr.lab=age.lab, kcal=FALSE, acc.lab=c(), d.min=c(), d.max=c(), d.by=c(), depths=set$depths, depths.file=FALSE, age.min=c(), yr.min=age.min, age.max=c(), yr.max=age.max, hiatus.option=1, dark=c(), prob=set$prob, rounded=c(), d.res=400, age.res=400, yr.res=age.res, date.res=100, rotate.axes=FALSE, rev.age=FALSE, rev.yr=rev.age, rev.d=FALSE, maxcalc=500, height=1, calheight=1, mirror=TRUE, up=TRUE, cutoff=.1, plot.range=TRUE, range.col=grey(.5), range.lty="12", mn.col="red", mn.lty="12", med.col=NA, med.lty="12", C14.col=rgb(0,0,1,.35), C14.border=rgb(0,0,1,.5), cal.col=rgb(0,.5,.5,.35), cal.border=rgb(0,.5,.5,.5), dates.col=c(), pb.background=.5, pbmodelled.col=function(x) rgb(0,0,1,.5*x), pbmeasured.col="blue", pb.lim=c(), supp.col="purple", hiatus.col=grey(0.5), hiatus.lty="12", rgb.scale=c(0,0,0), rgb.res=100, slump.col=grey(0.8), normalise.dists=TRUE, same.heights=FALSE, cc=set$cc, title=set$core, title.location="topleft", title.size=1.5, after=set$after, bty="l", mar.left=c(3,3,1,1), mar.middle=c(3,0,1,.5), mar.right=c(3,0,1,1), mar.main=c(3,3,1,1), righthand=3, mgp=c(1.7,.7,.0), xaxs="r", yaxs="i", prior.ticks="n", prior.fontsize=0.9, toppanel.fontsize=0.9, xaxt="s", yaxt="s", plot.pb=TRUE, plot.pdf=FALSE, dates.only=FALSE, model.only=FALSE, verbose=TRUE) {
-# Load the output, if it exists
+  # Load the output, if it exists
   outp <- paste0(set$prefix, ".out")
   if(file.exists(outp))
     set <- Bacon.AnaOut(outp, set)
 
-# Plum-specific
+  # Plum-specific
   if(set$isplum) {
     outPlum <- paste0(set$prefix, "_plum.out")
     if(file.exists(outPlum))
       set <- Plum.AnaOut(outPlum, set)
+    assign_to_global("info", set)
 
   # sometimes runs don't go well, indicated by a very high posterior for memory
     if(mn <- mean(set$output[,set$K+2]) > 0.95)
@@ -122,6 +117,7 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
     bg <- background(set) # calculate which Pb data have likely reached background
     set$background <- bg
   }
+  
 
   # Adapt ages of sections which contain hiatuses
   if(!is.na(set$hiatus.depths[1]))
@@ -323,16 +319,20 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
     if(!dates.only)
       message("\nMean ", 100*prob, "% confidence ranges ", round(mean(rng), rounded), " ", age.unit, ", min. ",
         min(rng), " ", min.rng, ", max. ", max(rng), " ", max.rng)
-    if(set$isplum) {
+    if(set$isplum) { 
+	  if(set$radon.case == 2) {
+        if(set$radon.case == 2)
+          message("we're still working on estimating automatically when background is reached within radon.case 2") else {
       below <- which(bg > pb.background)
       if(length(below) > 0) {
         message("Pb-210 likely at or below detection limit from ", min(set$dets[below,4]), " ", set$depth.unit, " depth onward: ")
         for(i in 1:length(below))
           cat(set$dets[below[i],4], " ", set$depth.unit, " (", round(100*bg[below[i]]), "%) ", sep="")
-      }
+          }
+        }
+      } 
     } else
-      overlap()
+        overlap()
     message("\n")  
   }
-#   on.exit(par(oldpar))
 }

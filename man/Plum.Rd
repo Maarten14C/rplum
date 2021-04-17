@@ -276,7 +276,8 @@ Plum also needs the date of sampling, in AD (\code{date.sample}).
 }
 \examples{
 \donttest{
-  Plum(ask=FALSE, coredir=tempfile(), date.sample=2018.5, radon.case=0, n.supp=3)
+  Plum(ask=FALSE, run=FALSE, coredir=tempfile(), date.sample=2018.5, radon.case=0, n.supp=3)
+  agedepth(age.res=50, d.res=50)
 }
 }
 \references{

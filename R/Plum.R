@@ -18,8 +18,6 @@
 NULL
 
 library(rbacon)
-#thinner <- rplum:::thinner # because this is rplum-specific
-#scissors <- rplum:::scissors # this one too
 
 # background: pon parenteses de los datos que fueron usados p background, o un x rojo. Poner la prob de quales son los background, como mensaje, pero no en la grafica (que ya esta muy llena). Corta la cronologia en el ultimo dato antes de llegar a la cola
 
@@ -29,11 +27,9 @@ library(rbacon)
 
 # no need for accrate.R, Bacon.R, plots.R, calc.R and calibrate.R since they duplicate all functions from rbacon. Would be very hard to keep both up to date with bug repairs etc. Removed these files
 
-# the background function does not work if there are multiple radon entries. Then not between 0 and 1
+# the background function does not work yet with radon.case 2... work on that.
 
 # ensure supported data are always plotted
-
-# add .out files to example core again (thinned to reduce package size and calculation times)
 
 # we need to explain clearly the radon cases and n.supp. Current explanations are confusing. Also, explain how to make the relevant files (in case of constant supported, individual supported, 210Pb and other data, ...)
 
@@ -167,7 +163,8 @@ library(rbacon)
 #' @return An age-depth model graph, its age estimates, and a summary.
 #' @examples
 #' \donttest{
-#'   Plum(ask=FALSE, coredir=tempfile(), date.sample=2018.5, radon.case=0, n.supp=3)
+#'   Plum(ask=FALSE, run=FALSE, coredir=tempfile(), date.sample=2018.5, radon.case=0, n.supp=3)
+#'   agedepth(age.res=50, d.res=50)
 #' }
 #' @references
 #' Aquino-Lopez, M.A., Blaauw, M., Christen, J.A., Sanderson, N., 2018. Bayesian analysis of 210Pb dating. Journal of Agricultural, Biological, and Environmental Statistics 23, 317-333
@@ -237,11 +234,11 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
 
     # we make full dets
   if(!is.na(otherdates)) {
-    detsBacon <- .read.dets.plumbacon(core, otherdates, coredir, sep=sep, dec=dec, cc=cc)
+    detsBacon <- read.dets.plumbacon(core, otherdates, coredir, sep=sep, dec=dec, cc=cc)
     detsPlum <- dets
 
     # merge radiocarbon and 210Pb dates into the same variable dets
-    dets <- .merge.dets(dets, detsBacon, delta.R, delta.STD, t.a, t.b, cc)
+    dets <- merge.dets(dets, detsBacon, delta.R, delta.STD, t.a, t.b, cc)
 
   } else {
     detsPlum <- dets

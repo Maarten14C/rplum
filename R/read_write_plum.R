@@ -603,7 +603,7 @@ Plum.cleanup <- function(set=get('info')) {
 
 
 #function to merge dets of plum and bacon data
-.merge.dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc){
+merge.dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc){
   if( ncol(detsBacon) >= 5 ) {
     cc <- detsBacon[,5]
     detsBacon <- detsBacon[,-5]
@@ -779,7 +779,7 @@ Plum.cleanup <- function(set=get('info')) {
 
 
 # function to read output files into memory
-.Plum.AnaOut <- function(fnam, set=get('info')) {
+Plum.AnaOut <- function(fnam, set=get('info')) {
   out <- read.table(fnam)
   n <- ncol(out)-1
   set$nPs  <- n
@@ -793,7 +793,7 @@ Plum.cleanup <- function(set=get('info')) {
 
 
 # read the dets file, converting old formats to new ones if so required
-.read.dets.plumbacon <- function(core, otherdates, coredir, set=get('info'), sep=",", dec=".", cc=1) {
+read.dets.plumbacon <- function(core, otherdates, coredir, set=get('info'), sep=",", dec=".", cc=1) {
   # if a .csv file exists, read it (checking that it is more recent than any .dat file in the folder). Otherwise, read the .dat file, check the columns, report back if >4 (>5?) columns, and convert to .csv (report this also)
   
   dat.file <- paste0(coredir,  core, "/", otherdates, ".dat")
