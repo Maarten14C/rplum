@@ -194,6 +194,7 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
     message("Calculating age ranges...\n")
   modelranges <- c()
   ranges <- Bacon.rng(d, set, BCAD=BCAD, prob=prob)
+  d.rng <- d
   # calculate calendar axis limits
   modelranges <- range(ranges[!is.na(ranges)])
 
@@ -240,7 +241,7 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
     if(!set$hasBaconData) { # needs more work
       above <- which(set$background < pb.background)
       d.max <- max(set$dets[above,4]) # cut depths that have reached background
-      ranges <- ranges[which(ranges[,1] <= d.max),]
+      ranges <- ranges[which(d.rng <= d.max),]
       d <- d[which(d <= d.max)]
     }
 
@@ -332,7 +333,7 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
       if(length(below) > 0) {
         message("Pb-210 likely at or below detection limit from ", min(set$dets[below,4]), " ", set$depth.unit, " depth onward: ")
         for(i in 1:length(below))
-          cat(set$dets[below[i],4], " ", set$depth.unit, " (", round(bg[below[i]]), "%) ", sep="")
+          cat(set$dets[below[i],4], " ", set$depth.unit, " (", round(100*bg[below[i]]), "%) ", sep="")
       }
     } else
       overlap()
