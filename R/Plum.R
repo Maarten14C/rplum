@@ -518,10 +518,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
 
     agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # using rplum's agedepth for now, until rbacon's is updated and dandy and on CRAN
 
-    # calculate probability for each Pb data point that it has reached background
-  #  message("estimating background levels...")
-  #  info$background <- background(info)
-
     if(plot.pdf)
       if(interactive())
         if(length(dev.list()) > 0)

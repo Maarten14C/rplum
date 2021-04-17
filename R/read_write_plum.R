@@ -58,9 +58,13 @@ background <- function(set=get('info'), Al=set$Al) {
     pb <- 0
     its <- nrow(set$output)
     dets <- set$dets[,4:6] # we need maxdepth, mindepth, density
+    ps <- cbind(set$ps)
+    if(ncol(ps) == 1) # constant supported assumed, radon.case 0 or 1
+      k <- rep(1, nrow(set$dets)) else
+        k <- 1:nrow(set$dets) # radon case 2
     for(i in 1:nrow(set$dets)) {
       As <- A.modelled(dets[i,1]-dets[i,2], dets[i,1], dets[i,3])
-      bg <- which((As - set$ps) <= Al) # which modelled data are at or below the detection limit?
+      bg <- which((As - ps[,k[i]]) <= Al) # which modelled data are at or below the detection limit?
       pb[i] <- length(bg) / its
     }
     return(pb)

@@ -275,11 +275,6 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
       abline(h=hiatus.depths, col=hiatus.col, lty=hiatus.lty) else
         abline(v=hiatus.depths, col=hiatus.col, lty=hiatus.lty)
 
-#  if(set$isplum) {
-#    ranges <- ranges[which(ranges[,1] <= max(set$detsOrig[,2])),]
-#    d <- d[which(d <= max(set$detsOrig[,2])),]
-#  }
-
   th <- rbind(1, nrow(ranges))
   if(!is.na(set$hiatus.depths[1])) {
     hi.d <- c()

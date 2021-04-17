@@ -560,7 +560,7 @@ A.modelled <- function(d.top, d.bottom, dens, set=get('info'), phi=set$phi, sup=
   dd <- 1
   if(ncol(cbind(sup)) > 1) { # then multiple, varying estimates of supported, find the one belonging to the specified depth interval
     dd <- set$supportedData[,3] # bottom depths
-    dd <- max(1, which(dd < d.bottom))
+    dd <- max(1, which(dd <= d.bottom))
     sup <- sup[,dd]
   }
 
