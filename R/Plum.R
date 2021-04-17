@@ -19,8 +19,6 @@ NULL
 
 library(rbacon)
 
-# background: pon parenteses de los datos que fueron usados p background, o un x rojo. Poner la prob de quales son los background, como mensaje, pero no en la grafica (que ya esta muy llena). Corta la cronologia en el ultimo dato antes de llegar a la cola
-
 # LL14 es de Lysanne, Marco la va a contactar, tambien a Nicole p pedirle un nucleo con radon
 
 # rbacon should adapt draw.pbmodelled so that Pb data are plotted also when BCAD=T. Perhaps a var which is 0 when cal BP and -1950 when BCAD. Currently BCAD=T throws an error. Update these functions in rbacon: agedepth, draw.pbmodelled
@@ -28,8 +26,6 @@ library(rbacon)
 # no need for accrate.R, Bacon.R, plots.R, calc.R and calibrate.R since they duplicate all functions from rbacon. Would be very hard to keep both up to date with bug repairs etc. Removed these files
 
 # the background function does not work yet with radon.case 2... work on that.
-
-# ensure supported data are always plotted
 
 # we need to explain clearly the radon cases and n.supp. Current explanations are confusing. Also, explain how to make the relevant files (in case of constant supported, individual supported, 210Pb and other data, ...)
 

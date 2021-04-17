@@ -35,10 +35,13 @@ draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev
   # translate pb values to cal BP/AD values for plotting on the age axis
   pb2bp <- function(pb, pb.min=pb.lim[1], pb.max=pb.lim[2], agemin=min(age.lim), agemax=max(age.lim), AD=BCAD) {
     if(on.agescale) {  
-        ex <- (agemax-agemin) / (pb.max - pb.min)
-        if(AD)
-          return(agemin - ex*pb) else
+        if(AD) {
+          ex <- (agemin - agemax) / (pb.max - pb.min)
+          return(agemax + ex*pb) 	
+        } else {
+            ex <- (agemax - agemin) / (pb.max - pb.min)
             return(agemin + ex*pb)
+        }
       } else
         return(pb)
   }

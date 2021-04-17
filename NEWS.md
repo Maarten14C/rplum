@@ -1,8 +1,8 @@
 # rplum 0.2.0
 * now depends on the rbacon c++ code instead of carrying a duplicate of the code. Same for many of rbacon's internal functions for plotting etc.
 * now depends on IntCal package for its calibration curves
-* note that BCAD=T currently throws an error - this has to be repaired within rbacon
-
+* now only calculates the age-depth model for Pb data that are above background level
+* enhanced how to take into account different scenarios with radon.case and n.supp
 
 # rplum 0.1.5.1
 * removed vignette for now as they threw errors which made the package unacceptable by CRAN
