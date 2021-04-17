@@ -9,6 +9,7 @@ draw.pbmeasured(
   rotate.axes = FALSE,
   rev.d = FALSE,
   rev.age = FALSE,
+  BCAD = set$BCAD,
   pb.lim = c(),
   age.lim = c(),
   d.lim = c(),
@@ -16,7 +17,9 @@ draw.pbmeasured(
   pb.lab = c(),
   pbmeasured.col = "blue",
   pb.log = FALSE,
-  supp.col = "red"
+  supp.col = "purple",
+  newplot = TRUE,
+  on.agescale = FALSE
 )
 }
 \arguments{
@@ -27,6 +30,8 @@ draw.pbmeasured(
 \item{rev.d}{The direction of the depth axis can be reversed from the default (\code{rev.d=TRUE}).}
 
 \item{rev.age}{The direction of the calendar age axis can be reversed from the default (\code{rev.age=TRUE})}
+
+\item{BCAD}{The calendar scale of graphs and age output-files is in cal BP (calendar or calibrated years before the present, where the present is AD 1950) by default, but can be changed to BC/AD using \code{BCAD=TRUE}.}
 
 \item{pb.lim}{Minimum and maximum of the 210Pb axis ranges, calculated automatically by default (\code{pb.lim=c()}).}
 
@@ -43,6 +48,10 @@ draw.pbmeasured(
 \item{pb.log}{Use a log scale for the 210Pb-axis (default \code{pb.log=FALSE}).}
 
 \item{supp.col}{Colour of the supported 210Pb data. Defaults to red: \code{supp.col="red"}.}
+
+\item{newplot}{make new plot (default TRUE)}
+
+\item{on.agescale}{Plot the Pb-210 on the cal BP scale. Defaults to FALSE.}
 }
 \value{
 A plot of the measured 210Pb values

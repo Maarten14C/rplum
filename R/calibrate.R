@@ -436,13 +436,12 @@ calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, rota
 #' @param pbmodelled.col Colour of the modelled 210Pb values. Defaults to scales of blue: \code{pbmodelled.col=function(x) rgb(0,0,1,x)}.
 #' @param pbmeasured.col Colour of the measured 210Pb values. Defaults to blue.
 #' @param plot.measured Plot the measured 210Pb values (default \code{plot.measured=TRUE}).
-#' @param draw.background Whether or not to identify Pb-210 data that have probably reached background levels. Redscale indicates the probability (0-1).
 #' @param age.lim values of the age axis. Used to calculate where to plot the pb values on the secondary axis
 #' @param mgp Axis text margins (where should titles, labels and tick marks be plotted). Defaults to \code{mgp=c(1.7, .7, .0)}.
 #' @author Maarten Blaauw, J. Andres Christen, Marco Aquino-Lopez
 #' @return A plot of the modelled (and optionally the measured) 210Pb values
 #' @export
-draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, pb.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmodelled.col=function(x) rgb(0,0,1,x), pbmeasured.col="blue", supp.col="purple", plot.measured=TRUE, draw.background=TRUE, age.lim=c(), mgp=mgp) {
+draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, pb.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmodelled.col=function(x) rgb(0,0,1,x), pbmeasured.col="blue", supp.col="purple", plot.measured=TRUE, age.lim=c(), mgp=mgp) {
   depths <- set$detsOrig[,2]
   dns <- set$detsOrig[,3]
   Pb <- set$detsOrig[,4]
@@ -533,42 +532,11 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
     }  
   }
 
-  # indicate in 'purplescale' which Pb-210 data have most likely reached background. Requires assumption of constant background, so radon.case < 2
-#   if(draw.background)
-#     if(set$radon.case < 2) {
-#       bg <- background(set)
-#       set$background <- bg
-#       assign_to_global("info", set, .GlobalEnv)
-#       if(rotate.axes)
-#         abline(h=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg) else
-#           abline(v=set$dets[,4]-(set$dets[,5]/2), col=rgb(bg,0,bg,bg), lty=3, lwd=bg)
-#     }
-
   if(BCAD)
     pb2bp <- pb2ad
 
   if(plot.measured)
     draw.pbmeasured(newplot=FALSE, rotate.axes=rotate.axes, BCAD=BCAD, on.agescale=TRUE, pb.lim=pb.lim, age.lim=age.lim, supp.col=supp.col)
-
-#   if(plot.measured)
-#     if(ncol(set$detsOrig) == 6) {
-#       if(rotate.axes) {
-#         rect(pb2bp(Pb-2*err), depths-thickness, pb2bp(Pb+2*err), depths,
-#           border=pbmeasured.col, lty=3)
-#         rect(pb2bp(supp-2*supperr), suppd-suppthick, pb2bp(supp+2*supperr), suppd, border=supp.col, lty=3)
-#       } else {
-#           rect(depths-thickness, pb2bp(Pb-2*err), depths, pb2bp(Pb+2*err), border=pbmeasured.col, lty=3)
-#           rect(suppd-suppthick, pb2bp(supp-2*supperr), suppd, pb2bp(supp+2*supperr), border=supp.col, lty=3)
-#         }
-#       } else {
-#           if(rotate.axes)
-#             rect(pb2bp(c(Pb-2*err,supp-2*supperr)), c(depths-thickness,depths),
-#               pb2bp(c(Pb+2*err,supp+2*supperr)), c(depths-thickness, depths),
-#                 border=c(rep(pbmeasured.col, n), rep(supp.col, n)), lty=3) else
-#                 rect(c(depths-thickness,depths), pb2bp(c(Pb-2*err,supp-2*supperr)),
-#                   c(depths-thickness, depths), pb2bp(c(Pb+2*err,supp+2*supperr)),
-#                   border=c(rep(pbmeasured.col, n), rep(supp.col, n)), lty=3)
-#         }
 }
 
 

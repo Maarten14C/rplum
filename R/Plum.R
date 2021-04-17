@@ -18,38 +18,26 @@
 NULL
 
 library(rbacon)
+#thinner <- rplum:::thinner # because this is rplum-specific
+#scissors <- rplum:::scissors # this one too
 
 # background: pon parenteses de los datos que fueron usados p background, o un x rojo. Poner la prob de quales son los background, como mensaje, pero no en la grafica (que ya esta muy llena). Corta la cronologia en el ultimo dato antes de llegar a la cola
 
-# LL14 es de Lysanne, Marco va a contactala, tambien a Nicole p pedir un nucleo con radon
+# LL14 es de Lysanne, Marco la va a contactar, tambien a Nicole p pedirle un nucleo con radon
 
 # rbacon should adapt draw.pbmodelled so that Pb data are plotted also when BCAD=T. Perhaps a var which is 0 when cal BP and -1950 when BCAD. Currently BCAD=T throws an error. Update these functions in rbacon: agedepth, draw.pbmodelled
 
 # no need for accrate.R, Bacon.R, plots.R, calc.R and calibrate.R since they duplicate all functions from rbacon. Would be very hard to keep both up to date with bug repairs etc. Removed these files
 
-# adapt rbacon's scissors and thinner to read and write plumout if info$isplum
-
 # the background function does not work if there are multiple radon entries. Then not between 0 and 1
 
 # ensure supported data are always plotted
 
-# check a range of scenarios: Pb data without supported info and no further info provided within the .csv file, Pb without supported info but with information provided in .csv file, Pb data with supported info, and those two cases with and without additional dates - C14 or cal BP (e.g. historical 137Cs)
-
 # add .out files to example core again (thinned to reduce package size and calculation times)
-
-# Plum("SAMO14-1", radon.case=1) results in a 0 B output file (or at least one with just one line or so). With radon.case=2 same, but if I choose, e.g., n.supp=3, then it runs OK. Has to do with formatting of .plum file? That file is NA NA when n.supp is not given. If n.supp set to 2, OK. n.supp=1, ?
-# Additionally, do you want to set a number of tail measurements for supported Pb-210? (y/n) if n, goes wrong
-
-# it seems that depths.file=T doesn't work. Same for scissors()
-
-# when running Plum(), all input looks fine. When running Plum('LL14'), the .bacon file looks fine, but the terminal reports strange numbers for 210Pb and supported. Check. Are these simply the numbers for estimating supported? This has to do, somehow, with the numbers of lines in the .out files being different if rbacon:::bacon() is run vs rplum:::bacon(), even though the src files of the two packages are now EXACTLY the same. Apparently this is solved using the getFromNamespace approach, but perhaps check again if LL14 works better using internal src code...
-
-# does Plum.cleanup work? 
-
 
 # we need to explain clearly the radon cases and n.supp. Current explanations are confusing. Also, explain how to make the relevant files (in case of constant supported, individual supported, 210Pb and other data, ...)
 
-# do plum: add prior settings in red to upper panels, check if ResCor is done correctly if using a C14-file, consider replacing bluescales with blobs, check if age.max etc. work, A.rng and Ai (in calibrate.plum.plot() somehow don't want to be saved to info (needed to provide post-run info on fit 210Pb data), remove Bacon.R (so that no need for running long-lasting examples)? why does HP1C return only 30 cm if the core is 50 cm long (bottom 4 measurements removed and not included in the run), is it OK that d.min is set at 0 by default?, check and adapt confusing description and default of n.supp, add a red line showing the depths and mean value of the supported measurements if info$supportedData used
+# do plum: check if ResCor is done correctly if using a C14-file, consider replacing bluescales with blobs, check if age.max etc. work, A.rng and Ai (in calibrate.plum.plot() somehow don't want to be saved to info (needed to provide post-run info on fit 210Pb data), remove Bacon.R (so that no need for running long-lasting examples)? is it OK that d.min is set at 0 by default?, add a red line showing the depths and mean value of the supported measurements if info$supportedData used
 
 #' @name Plum
 #' @title  Main 210Pb age-depth modelling function
@@ -89,7 +77,6 @@ library(rbacon)
 #' @param s.shape Shape parameter of the prior gamma distribution used for the supported Pb-210 to the sediment, default \code{s.shape=5}.
 #' @param s.mean Mean parameter of the prior gamma distribution used for the supported Pb-210 to the sediment, default \code{s.mean=10}.
 #' @param Al Parameter used to limit the chronologies described in Aquino-Lopez et al. (2018) for the minimum distinguishable unsupported activity; default \code{Al=0.1}.
-#' @param draw.background Whether or not to identify Pb-210 data that have probably reached background levels. Redscale indicates the probability (0-1).
 #' @param date.sample Date at which the core was measured for Pb-120. This date will be used as a surface date and is assumed to have no uncertainty, \code{date.sample=NA}. If the date is not provided (in the .csv file or as \code{date.sample}), Plum will ask for it.
 #' @param n.supp This value will delete n.supp data points from the deepest part of the core, and these points will then be used exclusively to estimate the supported activity. If this option is used, a constant supported Pb-210 will be assumed, \code{n.supp=-1}.
 #' @param radon.case How to use radon measurements if they are provided in the core's .csv file. 0 = do not use radon (e.g., if not measured), 1 = assume constant radon, 2 = assume varying radon and use the radon measurements as individual estimates of supported Pb-210.
@@ -202,7 +189,7 @@ library(rbacon)
 #' Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62. doi: 10.1017/RDC.2020.41
 #'
 #' @export
-Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, draw.background=TRUE, date.sample = c(), n.supp = c(), radon.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", ccdir="", postbomb=0, delta.R=1, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=2000, th0=c(), burnin=min(1500, ssize), MinAge=c(), MaxAge=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, verbose=TRUE, ...) {
+Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), radon.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", ccdir="", postbomb=0, delta.R=1, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=2000, th0=c(), burnin=min(1500, ssize), MinAge=c(), MaxAge=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, verbose=TRUE, ...) {
   # Check coredir and if required, copy example file in core directory
   coredir <- assign_coredir(coredir, core, ask)
   if(core == "HP1C") { # || core == "SIM")
@@ -526,10 +513,14 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     bacon <- utils::getFromNamespace("bacon", "rbacon")
     bacon(txt, outfile, ssize, ccdir)
 
-    rplum::scissors(burnin, info) # scissors adapted to cut iterations from both output files
+    plum.scissors(burnin, info) # should use rbacon's scissors but the CRAN version doesn't deal with rplum output
     #scissors.plum(burnin, info)
 
     agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # using rplum's agedepth for now, until rbacon's is updated and dandy and on CRAN
+
+    # calculate probability for each Pb data point that it has reached background
+  #  message("estimating background levels...")
+  #  info$background <- background(info)
 
     if(plot.pdf)
       if(interactive())

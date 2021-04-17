@@ -14,7 +14,6 @@ Plum(
   s.shape = 5,
   s.mean = 10,
   Al = 0.1,
-  draw.background = TRUE,
   date.sample = c(),
   n.supp = c(),
   radon.case = c(),
@@ -97,8 +96,6 @@ Thinner (and thus more) sections will result in smoother age-models, but too man
 \item{s.mean}{Mean parameter of the prior gamma distribution used for the supported Pb-210 to the sediment, default \code{s.mean=10}.}
 
 \item{Al}{Parameter used to limit the chronologies described in Aquino-Lopez et al. (2018) for the minimum distinguishable unsupported activity; default \code{Al=0.1}.}
-
-\item{draw.background}{Whether or not to identify Pb-210 data that have probably reached background levels. Redscale indicates the probability (0-1).}
 
 \item{date.sample}{Date at which the core was measured for Pb-120. This date will be used as a surface date and is assumed to have no uncertainty, \code{date.sample=NA}. If the date is not provided (in the .csv file or as \code{date.sample}), Plum will ask for it.}
 
