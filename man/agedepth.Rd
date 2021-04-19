@@ -59,6 +59,7 @@ agedepth(
   pbmeasured.col = "blue",
   pb.lim = c(),
   supp.col = "purple",
+  plot.tail = TRUE,
   hiatus.col = grey(0.5),
   hiatus.lty = "12",
   rgb.scale = c(0, 0, 0),
@@ -203,6 +204,8 @@ and its name should start with the core's name and end with '_depths.txt'. Then 
 \item{pb.lim}{Axis limits for the Pb-210 data. Calculated automatically by default (\code{pblim=c()}).}
 
 \item{supp.col}{Colour of supported Pb-210. Defaults to purple, because why not.}
+
+\item{plot.tail}{The depth axis can extend to all Pb measurements (\code{plot.tail=TRUE}), or leave out the ones where background has been reached.}
 
 \item{hiatus.col}{The colour of the depths of any hiatuses. Default \code{hiatus.col=grey(0.5)}.}
 
