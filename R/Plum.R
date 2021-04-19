@@ -23,7 +23,7 @@ library(rbacon)
 
 # no need for accrate.R, Bacon.R, plots.R, calc.R and calibrate.R since they duplicate all functions from rbacon. Would be very hard to keep both up to date with bug repairs etc. Removed these files
 
-# the background function does not work yet with radon.case 2... work on that. Add an option plot.tail to plot the tail measurements (default TRUE)
+# the background function does not work yet with radon.case 2... work on that. Added an option plot.tail whether or to plot the tail measurements (default TRUE)
 
 # we need to explain clearly the radon cases and n.supp. Current explanations are confusing. Also, explain how to make the relevant files (in case of constant supported, individual supported, 210Pb and other data, ...)
 
