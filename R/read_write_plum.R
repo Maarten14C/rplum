@@ -62,14 +62,14 @@ background <- function(set=get('info'), Al=set$Al) {
     for(i in 1:nrow(dets)) {
       As <- A.modelled(dets[i,1]-dets[i,2], dets[i,1], dets[i,3])
       if(set$radon.case == 2)
-        ps <- ps[,i]
+        ps <- set$ps[,i] else
+          ps <- set$ps
       bg <- which((As - ps) <= Al) # which modelled data are at or below the detection limit?
       pb[i] <- length(bg) / its
     }
     return(pb)
   }
 }
-
 
 
 
