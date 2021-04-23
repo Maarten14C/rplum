@@ -359,6 +359,7 @@ calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, rota
     for(i in 1:length(set$calib$probs)) {
         cal <- cbind(set$calib$probs[[i]])
         d <- set$calib$d[[i]]
+        cc <- set$calib$cc[[i]]
         if(BCAD)
           cal[,1] <- 1950-cal[,1]
         o <- order(cal[,1])
@@ -388,12 +389,12 @@ calib.plumbacon.plot <- function(set=get('info'), BCAD=set$BCAD, cc=set$cc, rota
                 pol <- cbind(d+c(0, cal$y, 0), c(min(cal$x), cal$x, max(cal$x)))
         if(rotate.axes)
           pol <- cbind(pol[,2], pol[,1])
-        if(cc > 0 || set$dets[i,9] > 0) {
+        if(cc > 0) {
           col <- C14.col
           border <- C14.border
         } else {
-          col <- cal.col
-          border <- cal.border
+           col <- cal.col
+           border <- cal.border
         }
         if(length(dates.col) > 0) {
           col <- dates.col[i]
@@ -456,25 +457,26 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
     d.lim <- range(depths)
   if(rev.d)
     d.lim <- d.lim[2:1]
-
   if(length(set$phi) > 0) {
     Ai <- list(x=NULL, y=NULL)
     hght <- 0; pbmin <- c(); pbmax <- 0
     A.rng <- array(0, dim=c(n,2))
-
+    cat(4)
     for(i in 1:length(depths)) {
       A <- A.modelled(depths[i]-thickness[i], depths[i], dns[i], set)
+      A <<- A; d <<- depths[i]; dns <<- dns[i]
+      cat(5)
       tmp <- density(A)
       Ai$x[[i]] <- tmp$x
       Ai$y[[i]] <- tmp$y
+      cat(6)
       hght <- max(hght, Ai$y[[i]])
       pbmin <- min(pbmin, Ai$y[[i]])
       pbmax <- max(pbmax, Ai$x[[i]])
       A.rng[i,] <- quantile(A, c((1-set$prob)/2, 1-(1-set$prob)/2))
     } 
-
-    if(length(pb.lim) == 0) 
-      pb.lim <- extendrange(c(0, Pb-2*err, Pb+2*err, pbmax), f=c(0,0.05))
+  if(length(pb.lim) == 0)
+    pb.lim <- extendrange(c(0, Pb-2*err, Pb+2*err, pbmax), f=c(0,0.05))
  
     # translate pb values to cal BP values for plotting on the age axis
     pb2bp <- function(pb, pb.min=pb.lim[1], pb.max=pb.lim[2], agemin=min(age.lim), agemax=max(age.lim)) {
@@ -486,7 +488,7 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
       ex <- (agemin-agemax) / (pb.max - pb.min)
       agemin - ex*pb
     }
-
+cat(5)
     # save the values for later
     set$Ai <- Ai
     set$A.rng <- A.rng
