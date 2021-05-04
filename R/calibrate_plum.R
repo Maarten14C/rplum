@@ -14,6 +14,7 @@
 #' @param d.lab The labels for the depth axis. Default \code{d.lab="Depth (cm)"}.
 #' @param pb.lab The label for the 210Pb axis (default \code{pb.lab="210Pb (Bq/kg)"} or \code{"210Pb (dpm/g)"}).
 #' @param pbmeasured.col The label for the measured 210Pb data. \code{pbmeasured.col="blue"}.
+#' @param pbmeasured.lty Line type of the measured 210Pb data. Defaults to continuous lines.
 #' @param pb.log Use a log scale for the 210Pb-axis (default \code{pb.log=FALSE}).
 #' @param supp.col Colour of the supported 210Pb data. Defaults to red: \code{supp.col="red"}.
 #' @param newplot make new plot (default TRUE)
@@ -21,7 +22,7 @@
 #' @author Maarten Blaauw, J. Andres Christen, Marco Aquino-Lopez
 #' @return A plot of the measured 210Pb values
 #' @export
-draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, BCAD=set$BCAD, pb.lim=c(), age.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmeasured.col="blue", pb.log=FALSE, supp.col="purple", newplot=TRUE, on.agescale=FALSE) {
+draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, BCAD=set$BCAD, pb.lim=c(), age.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmeasured.col="blue", pbmeasured.lty=1, pb.log=FALSE, supp.col="purple", newplot=TRUE, on.agescale=FALSE) {
   depths <- set$detsOrig[,2]
   dns <- set$detsOrig[,3]
   Pb <- set$detsOrig[,4]
@@ -62,8 +63,8 @@ draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev
   }
 
   if(rotate.axes)
-    rect(pb2bp(Pb-err), depths-thickness, pb2bp(Pb+err), depths, border=pbmeasured.col, lty=3) else
-      rect(depths-thickness, pb2bp(Pb-err), depths, pb2bp(Pb+err), lty=3, border=pbmeasured.col)
+    rect(pb2bp(Pb-err), depths-thickness, pb2bp(Pb+err), depths, border=pbmeasured.col, lty=pbmeasured.lty) else
+      rect(depths-thickness, pb2bp(Pb-err), depths, pb2bp(Pb+err), lty=pbmeasured.lty, border=pbmeasured.col)
     
   if(length(set$supportedData) > 0) {
     supp <- set$supportedData[,1]
@@ -73,9 +74,9 @@ draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev
 
     if(rotate.axes)
       rect(pb2bp(supp-supperr), suppd-suppthick, pb2bp(supp+supperr), suppd,
-        border=supp.col, lty=3) else
+        border=supp.col, lty=pbmeasured.lty) else
         rect(suppd-suppthick, pb2bp(supp-supperr), suppd, pb2bp(supp+supperr),
-          border=supp.col, lty=3) 
+          border=supp.col, lty=pbmeasured.lty)
   }
 }
 

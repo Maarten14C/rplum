@@ -507,7 +507,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     plum.scissors(burnin, info) # should use rbacon's scissors but the CRAN version doesn't deal with rplum output
     #scissors.plum(burnin, info)
 
-    agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # using rplum's agedepth for now, until rbacon's is updated and dandy and on CRAN
+    rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # using rplum's agedepth for now, until rbacon's is updated and dandy and on CRAN
 
     if(plot.pdf)
       if(interactive())

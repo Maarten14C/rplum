@@ -16,6 +16,7 @@ draw.pbmeasured(
   d.lab = c(),
   pb.lab = c(),
   pbmeasured.col = "blue",
+  pbmeasured.lty = 1,
   pb.log = FALSE,
   supp.col = "purple",
   newplot = TRUE,
@@ -44,6 +45,8 @@ draw.pbmeasured(
 \item{pb.lab}{The label for the 210Pb axis (default \code{pb.lab="210Pb (Bq/kg)"} or \code{"210Pb (dpm/g)"}).}
 
 \item{pbmeasured.col}{The label for the measured 210Pb data. \code{pbmeasured.col="blue"}.}
+
+\item{pbmeasured.lty}{Line type of the measured 210Pb data. Defaults to continuous lines.}
 
 \item{pb.log}{Use a log scale for the 210Pb-axis (default \code{pb.log=FALSE}).}
 

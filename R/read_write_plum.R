@@ -57,7 +57,8 @@ background <- function(set=get('info'), Al=set$Al) {
   if(set$isplum) { # works with Pb-210 data only
     pb <- 0
     its <- nrow(set$output)
-    dets <- set$detsOrig[,c(2,6,3)] # we need maxdepth, mindepth, density
+#    dets <- set$detsOrig[,c(2,6,3)] # we need maxdepth, mindepth, density
+    dets <- set$dets[which(set$dets[,9] == 5),4:6] # should leave out any non-Pb data
     ps <- cbind(set$ps)
     for(i in 1:nrow(dets)) {
       As <- A.modelled(dets[i,1]-dets[i,2], dets[i,1], dets[i,3])
