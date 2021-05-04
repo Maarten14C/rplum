@@ -77,12 +77,12 @@ Plum(
 )
 }
 \arguments{
-\item{core}{Name of the core, given using quotes. Defaults to one of the cores provided with rplum, \code{core="HP1C"} also reported by Aquino-Lopez et al. (2018).
+\item{core}{Name of the core, given using quotes. Defaults to one of the cores provided with rplum, \code{core="HP1C"} also reported by Aquino-Lopez et al. (2018). Also available is LL14, a core kindly provided by Dr Lysanna Anderson (USGS). LL14 has radon data (so can be run with \code{radon.case=1} or \code{radon.case=2}, see below), and also has additional C-14 and cal BP data (these can be added using \code{otherdates="LL14_14C.csv"}). The original LL14 core has more 14C data than provided here (for reasons of brevity).
 To run your own core, produce a .csv file with the dates as outlined in the manual, add a folder with the core's name to the default directory for cores (see \code{coredir}), and save the .csv file there. For example, the file's location and name could be \code{Plum_runs/MyCore/MyCore.csv}. Then run Plum as follows: \code{Plum("MyCore")}.}
 
 \item{thick}{Plum will divide the core into sections of equal thickness specified by thick (default \code{thick=1}).}
 
-\item{otherdates}{Name of (optional) file with radiocarbon dates. This file should have the same format as the one used for rbacon.}
+\item{otherdates}{Name of (optional) file with radiocarbon dates. This file should have the same format as the one used for rbacon. For example, \code{Bacon("LL14", otherdates="LL14_14C.csv")}.}
 
 \item{coredir}{Folder where the core's files \code{core} are and/or will be located. This will be a folder with the core's name, within either the folder \code{coredir='Plum_runs/'}, or the folder Cores/ if it already exists within R's working directory, or a custom-built folder. For example, use \code{coredir="."} to place the core's folder within the current working directory, or \code{coredir="F:"} if you want to put the core's folder and files on a USB drive loaded under F:.
 Thinner (and thus more) sections will result in smoother age-models, but too many sections can cause `run-away' models.}
@@ -101,7 +101,7 @@ Thinner (and thus more) sections will result in smoother age-models, but too man
 
 \item{n.supp}{This value will delete n.supp data points from the deepest part of the core, and these points will then be used exclusively to estimate the supported activity. If this option is used, a constant supported Pb-210 will be assumed, \code{n.supp=-1}.}
 
-\item{radon.case}{How to use radon measurements if they are provided in the core's .csv file. 0 = do not use radon (e.g., if not measured), 1 = assume constant radon, 2 = assume varying radon and use the radon measurements as individual estimates of supported Pb-210.}
+\item{radon.case}{How to use radon measurements if they are provided in the core's .csv file. 1 = assume constant radon, 2 = assume varying radon and use the radon measurements as individual estimates of supported Pb-210. If no radon measurements are present, use \code{radon.case=0}.}
 
 \item{Bqkg}{This variable indicates whether total Pb-210 is expressed in Bq/kg (default; \code{Bqkg=TRUE}) or dpm/g if set to FALSE.}
 

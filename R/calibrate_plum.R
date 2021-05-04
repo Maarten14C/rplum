@@ -1,88 +1,6 @@
-#' @name draw.pbmeasured
-#' @title Plot the 210Pb data
-#' @description Produce a plot of the 210Pb data and their depths
-#' @details This function is generally called internally to produce the age-depth graph.
-#' It can be used to produce custom-built graphs.
-#' @param set Detailed information of the current run, stored within this session's memory as variable \code{info}.
-#' @param rotate.axes The default of plotting age on the horizontal axis and event probability on the vertical one can be changed with \code{rotate.axes=TRUE}.
-#' @param rev.d The direction of the depth axis can be reversed from the default (\code{rev.d=TRUE}).
-#' @param rev.age The direction of the calendar age axis can be reversed from the default (\code{rev.age=TRUE})
-#' @param BCAD The calendar scale of graphs and age output-files is in cal BP (calendar or calibrated years before the present, where the present is AD 1950) by default, but can be changed to BC/AD using \code{BCAD=TRUE}.
-#' @param pb.lim Minimum and maximum of the 210Pb axis ranges, calculated automatically by default (\code{pb.lim=c()}).
-#' @param age.lim Minimum and maximum of the age ranges to be used to plot 210Pb values. Calculated automatically by default (\code{age.lim=c()}).
-#' @param d.lim Minimum and maximum depths to plot; calculated automatically by default (\code{d.lim=c()}).
-#' @param d.lab The labels for the depth axis. Default \code{d.lab="Depth (cm)"}.
-#' @param pb.lab The label for the 210Pb axis (default \code{pb.lab="210Pb (Bq/kg)"} or \code{"210Pb (dpm/g)"}).
-#' @param pbmeasured.col The label for the measured 210Pb data. \code{pbmeasured.col="blue"}.
-#' @param pbmeasured.lty Line type of the measured 210Pb data. Defaults to continuous lines.
-#' @param pb.log Use a log scale for the 210Pb-axis (default \code{pb.log=FALSE}).
-#' @param supp.col Colour of the supported 210Pb data. Defaults to red: \code{supp.col="red"}.
-#' @param newplot make new plot (default TRUE)
-#' @param on.agescale Plot the Pb-210 on the cal BP scale. Defaults to FALSE.
-#' @author Maarten Blaauw, J. Andres Christen, Marco Aquino-Lopez
-#' @return A plot of the measured 210Pb values
-#' @export
-draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev.age=FALSE, BCAD=set$BCAD, pb.lim=c(), age.lim=c(), d.lim=c(), d.lab=c(), pb.lab=c(), pbmeasured.col="blue", pbmeasured.lty=1, pb.log=FALSE, supp.col="purple", newplot=TRUE, on.agescale=FALSE) {
-  depths <- set$detsOrig[,2]
-  dns <- set$detsOrig[,3]
-  Pb <- set$detsOrig[,4]
-  err <- set$detsOrig[,5]
-  thickness <- set$detsOrig[,6]
-  n <- nrow(set$detsOrig)
-
-  if(length(pb.lim) == 0) 
-    pb.lim <- extendrange(c(0, Pb+2*err), f=c(0,0.05))
- 
-  # translate pb values to cal BP/AD values for plotting on the age axis
-  pb2bp <- function(pb, pb.min=pb.lim[1], pb.max=pb.lim[2], agemin=min(age.lim), agemax=max(age.lim), AD=BCAD) {
-    if(on.agescale) {  
-        if(AD) {
-          ex <- (agemin - agemax) / (pb.max - pb.min)
-          return(agemax + ex*pb) 	
-        } else {
-            ex <- (agemax - agemin) / (pb.max - pb.min)
-            return(agemin + ex*pb)
-        }
-      } else
-        return(pb)
-  }
-
-  if(newplot) {
-    if(length(d.lab) == 0)
-      d.lab <- paste0("depth (", set$depth.unit, ")")
-    if(length(pb.lab) == 0)
-      pb.lab <- ifelse(set$Bqkg, "210Pb (Bq/kg)", "210Pb (dpm/g)")
-
-    if(length(d.lim) == 0)
-      d.lim <- range(depths, set$supportedData[,3])
-    if(rev.d)
-      d.lim <- d.lim[2:1]
-    if(rotate.axes)
-      plot(0, type="n", ylim=d.lim, ylab=d.lab, xlim=pb2bp(pb.lim), xlab=pb.lab) else
-        plot(0, type="n", xlim=d.lim, xlab=d.lab, ylim=pb2bp(pb.lim), ylab=pb.lab)
-  }
-
-  if(rotate.axes)
-    rect(pb2bp(Pb-err), depths-thickness, pb2bp(Pb+err), depths, border=pbmeasured.col, lty=pbmeasured.lty) else
-      rect(depths-thickness, pb2bp(Pb-err), depths, pb2bp(Pb+err), lty=pbmeasured.lty, border=pbmeasured.col)
-    
-  if(length(set$supportedData) > 0) {
-    supp <- set$supportedData[,1]
-    supperr <- set$supportedData[,2]
-    suppd <- set$supportedData[,3]
-    suppthick <- set$supportedData[,4]
-
-    if(rotate.axes)
-      rect(pb2bp(supp-supperr), suppd-suppthick, pb2bp(supp+supperr), suppd,
-        border=supp.col, lty=pbmeasured.lty) else
-        rect(suppd-suppthick, pb2bp(supp-supperr), suppd, pb2bp(supp+supperr),
-          border=supp.col, lty=pbmeasured.lty)
-  }
-}
 
 
-
-.plum.calib <- function(dat, set=get('info'), date.res=100, normal=set$normal, t.a=set$t.a, t.b=set$t.b, delta.R=set$delta.R, delta.STD=set$delta.STD, ccdir="") {
+plum.calib <- function(dat, set=get('info'), date.res=100, normal=set$normal, t.a=set$t.a, t.b=set$t.b, delta.R=set$delta.R, delta.STD=set$delta.STD, ccdir="") {
   # read in the curves
   if(set$cc1=="IntCal20" || set$cc1=="\"IntCal20\"")
     cc1 <- read.table(paste0(ccdir, "3Col_intcal20.14C")) else
@@ -103,6 +21,7 @@ draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev
           if(set$postbomb==4) bomb <- read.table(paste0(ccdir,"postbomb_SH1-2.14C"))[,1:3] else
             if(set$postbomb==5) bomb <- read.table(paste0(ccdir,"postbomb_SH3.14C"))[,1:3] else
               stop("cannot find postbomb curve #", set$postbomb, " (use values of 1 to 5 only)", call.=FALSE)
+      bomb <- bomb[order(bomb[,1], decreasing=FALSE),]
       bomb.x <- seq(max(bomb[,1]), min(bomb[,1]), by=-.1) # interpolate
       bomb.y <- approx(bomb[,1], bomb[,2], bomb.x)$y
       bomb.z <- approx(bomb[,1], bomb[,3], bomb.x)$y
@@ -113,7 +32,7 @@ draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev
   }
 
   ## use Gaussian or t (Christen and Perez Radiocarbon 2009) calibration
-  if(round(set$t.b-set$t.a) !=1)
+  if(round(set$t.b-set$t.a) != 1)
     stop("t.b - t.a should always be 1, check the manual", call.=FALSE)
 
   d.cal <- function(cc, rcmean, w2, t.a, t.b) {
@@ -133,8 +52,8 @@ draw.pbmeasured <- function(set=get('info'), rotate.axes=FALSE, rev.d=FALSE, rev
   calib <- list(d=dat[,4], cc=dat[,9])
 
   for(i in 1:nrow(dat)) {
-    dets <- c(NA, as.numeric(dat[i,-1])) # first entry is often not numeric    
-    if(dets[9]==0 || dets[9] == 5) { # cal BP or 210Pb data
+    dets <- c(NA, as.numeric(dat[i,-1])) # first entry is often not numeric
+    if(dets[9] == 0 || dets[9] == 5) { # cal BP or 210Pb data
       x <- seq(dets[2]-(5*dets[3]), dets[2]+(5*dets[3]), by=5) # simplify, May 2019
       if(length(x) < 5 || length(x) > 100) # if too many resulting years, make 100 vals
         x <- seq(dets[2]-(5*dets[3]), dets[2]+(5*dets[3]), length=100)

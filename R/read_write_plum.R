@@ -1,35 +1,46 @@
 
-validateDirectoryName <- function(dir) {
-  if(!dir.exists(dir))
-    dir.create(dir, recursive=TRUE)
-  dir <- suppressWarnings(normalizePath(dir))
-  lastchar <- substr(dir, nchar(dir), nchar(dir))
-  if(lastchar != "/" & lastchar != "\\" & lastchar != "" & lastchar != "." )
-    dir <- paste0(dir, "/") # does this work in Windows?
-  return(dir)
-}
+# validateDirectoryName <- function(dir) {
+#   if(!dir.exists(dir))
+#     dir.create(dir, recursive=TRUE)
+#   dir <- suppressWarnings(normalizePath(dir))
+#   lastchar <- substr(dir, nchar(dir), nchar(dir))
+#   if(lastchar != "/" & lastchar != "\\" & lastchar != "" & lastchar != "." )
+#     dir <- paste0(dir, "/") # does this work in Windows?
+#   return(dir)
+# }
 
 
 
-# function to load results in global environment
-# parameter position defaults to 1, which equals an assignment to the global environment
-assign_to_global <- function(key, val, pos=1) { # was pos=1
-  assign(key, val, envir=as.environment(pos) )
-}
+# # function to load results in global environment
+# # parameter position defaults to 1, which equals an assignment to the global environment
+# assign_to_global <- function(key, val, pos=1) { # was pos=1
+#   assign(key, val, envir=as.environment(pos) )
+# }
 
-
-
-# function to read output files into memory
-Bacon.AnaOut <- function(fnam, set=get('info')) {
-  out <- read.table(fnam)
-  n <- ncol(out)-1
-  set$n <- n
-  set$Tr <- nrow(out)
-  set$Us <- out[,n+1]
-  set$output <- out[,1:n]
-  set
-}
-
+#
+#
+# # function to read output files into memory
+# Bacon.AnaOut <- function(fnam, set=get('info')) {
+#   out <- read.table(fnam)
+#   n <- ncol(out)-1
+#   set$n <- n
+#   set$Tr <- nrow(out)
+#   set$Us <- out[,n+1]
+#   set$output <- out[,1:n]
+#   set
+# }
+#
+#
+# # function to read output files into memory
+# Plum.AnaOut <- function(fnam, set=get('info')) {
+#   out <- read.table(fnam)
+#   n <- ncol(out)-1
+#   set$nPs  <- n
+#   set$TrPs <- nrow(out)
+#   set$phi  <- out[,1]
+#   set$ps   <- out[,2:(n+1)]
+#   set
+# }
 
 
 #' @name Plum_runs
@@ -44,34 +55,34 @@ Plum_runs <- function(coredir=get('info')$coredir)
   list.files(coredir)
 
 
-
-#' @name background
-#' @title calculate probabilities that Pb-210 data have reached background levels
-#' @description Checks which of the Pb-210 data most likely have reached background levels and thus are below the detection limit Al (probabilities between 0 and 1)
-#' @author Maarten Blaauw
-#' @return a list of probabilities for each Pb-210 data point
-#' @param set Detailed information of the current run, stored within this session's memory as variable \code{info}.
-#' @param Al The detection limit. Default \code{Al=0.1}.
-#' @export
-background <- function(set=get('info'), Al=set$Al) {
-  if(set$isplum) { # works with Pb-210 data only
-    pb <- 0
-    its <- nrow(set$output)
-#    dets <- set$detsOrig[,c(2,6,3)] # we need maxdepth, mindepth, density
-    dets <- set$dets[which(set$dets[,9] == 5),4:6] # should leave out any non-Pb data
-    ps <- cbind(set$ps)
-    for(i in 1:nrow(dets)) {
-      As <- A.modelled(dets[i,1]-dets[i,2], dets[i,1], dets[i,3])
-      if(set$radon.case == 2)
-        ps <- set$ps[,i] else
-          ps <- set$ps
-      bg <- which((As - ps) <= Al) # which modelled data are at or below the detection limit?
-      pb[i] <- length(bg) / its
-    }
-    return(pb)
-  }
-}
-
+#
+# #' @name background
+# #' @title calculate probabilities that Pb-210 data have reached background levels
+# #' @description Checks which of the Pb-210 data most likely have reached background levels and thus are below the detection limit Al (probabilities between 0 and 1)
+# #' @author Maarten Blaauw
+# #' @return a list of probabilities for each Pb-210 data point
+# #' @param set Detailed information of the current run, stored within this session's memory as variable \code{info}.
+# #' @param Al The detection limit. Default \code{Al=0.1}.
+# #' @export
+# background <- function(set=get('info'), Al=set$Al) {
+#   if(set$isplum) { # works with Pb-210 data only
+#     pb <- 0
+#     its <- nrow(set$output)
+# #    dets <- set$detsOrig[,c(2,6,3)] # we need maxdepth, mindepth, density
+#     dets <- set$dets[which(set$dets[,9] == 5),4:6] # should leave out any non-Pb data
+#     ps <- cbind(set$ps)
+#     for(i in 1:nrow(dets)) {
+#       As <- A.modelled(dets[i,1]-dets[i,2], dets[i,1], dets[i,3])
+#       if(set$radon.case == 2)
+#         ps <- set$ps[,i] else
+#           ps <- set$ps
+#       bg <- which((As - ps) <= Al) # which modelled data are at or below the detection limit?
+#       pb[i] <- length(bg) / its
+#     }
+#     return(pb)
+#   }
+# }
+#
 
 
 # If coredir is left empty, check for a folder named Cores in the current working directory, and if this doesn't exist, for a folder called Plum_runs (make this folder if it doesn't exist yet and if the user agrees).
@@ -778,26 +789,26 @@ merge.dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc){
 
 
 
-# function to read output files into memory
-Plum.AnaOut <- function(fnam, set=get('info')) {
-  out <- read.table(fnam)
-  n <- ncol(out)-1
-  set$nPs  <- n
-  set$TrPs <- nrow(out)
-  set$phi  <- out[,1]
-  set$ps   <- out[,2:(n+1)]
+# # function to read output files into memory
+# Plum.AnaOut <- function(fnam, set=get('info')) {
+#   out <- read.table(fnam)
+#   n <- ncol(out)-1
+#   set$nPs  <- n
+#   set$TrPs <- nrow(out)
+#   set$phi  <- out[,1]
+#   set$ps   <- out[,2:(n+1)]
+#
+#   return(set)
+# }
 
-  return(set)
-}
 
 
-
-# read the dets file, converting old formats to new ones if so required
+# read the other dates' dets file, converting old formats to new ones if so required
 read.dets.plumbacon <- function(core, otherdates, coredir, set=get('info'), sep=",", dec=".", cc=1) {
   # if a .csv file exists, read it (checking that it is more recent than any .dat file in the folder). Otherwise, read the .dat file, check the columns, report back if >4 (>5?) columns, and convert to .csv (report this also)
-  
+
   dat.file <- paste0(coredir,  core, "/", otherdates, ".dat")
-  if(length(grep(".csv", otherdates)) > 0) # if the name has extension .csv 
+  if(length(grep(".csv", otherdates)) > 0) # if the name has extension .csv
     csv.file <- paste0(coredir, core, "/", otherdates) else
       csv.file <- paste0(coredir,  core, "/", otherdates, ".csv")
 

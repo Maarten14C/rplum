@@ -1,10 +1,12 @@
 # to enable running rbacon functions from within rplum
 events <- utils::getFromNamespace("events", "rbacon")
 bacon <- utils::getFromNamespace("bacon", "rbacon")
-#agedepth <- rbacon::agedepth # currently using tailed-made version for rplum
-#calib.plumbacon.plot <- utils::getFromNamespace("calib.plumbacon.plot", "rbacon") # currently using rplum version instead of the one from rbacon
+agedepth <- rbacon::agedepth
+calib.plumbacon.plot <- utils::getFromNamespace("calib.plumbacon.plot", "rbacon")
 proxy.ghost <- rbacon::proxy.ghost # is this a good idea?
+#bacon.calib <- utils::getFromNamespace("bacon.calib", "rbacon")
 calib.plot <- utils::getFromNamespace("calib.plot", "rbacon")
+read.dets <- utils::getFromNamespace("read.dets", "rbacon")
 toslump <- utils::getFromNamespace("toslump", "rbacon")
 PlotAccPrior <- utils::getFromNamespace("PlotAccPrior", "rbacon")
 PlotMemPrior <- utils::getFromNamespace("PlotMemPrior", "rbacon")
@@ -22,3 +24,4 @@ agedepth.ghost <- utils::getFromNamespace("agedepth.ghost", "rbacon")
 Bacon.rng <- utils::getFromNamespace("Bacon.rng", "rbacon")
 hiatus.slopes <- utils::getFromNamespace("hiatus.slopes", "rbacon")
 assign_to_global <- utils::getFromNamespace("assign_to_global", "rbacon")
+validateDirectoryName <- utils::getFromNamespace("validateDirectoryName", "rbacon")
