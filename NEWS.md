@@ -1,3 +1,8 @@
+# rplum 0.2.1
+* further separation of rbacon and rplum
+* added LL14, a core with Pb-210, radon and C14 dates (core kindly provided by Dr Lysanna Anderson, USGS)
+* many sundry bug fixes related mainly to plotting
+
 # rplum 0.2.0
 * now depends on the rbacon c++ code instead of carrying a duplicate of the code. Same for many of rbacon's internal functions for plotting etc.
 * now depends on IntCal package for radiocarbon calibration curves
@@ -5,7 +10,7 @@
 * enhanced how to take into account different scenarios with radon.case and n.supp
 
 # rplum 0.1.5.1
-* removed vignette for now as they threw errors which made the package unacceptable by CRAN
+* removed vignettes as they threw errors which made the package unacceptable by CRAN
 
 # rplum 0.1.5
 * updated to the latest radiocarbon calibration curves IntCal20

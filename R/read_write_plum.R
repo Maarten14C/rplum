@@ -1,48 +1,3 @@
-
-# validateDirectoryName <- function(dir) {
-#   if(!dir.exists(dir))
-#     dir.create(dir, recursive=TRUE)
-#   dir <- suppressWarnings(normalizePath(dir))
-#   lastchar <- substr(dir, nchar(dir), nchar(dir))
-#   if(lastchar != "/" & lastchar != "\\" & lastchar != "" & lastchar != "." )
-#     dir <- paste0(dir, "/") # does this work in Windows?
-#   return(dir)
-# }
-
-
-
-# # function to load results in global environment
-# # parameter position defaults to 1, which equals an assignment to the global environment
-# assign_to_global <- function(key, val, pos=1) { # was pos=1
-#   assign(key, val, envir=as.environment(pos) )
-# }
-
-#
-#
-# # function to read output files into memory
-# Bacon.AnaOut <- function(fnam, set=get('info')) {
-#   out <- read.table(fnam)
-#   n <- ncol(out)-1
-#   set$n <- n
-#   set$Tr <- nrow(out)
-#   set$Us <- out[,n+1]
-#   set$output <- out[,1:n]
-#   set
-# }
-#
-#
-# # function to read output files into memory
-# Plum.AnaOut <- function(fnam, set=get('info')) {
-#   out <- read.table(fnam)
-#   n <- ncol(out)-1
-#   set$nPs  <- n
-#   set$TrPs <- nrow(out)
-#   set$phi  <- out[,1]
-#   set$ps   <- out[,2:(n+1)]
-#   set
-# }
-
-
 #' @name Plum_runs
 #' @title List the folders present in the current core directory.
 #' @description Lists all folders located within the core's directory.
@@ -53,66 +8,6 @@
 #' @export
 Plum_runs <- function(coredir=get('info')$coredir)
   list.files(coredir)
-
-
-#
-# #' @name background
-# #' @title calculate probabilities that Pb-210 data have reached background levels
-# #' @description Checks which of the Pb-210 data most likely have reached background levels and thus are below the detection limit Al (probabilities between 0 and 1)
-# #' @author Maarten Blaauw
-# #' @return a list of probabilities for each Pb-210 data point
-# #' @param set Detailed information of the current run, stored within this session's memory as variable \code{info}.
-# #' @param Al The detection limit. Default \code{Al=0.1}.
-# #' @export
-# background <- function(set=get('info'), Al=set$Al) {
-#   if(set$isplum) { # works with Pb-210 data only
-#     pb <- 0
-#     its <- nrow(set$output)
-# #    dets <- set$detsOrig[,c(2,6,3)] # we need maxdepth, mindepth, density
-#     dets <- set$dets[which(set$dets[,9] == 5),4:6] # should leave out any non-Pb data
-#     ps <- cbind(set$ps)
-#     for(i in 1:nrow(dets)) {
-#       As <- A.modelled(dets[i,1]-dets[i,2], dets[i,1], dets[i,3])
-#       if(set$radon.case == 2)
-#         ps <- set$ps[,i] else
-#           ps <- set$ps
-#       bg <- which((As - ps) <= Al) # which modelled data are at or below the detection limit?
-#       pb[i] <- length(bg) / its
-#     }
-#     return(pb)
-#   }
-# }
-#
-
-
-# If coredir is left empty, check for a folder named Cores in the current working directory, and if this doesn't exist, for a folder called Plum_runs (make this folder if it doesn't exist yet and if the user agrees).
-# Check if we have write access. If not, tell the user to provide a different, writeable location for coredir.
-assign_coredir <- function(coredir, core, ask=TRUE) {
-  if(coredir == "") {
-    if(dir.exists("Cores"))
-      coredir <- "Cores" else
-        if(dir.exists("Plum_runs"))
-          coredir <- "Plum_runs" else {
-            coredir <- "Plum_runs"
-            ans <- readline(message("I will create a folder called ", coredir, ", is that OK? (Y/n)  "))
-            ans <- tolower(substr(ans,1,1))[1]
-            if(ask)
-              if(ans == "y" || ans == "")
-                wdir <- dir.create(coredir, FALSE) else
-                  stop("No problem. Please provide an alternative folder location using coredir\n", call.=FALSE)
-            if(!wdir)
-              stop("cannot write into the current directory.\nPlease set coredir to somewhere where you have writing access, e.g. Desktop or ~.", call.=FALSE)
-        }
-  } else {
-    if(!dir.exists(coredir))
-        wdir <- dir.create(coredir, FALSE)
-      if(!dir.exists(coredir)) # if it still doesn't exist, we probably don't have enough permissions
-        stop("cannot write into the current directory.\nPlease set coredir to somewhere where you have writing access, e.g. Desktop or ~.", call.=FALSE)
-  }
-  coredir <- validateDirectoryName(coredir)
-  message("The run's files will be put in this folder: ", coredir, core, sep="")
-  return(coredir)
-}
 
 
 
@@ -492,7 +387,7 @@ Plum.cleanup <- function(set=get('info')) {
 
 
 
-# read in default values, values from previous run, any specified values, and report the desired one. Internal function.
+# read in default values, values from previous run, any specified values, and report the desired one. Internal function. Differs from Bacon.settings because it requires Pb-specific settings.
 .plum.settings <- function(core, coredir, dets, thick, remember=TRUE, d.min, d.max, d.by, depths.file,
   slump, acc.mean, acc.shape, mem.mean, mem.strength, boundary, hiatus.depths, hiatus.max, hiatus.shape,
   BCAD, cc, postbomb, cc1, cc2, cc3, cc4, depth.unit, normal, t.a, t.b, delta.R, delta.STD, prob,
@@ -537,20 +432,6 @@ Plum.cleanup <- function(set=get('info')) {
     prevfile <- readLines(prevfile, n=-1)
     if(length(prevfile) > 0) prevf <- TRUE
   }
-
-  #d.min <- extr(1); d.by <- extr(3); depths.file <- extr(4)
-  #slump <- extr(5); acc.mean <- extr(6);
-  #if(length(acc.shape) == 1)
-  #  acc.shape <- extr(7)
-  #mem.mean <- extr(8)
-  #mem.strength <- extr(9)
-  #boundary <- if(is.na(boundary)[1]) NA else sort(extr(10))
-  #hiatus.depths <- if(is.na(hiatus.depths)[1]) NA else sort(extr(11))
-  #hiatus.max <- extr(12)
-  #BCAD <- extr(13); cc <- extr(14); postbomb <- extr(15); cc1 <- extr(16, isnum=FALSE)
-  #cc2 <- extr(17, isnum=FALSE); cc3 <- extr(18, isnum=FALSE); cc4 <- extr(19, isnum=FALSE)
-  #depth.unit <- extr(20, isnum=FALSE); normal <- extr(21); t.a <- extr(22); t.b <- extr(23)
-  #delta.R <- extr(24); delta.STD <- extr(25); prob <- extr(26); age.unit <- extr(27, isnum=FALSE)
 
   if(is.na(d.min) || d.min=="NA")
     d.min <- min(dets[,4])
@@ -614,70 +495,57 @@ Plum.cleanup <- function(set=get('info')) {
 
 
 #function to merge dets of plum and bacon data
-merge.dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc){
-  if( ncol(detsBacon) >= 5 ) {
+merge.dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc) {
+  if(ncol(detsBacon) >= 5) {
     cc <- detsBacon[,5]
     detsBacon <- detsBacon[,-5]
-  } else {
-    cc <- array(cc, dim=c(nrow(detsBacon),1))
-  }
+  } else
+      cc <- array(cc, dim=c(nrow(detsBacon),1))
 
-  if( ncol(detsBacon) < 9 ){
-
-    for(i in (ncol(detsBacon)+1):9){
-      if( i == 5){
+  if(ncol(detsBacon) < 9 ) {
+    for(i in(ncol(detsBacon)+1):9) {
+      if(i==5) {
         col <- array(delta.R, dim=c(nrow(detsBacon),1))
-      }else if(i == 6){
+      } else if(i==6) {
         col <- array(delta.STD, dim=c(nrow(detsBacon),1))
-      }else if(i == 7){
+      } else if(i==7) {
         col <- array(t.a, dim=c(nrow(detsBacon),1))
-      }else if(i == 8){
+      } else if(i==8) {
         col <- array(t.b, dim=c(nrow(detsBacon),1))
-      }else if(i==9){
+      } else if(i==9) {
         col <- cc
       }
       detsBacon <- cbind(detsBacon, col)
     }
     colnames(detsBacon) <- c("labID", "X210Pb.Bq.kg.", "sd.210Pb.", "depth.cm.", "thickness.cm.", "density.g.cm.3.",  "t.a", "t.b", "cc")
-    #print(detsBacon)
   }
 
-  if( ncol(detsPlum) < 9 ){
+  if(ncol(detsPlum) < 9) {
     for(i in (ncol(detsPlum)+1):9){
-      if( i == 5){
+      if(i==5) {
         col <- array(delta.R, dim=c(nrow(detsPlum),1))
-      }else if(i == 6){
+      } else if(i==6) {
         col <- array(delta.STD, dim=c(nrow(detsPlum),1))
-      }else if(i == 7){
+      } else if(i==7) {
         col <- array(t.a, dim=c(nrow(detsPlum),1))
-      }else if(i == 8){
+      } else if(i==8) {
         col <- array(t.b, dim=c(nrow(detsPlum),1))
-      }else if(i==9){
+      } else if(i==9) {
         col <- array(5, dim=c(nrow(detsPlum),1))
       }
       detsPlum <- cbind(detsPlum, col)
     }
     colnames(detsPlum) <- c("labID", "X210Pb.Bq.kg.", "sd.210Pb.", "depth.cm.", "thickness.cm.", "density.g.cm.3.",  "t.a", "t.b", "cc")
-    #print(detsPlum)
   }
 
   dets <- rbind(detsPlum, detsBacon, make.row.names=FALSE)
-  dets <- dets[ order(dets[,4]),]
+  dets <- dets[order(dets[,4]),]
 }
 
 
 
-# write files to be read by the main Bacon age-depth modelling function
-.write.plum.file <- function(set=get('info')) {
-
-  #a relation between the name of column and his position
-  #These are the column of the plum file
-  idColumn       <- 1
-  plumdataColumn <- 2
-  stdColumn      <- 3
-  depthColumn    <- 4
-  deltaColumn    <- 5
-  rhoColumn      <- 6
+# write files to be read by the main Bacon age-depth modelling function. Has plum-specific settings so differs from write.Bacon.file
+write.plum.file <- function(set=get('info')) {
 
   if(length(set$slump) > 0) {
     dets <- set$slumpdets
@@ -689,6 +557,7 @@ merge.dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc){
     boundary <- set$boundary
   }
 
+  depthColumn <- 4 # column of the depths
   if(is.na(set$d.min) || set$d.min < min(dets[,depthColumn])) { # repeat relevant row, change error and depth
     dets <- rbind(dets[which(dets[,depthColumn] == min(dets[,depthColumn]))[1],], dets, make.row.names=FALSE)
     dets[1,1] <- NA # calling this "d.min" causes issues
@@ -739,8 +608,8 @@ merge.dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc){
 
   if(!is.na(hiatus.depths[1])) {
     if(is.null(boundary[1]))
-      message("\n  Hiatus set at depth(s)", hiatus.depths, "\n") else
-        message("\n  Boundary set at depth(s)", boundary, "\n")
+      message("\n  Hiatus set at depth(s) ", hiatus.depths, "\n") else
+        message("\n  Boundary set at depth(s) ", boundary, "\n")
     if(length(set$acc.shape)==1)
       set$acc.shape <- rep(set$acc.shape, length(hiatus.depths)+1)
     if(length(set$acc.mean)==1)
@@ -785,129 +654,4 @@ merge.dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc){
     }	
   close(fl)
   # we have to check that there are no NAs in the .plum file
-}
-
-
-
-# # function to read output files into memory
-# Plum.AnaOut <- function(fnam, set=get('info')) {
-#   out <- read.table(fnam)
-#   n <- ncol(out)-1
-#   set$nPs  <- n
-#   set$TrPs <- nrow(out)
-#   set$phi  <- out[,1]
-#   set$ps   <- out[,2:(n+1)]
-#
-#   return(set)
-# }
-
-
-
-# read the other dates' dets file, converting old formats to new ones if so required
-read.dets.plumbacon <- function(core, otherdates, coredir, set=get('info'), sep=",", dec=".", cc=1) {
-  # if a .csv file exists, read it (checking that it is more recent than any .dat file in the folder). Otherwise, read the .dat file, check the columns, report back if >4 (>5?) columns, and convert to .csv (report this also)
-
-  dat.file <- paste0(coredir,  core, "/", otherdates, ".dat")
-  if(length(grep(".csv", otherdates)) > 0) # if the name has extension .csv
-    csv.file <- paste0(coredir, core, "/", otherdates) else
-      csv.file <- paste0(coredir,  core, "/", otherdates, ".csv")
-
-  dR.names <- c("r", "d", "d.r", "dr", "deltar", "r.mn", "rm", "rmn", "res.mean", "res.mn", "delta.r")
-  dSTD.names <- c("d.std", "std", "std.1", "dstd", "r.std", "rstd", "res.sd", "delta.std", "deltastd")
-  ta.names <- c("t", "t.a", "ta", "sta")
-  tb.names <- c("t", "t.b", "tb", "stb")
-  cc.names <- c("c", "cc")
-  suggested.names <- c("labID", "age", "error", "depth", "cc", "dR", "dSTD", "ta", "tb")
-  changed <- 0
-
-  if(file.exists(csv.file)) {
-    dets <- read.table(csv.file, header=TRUE, sep=sep)
-    if(file.exists(dat.file)) # deal with old .dat files
-      if(file.info(csv.file)$mtime < file.info(dat.file)$mtime)
-        message("Warning, the .dat file is newer than the .csv file! I will read the .csv file. From now on please modify ", csv.file, ", not ", dat.file) else
-          message("Reading", csv.file)
-    } else {
-      if(file.exists(paste0(csv.file, ".txt"))) {
-        file.rename(paste0(csv.file, ".txt"), csv.file)
-        message("Removing .txt extension from .csv file")
-      } else {
-        message("No .csv file found, reading", dat.file, "and converting it to .csv")
-        dets <- read.table(dat.file, header=TRUE)
-        changed <- 1
-        }
-    }
-  name <- tolower(names(dets))
-  commas <- grep(",,", readLines(csv.file)) # check if there are too many commas (e.g., lines with just commas)
-  if(length(!is.na(commas)) > 0) # often an artifact of spreadsheet programs
-    stop("check the .csv file in a plain-text editor for 'orphan' commas\n", call.=FALSE)
-
-  # check if 'classic' dets file, which has a different column order from the current default
-  if(ncol(dets) > 4)
-    if(ncol(dets) == 5) { # then probably a 'new' dets file
-      if((name[5] %in% cc.names) && min(dets[,5]) >= 0 && max(dets[,5]) <= 4) {} else # extra check for correct values
-        stop("unexpected name or values in fifth column (cc, should be between 0 and 4). Please check the manual for guidelines in producing a correct .csv file.\n", call.=FALSE)
-    } else
-      if(ncol(dets) == 6) { # probably an 'old' file: dR, dSTD, but could also be cc and delta.R (so no column for delta.STD)
-        if(name[5] %in% dR.names && name[6] %in% dSTD.names) {
-          message("\nHELP!!! 6!!!\n")
-          dets <- cbind(dets[,1:4], rep(cc, nrow(dets)), dets[,5:6]) # some shuffling
-          message(" Assumed order of columns in dets file: lab ID, Age, error, depth, dR, dSTD. \nAdding calibration curve column (fifth column, before dR and dSTD) and saving as", csv.file)
-          changed <- 1
-        } else
-	      stop("unexpected names for columns 5/6. If you want to include delta.R, also add a column for delta.STD. Check the manual for guidelines to producing a correct .csv file.\n", call.=FALSE)
-      } else
-        if(ncol(dets) == 7) { # probably a 'new' file: cc, dR, dSTD
-          if(name[5] %in% cc.names && min(dets[,5]) >= 0 && max(dets[,5]) <= 4 &&
-            name[6] %in% dR.names && name[7] %in% dSTD.names)
-              {} else
-                 stop("unexpected column names, order or values in dets file. \nPlease check the manual for correct dets file formats.\n", call.=FALSE)
-        } else
-          if(ncol(dets) == 8) { # probably an 'old' file: dR, dSTD, ta, tb
-            if(name[5] %in% dR.names && name[6] %in% dSTD.names)
-            if(name[7] %in% ta.names && name[8] %in% tb.names)
-            if(range(dets[,8] - dets[,7]) == c(1,1)) { # check that these set expected student-t values
-              dets <- cbind(dets[,1:4], rep(cc, nrow(dets)), dets[,5:6]) # some shuffling
-              message(" Assumed order of columns in dets file: lab ID, Age, error, depth, dR, dSTD. \nAdding calibration curve column (fifth column, before dR and dSTD) and saving as", csv.file)
-              changed <- 1
-            } else
-              stop("unexpected column names, order or values in dets file. \nPlease check the manual for how to produce a correct .csv file", call.=FALSE)
-          } else
-            if(ncol(dets) == 9) { # most complex case, many checks needed
-              if(name[9] %in% cc.names && # we're almost sure that this is a 'classic' dets file
-                min(dets[,9]) >= 0 && max(dets[,9]) <= 4 && # check that this sets calibration curves
-                  range(dets[,8] - dets[,7]) == c(1,1) && # check that these set expected student-t values
-                    name[5] %in% dR.names && name[6] %in% dSTD.names && # column names as expected?
-                      name[7] %in% ta.names && name[8] %in% tb.names) { # column names as expected?
-                        dets <- dets[,c(1:4,9,5:8)] # shuffle colums around
-                        message(" Assumed order of columns in dets file: lab ID, Age, error, depth, dR, dSTD, t.a, t.b, cc. \nAdapting column order and saving as", csv.file)
-                        changed <- 1
-                      } else
-                        if(name[5] %in% cc.names && # oh, probably a 'new' file from more recent Bacon
-                          min(dets[,5]) >= 0 && max(dets[,5]) <= 4 && # check that this sets cal.curves
-                            range(dets[,9] - dets[,8]) == c(1,1) && # columns 8-9 set student-t correctly
-                              name[8] %in% ta.names && name[9] %in% tb.names && # and are correctly named
-                                name[6] %in% dR.names && name[7] %in% dSTD.names) # all lights are green
-                                  {} else
-                                     stop("unexpected column names, order or values in dets file. \nPlease check the manual for how to produce a correct .csv file", call.=FALSE)
-            } else
-              stop("unexpected column names, order or values in dets file. \nPlease check the manual for how to produce a correct dets file.\n", call.=FALSE)
-
-  # more sanity checks
-  if(!is.numeric(dets[,2]) || !is.numeric(dets[,3]) || !is.numeric(dets[,4]))
-    stop("unexpected values in dets file, I expected numbers. Check the manual.\n", call.=FALSE)
-  if(min(dets[,3]) <= 0) {
-    message("Warning, zero year errors don't exist in Bacon's world. I will increase them to 1 ", set$age.unit, " yr")
-    dets[dets[,3] <= 0,3] <- 1
-    changed <- 1
-  }
-  if( nrow(dets) > 1 && min(diff(dets[,4])) < 0) {
-    message("Warning, the depths are not in ascending order, I will correct this")
-    dets <- dets[ order(dets[,4]), ]
-    changed <- 1
-  }
-
-  # if current dets differ from original .csv file, rewrite it
-  if(changed > 0)
-    write.table(dets, csv.file, sep=paste0(sep, "\t"), dec=dec, row.names=FALSE, col.names=suggested.names[1:ncol(dets)], quote=FALSE)
-  dets
 }

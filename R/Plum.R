@@ -50,6 +50,7 @@ library(rbacon)
 #'
 #' @param core Name of the core, given using quotes. Defaults to one of the cores provided with rplum, \code{core="HP1C"} also reported by Aquino-Lopez et al. (2018). Also available is LL14, a core kindly provided by Dr Lysanna Anderson (USGS). LL14 has radon data (so can be run with \code{radon.case=1} or \code{radon.case=2}, see below), and also has additional C-14 and cal BP data (these can be added using \code{otherdates="LL14_14C.csv"}). The original LL14 core has more 14C data than provided here (for reasons of brevity).
 #' To run your own core, produce a .csv file with the dates as outlined in the manual, add a folder with the core's name to the default directory for cores (see \code{coredir}), and save the .csv file there. For example, the file's location and name could be \code{Plum_runs/MyCore/MyCore.csv}. Then run Plum as follows: \code{Plum("MyCore")}.
+#' Note that for Pb-210 data, the depth in the .csv should be the bottom of the slice, not the mid-point. (For any non-Pb data, depths are the midpoints of their slices). Also make sure that the thickness and density are given correctly for each Pb-210 data point.
 #' @param thick Plum will divide the core into sections of equal thickness specified by thick (default \code{thick=1}).
 #' @param otherdates Name of (optional) file with radiocarbon dates. This file should have the same format as the one used for rbacon. For example, \code{Bacon("LL14", otherdates="LL14_14C.csv")}.
 #' @param coredir Folder where the core's files \code{core} are and/or will be located. This will be a folder with the core's name, within either the folder \code{coredir='Plum_runs/'}, or the folder Cores/ if it already exists within R's working directory, or a custom-built folder. For example, use \code{coredir="."} to place the core's folder within the current working directory, or \code{coredir="F:"} if you want to put the core's folder and files on a USB drive loaded under F:.
@@ -174,7 +175,7 @@ library(rbacon)
 #' @export
 Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), radon.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", ccdir="", postbomb=0, delta.R=1, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=2000, th0=c(), burnin=min(1500, ssize), MinAge=c(), MaxAge=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, verbose=TRUE, ...) {
   # Check coredir and if required, copy example file in core directory
-  coredir <- assign_coredir(coredir, core, ask)
+  coredir <- assign_coredir(coredir, core, ask, isPlum=TRUE)
   if(core == "HP1C" || core == "LL14") { # || core == "SIM")
     dir.create(paste0(coredir, core, "/"), showWarnings = FALSE, recursive = TRUE)
     fileCopy <- system.file(paste0("extdata/Cores/", core), package="rplum")
@@ -190,8 +191,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   defaults <- system.file("extdata", defaults, package=packageName())
   # read in the data, adapt settings from defaults if needed
   tmp <- read.dets.plum(core=core, coredir=coredir, n.supp=n.supp, date.sample=date.sample, sep=sep, dec=dec, cc=cc, Bqkg=Bqkg, radon.case=radon.case, suggest=suggest)
-
-  #core, coredir, n.supp=c(), date.sample, set=get('info'), sep=",", dec=".", cc=1, Bqkg=TRUE, radon.case=c(), suggest=TRUE
 
   dets <- tmp[[1]]
   supportedData <- tmp[[2]]
@@ -218,9 +217,8 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
       Al <- Al*500./3.
     }
 
-    # we make full dets
-  if(!is.na(otherdates)) {
-    detsBacon <- read.dets.plumbacon(core, otherdates, coredir, sep=sep, dec=dec, cc=cc)
+  if(!is.na(otherdates)) { # core also has cal BP or C-14 dates
+    detsBacon <- read.dets(core, coredir, otherdates, sep=sep, dec=dec, cc=cc)
     detsPlum <- dets
 
     # merge radiocarbon and 210Pb dates into the same variable dets
@@ -326,14 +324,12 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     if(info$postbomb == 0 && ((ncol(info$detsBacon) == 4 && min(info$detsBacon[,2]) < 0) ||
       ncol(info$detsBacon)>4 && max(info$detsBacon[,5]) > 0 && min(info$detsBacon[info$detsBacon[,5] > 0,2]) < 0))
         stop("you have negative C14 ages so should select a postbomb curve", call.=FALSE)
+  if(info$hasBaconData)  # only calibrate radiocarbon dates
+   info$calib <- bacon.calib(info$detsBacon, info, date.res, ccdir=ccdir)
 
-  if(info$hasBaconData) { # only calibrate radiocarbon dates. Try July 2020
-   info$calib <- plum.calib(dets[which(dets[,9] < 5),], info, date.res, ccdir=ccdir)
-  } 
-
-### find some relevant values
+  ### find some relevant values
   info$rng <- c()
-  if(info$hasBaconData) # July 2020, to get rid of Warning regarding min(na.rm=na.rm)
+  if(info$hasBaconData)
     for(i in 1:length(info$calib$probs)) {
       tmp <- info$calib$probs[[i]]
       info$rng <- range(info$rng, tmp[which(tmp[,2]>cutoff),1])
@@ -482,7 +478,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     PlotSuppPrior(info)
 
     if(info$hasBaconData)
-      calib.plumbacon.plot(info, BCAD=BCAD, new.plot=T, plot.dists=T, height=1)
+      calib.plot(info, BCAD=BCAD, new.plot=T, plot.dists=T, height=1)
     draw.pbmeasured(info)
     legend("top", core, bty="n", cex=1.5)
   }
@@ -511,7 +507,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   }
 
   ### run plum if initial graphs seem OK; run automatically, not at all, or only plot the age-depth model
-  .write.plum.file(info)
+  write.plum.file(info)
   if(!run)
     prepare() else
       if(!ask)
