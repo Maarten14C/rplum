@@ -19,7 +19,7 @@ License: GPL (>= 2)
 NeedsCompilation: no
 Imports: Rcpp (>= 0.12.12), coda (>= 0.19-1), grDevices, graphics,
         stats, utils
-Depends: rbacon (>= 2.5.4)
+Depends: rbacon (>= 2.5.5)
 RoxygenNote: 7.1.1
 Author: Maarten Blaauw [aut, cre],
   J. Andres Christen [aut, ctb, cph],

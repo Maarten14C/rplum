@@ -9,6 +9,7 @@ agedepth <- rbacon::agedepth
 proxy.ghost <- rbacon::proxy.ghost
 
 # these are R functions in rbacon which are not exported (because they are internal)
+draw.pbmeasured <- utils::getFromNamespace("draw.pbmeasured", "rbacon")
 bacon.calib <- utils::getFromNamespace("bacon.calib", "rbacon")
 calib.plot <- utils::getFromNamespace("calib.plot", "rbacon")
 read.dets <- utils::getFromNamespace("read.dets", "rbacon")

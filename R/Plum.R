@@ -17,9 +17,14 @@
 #' @name rplum
 NULL
 
-library(rbacon)
+library(rbacon) # see also import.R
 
-# do plum: check running with otherdates, check if ResCor is done correctly if using a C14-file, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
+# done: added Plum.agedepth(), tmpBacon.AnaOut() & tmpPlum.AnaOut(). Should be cleaned up for a future version of rbacon (and once that is done, the functions used in agedepth.R should be renamed to their original names again, and/or agedepth.R removed)
+
+
+
+
+# do plum: check if ResCor is done correctly if using a C14-file, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
 
 #' @name Plum
 #' @title  Main 210Pb age-depth modelling function
@@ -494,14 +499,16 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
 
     rbacon::scissors(burnin, info)
 
-    rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # using rplum's agedepth for now, until rbacon's is updated and dandy and on CRAN
+#    rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) 
+    Plum.agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # tmp May 21
 
     if(plot.pdf)
       if(interactive())
         if(length(dev.list()) > 0)
           dev.copy2pdf(file=paste0(info$prefix, ".pdf")) else {
             pdf(file=paste0(info$prefix, ".pdf"))
-            agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=FALSE, age.unit=age.unit, depth.unit=depth.unit, rounded=rounded, ...) 
+            # agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=FALSE, age.unit=age.unit, depth.unit=depth.unit, rounded=rounded, ...)
+            Plum.agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=FALSE, age.unit=age.unit, depth.unit=depth.unit, rounded=rounded, ...) # tmp May 21
             dev.off()
           }
   }

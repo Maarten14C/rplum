@@ -1,3 +1,29 @@
+# function to read plum output files into memory
+tmpPlum.AnaOut <- function(fnam, set=get('info')) {
+  out <- read.table(fnam)
+  n <- ncol(out)-1
+  set$nPs  <- n
+  set$TrPs <- nrow(out)
+  set$phi  <- out[,1]
+  set$ps   <- out[,2:(n+1)]
+  set
+}
+
+
+
+# function to read output file into memory
+tmpBacon.AnaOut <- function(fnam, set=get('info')) {
+  out <- read.table(fnam)
+  n <- ncol(out)-1
+  set$n <- n
+  set$Tr <- nrow(out)
+  set$Us <- out[,n+1]
+  set$output <- out[,1:n]
+  set
+}
+
+
+
 #' @name Plum_runs
 #' @title List the folders present in the current core directory.
 #' @description Lists all folders located within the core's directory.
