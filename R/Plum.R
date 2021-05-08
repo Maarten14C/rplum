@@ -19,12 +19,9 @@ NULL
 
 library(rbacon) # see also import.R
 
-# done: added Plum.agedepth(), tmpBacon.AnaOut() & tmpPlum.AnaOut(). Should be cleaned up for a future version of rbacon (and once that is done, the functions used in agedepth.R should be renamed to their original names again, and/or agedepth.R removed)
+# done: added Plum.agedepth.ghost(), Plum.agedepth(), tmpBacon.AnaOut() & tmpPlum.AnaOut(). Should be cleaned up for a future version of rbacon (and once that is done, the functions used in agedepth.R should be renamed to their original names again, and/or agedepth.R removed). 
 
-
-
-
-# do plum: check par righthand toppanel, too much space, check if ResCor is done correctly if using a C14-file, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
+# do plum: Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel, too much space, check if ResCor is done correctly if using a C14-file, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
 
 #' @name Plum
 #' @title  Main 210Pb age-depth modelling function

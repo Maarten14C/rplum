@@ -1,5 +1,52 @@
 # tmp file to repair bugs in rbacon 2.5.5
 
+# to plot greyscale/ghost graphs of the age-depth model
+Plum.agedepth.ghost <- function(set=get('info'), d.min=set$d.min, d.max=set$d.max, BCAD=set$BCAD, rotate.axes=FALSE, d.res=400, age.res=400, rgb.res=100, dark=c(), rgb.scale=c(0,0,0), cutoff=0.001, age.lim) {
+  dseq <- seq(d.min, d.max, length=d.res)
+  if(set$isplum) # plum has a strange feature with a grey shape appearing
+    dseq <- dseq[-1] # at dmin. Thus removing the first depth
+  if(length(set$slump) > 0) {
+    d.inside <- c()
+    for(i in 1:nrow(set$slump)) {
+      inside <- which(dseq < max(set$slump[i,]))
+      inside <- which(dseq[inside] > min(set$slump[i,]))
+      d.inside <- c(d.inside, inside)
+    }
+  dseq <- dseq[-d.inside]
+  }
+
+  Bacon.hist(dseq, set, BCAD=BCAD, calc.range=FALSE, draw=FALSE)
+  hists <- get('hists')
+  scales <- array(0, dim=c(length(dseq), age.res))
+  ageseq <- seq(min(age.lim), max(age.lim), length=age.res)
+  for(i in 1:length(hists)) { # was length(dseq)
+  if(length(hists[[i]]) < 7)
+      ages <- sort(unlist(hists[[i]])) else {
+       ages <- seq(hists[[i]]$th0, hists[[i]]$th1, length=hists[[i]]$n)
+       if(length(!is.na(ages)) > 0)
+        scales[i,] <- approx(ages, hists[[i]]$counts, ageseq, rule=2)$y
+     }
+  }
+  minmax <- hists[[length(hists)]]$min
+  maxmax <- hists[[length(hists)]]$max
+  scales <- scales/maxmax # normalise to the height of most precise age estimate
+  if(length(dark) == 0)
+    dark <- 10 * minmax/maxmax
+  scales[scales > dark] <- dark
+  scales <- scales/max(scales)
+  dseq <- sort(dseq)
+  cols <- rgb(rgb.scale[1], rgb.scale[2], rgb.scale[3], seq(0,1, length=rgb.res))
+  
+  scales[scales<cutoff] <- NA # so that pixels with probs very close to 0 are not plotted as white but empty
+  
+  if(rotate.axes)
+    image(ageseq, dseq, t(scales), add=TRUE, col=cols, useRaster=FALSE) else
+      image(dseq, ageseq, scales, add=TRUE, col=cols, useRaster=FALSE)
+}
+
+
+
+
 #' @name Plum.agedepth
 #' @title Plot an age-depth model
 #' @description Plot the age-depth model of a core.
@@ -279,7 +326,7 @@ Plum.agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.u
   if(!dates.only) {
     if(verbose)
       message("Preparing ghost graph... ")
-     agedepth.ghost(set, rotate.axes=rotate.axes, d.min=d.min, d.max=d.max, BCAD=BCAD, d.res=d.res, age.res=age.res, rgb.res=rgb.res, dark=dark, rgb.scale=rgb.scale, age.lim=age.lim)
+     Plum.agedepth.ghost(set, rotate.axes=rotate.axes, d.min=d.min, d.max=d.max, BCAD=BCAD, d.res=d.res, age.res=age.res, rgb.res=rgb.res, dark=dark, rgb.scale=rgb.scale, age.lim=age.lim)
   }
 
   if(length(set$slump) > 0 )
@@ -373,7 +420,7 @@ Plum.agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.u
           cat(set$dets[below[i],4], " ", set$depth.unit, " (", round(100*bg[below[i]]), "%) ", sep="")
       }
     } else
-        overlap()
+        rbacon:::overlap()
     message("\n")  
   }
   #par(oldpar) # tmp Jan 2021
