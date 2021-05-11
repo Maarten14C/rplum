@@ -173,7 +173,7 @@ Plum.agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.u
     if(mn <- mean(set$output[,set$K+2]) > 0.95)
       if(mn > set$mem.mean)
         message("\nWarning, this run has a very high posterior memory (", round(mn, 2), ") and probably didn't go very well. Please run again\n")
-    bg <- background(set) # calculate which Pb data have likely reached background
+    bg <- tmpbackground(set) # calculate which Pb data have likely reached background. using tmp function because radon.case was renamed to ra.case but not yet in rbacon
     set$background <- bg
   }
 
@@ -241,7 +241,7 @@ Plum.agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.u
     d <- sort(unique(c(i+after, i, d)))
 
   if(set$isplum) # new May 2021
-    if(set$radon.case == 0)
+    if(set$ra.case == 0)
       if(!set$hasBaconData) # new May 2021
         d <- d[which(d <= max(set$detsOrig[,2]))]
 

@@ -19,7 +19,7 @@ NULL
 
 library(rbacon) # see also import.R
 
-# done: added Plum.agedepth.ghost(), Plum.agedepth(), tmpBacon.AnaOut() & tmpPlum.AnaOut(). Should be cleaned up for a future version of rbacon (and once that is done, the functions used in agedepth.R should be renamed to their original names again, and/or agedepth.R removed). 
+# done: added Plum.agedepth.ghost(), Plum.agedepth(), tmpBacon.AnaOut() & tmpPlum.AnaOut(). Should be cleaned up for a future version of rbacon (and once that is done, the functions used in agedepth.R should be renamed to their original names again, and/or agedepth.R removed). r
 
 # do plum: Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel, too much space, check if ResCor is done correctly if using a C14-file, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
 
@@ -50,7 +50,7 @@ library(rbacon) # see also import.R
 #' For calendar dates, i.e. dates that are already on the calendar scale and thus should not be calibrated, set\code{cc=0}. 
 #' Plum also needs the date of sampling, in AD (\code{date.sample}). 
 #'
-#' @param core Name of the core, given using quotes. Defaults to one of the cores provided with rplum, \code{core="HP1C"} also reported by Aquino-Lopez et al. (2018). Also available is LL14, a core kindly provided by Dr Lysanna Anderson (USGS). LL14 has radon data (so can be run with \code{radon.case=1} or \code{radon.case=2}, see below), and also has additional C-14 and cal BP data (these can be added using \code{otherdates="LL14_14C.csv"}). The original LL14 core has more 14C data than provided here (for reasons of brevity).
+#' @param core Name of the core, given using quotes. Defaults to one of the cores provided with rplum, \code{core="HP1C"} also reported by Aquino-Lopez et al. (2018). Also available is LL14, a core kindly provided by Dr Lysanna Anderson (USGS). LL14 has ra-226 data (so can be run with \code{ra.case=1} or \code{ra.case=2}, see below), and also has additional C-14 and cal BP data (these can be added using \code{otherdates="LL14_14C.csv"}). The original LL14 core has more 14C data than provided here (for reasons of brevity).
 #' To run your own core, produce a .csv file with the dates as outlined in the manual, add a folder with the core's name to the default directory for cores (see \code{coredir}), and save the .csv file there. For example, the file's location and name could be \code{Plum_runs/MyCore/MyCore.csv}. Then run Plum as follows: \code{Plum("MyCore")}.
 #' Note that for Pb-210 data, the depth in the .csv should be the bottom of the slice, not the mid-point. (For any non-Pb data, depths are the midpoints of their slices). Also make sure that the thickness and density are given correctly for each Pb-210 data point.
 #' @param thick Plum will divide the core into sections of equal thickness specified by thick (default \code{thick=1}).
@@ -64,7 +64,7 @@ library(rbacon) # see also import.R
 #' @param Al Parameter used to limit the chronologies described in Aquino-Lopez et al. (2018) for the minimum distinguishable unsupported activity; default \code{Al=0.1}.
 #' @param date.sample Date at which the core was measured for Pb-120. This date will be used as a surface date and is assumed to have no uncertainty, \code{date.sample=NA}. If the date is not provided (in the .csv file or as \code{date.sample}), Plum will ask for it.
 #' @param n.supp This value will delete n.supp data points from the deepest part of the core, and these points will then be used exclusively to estimate the supported activity. If this option is used, a constant supported Pb-210 will be assumed, \code{n.supp=-1}.
-#' @param radon.case How to use radon measurements if they are provided in the core's .csv file. 1 = assume constant radon, 2 = assume varying radon and use the radon measurements as individual estimates of supported Pb-210. If no radon measurements are present, use \code{radon.case=0}.
+#' @param ra.case How to use radium-226 measurements if they are provided in the core's .csv file. 1 = assume constant radium, 2 = assume varying radium and use the radium measurements as individual estimates of supported Pb-210. If no radium measurements are present, use \code{ra.case=0}.
 #' @param Bqkg This variable indicates whether total Pb-210 is expressed in Bq/kg (default; \code{Bqkg=TRUE}) or dpm/g if set to FALSE.
 #' @param seed Seed used for C++ executions; if it is not assigned then the seed is set by system. Default \code{seed=NA}.
 #' @param prob Confidence interval to report. This should lie between 0 and 1, default \code{prob=0.95} (95 \%).
@@ -152,8 +152,8 @@ library(rbacon) # see also import.R
 #' @return An age-depth model graph, its age estimates, and a summary.
 #' @examples
 #' \donttest{
-#'   Plum(ask=FALSE, run=FALSE, coredir=tempfile(), date.sample=2018.5, radon.case=0, n.supp=3)
-#'   agedepth(age.res=50, d.res=50)
+#'   Plum(ask=FALSE, run=FALSE, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
+#'   Plum.agedepth(age.res=50, d.res=50)
 #' }
 #' @references
 #' Aquino-Lopez, M.A., Blaauw, M., Christen, J.A., Sanderson, N., 2018. Bayesian analysis of 210Pb dating. Journal of Agricultural, Biological, and Environmental Statistics 23, 317-333
@@ -175,7 +175,7 @@ library(rbacon) # see also import.R
 #' Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62. doi: 10.1017/RDC.2020.41
 #'
 #' @export
-Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), radon.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", ccdir="", postbomb=0, delta.R=1, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=2000, th0=c(), burnin=min(1500, ssize), MinAge=c(), MaxAge=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, verbose=TRUE, ...) {
+Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), ra.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", ccdir="", postbomb=0, delta.R=1, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=2000, th0=c(), burnin=min(1500, ssize), MinAge=c(), MaxAge=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, verbose=TRUE, ...) {
   # Check coredir and if required, copy example file in core directory
   coredir <- assign_coredir(coredir, core, ask, isPlum=TRUE)
   if(core == "HP1C" || core == "LL14") { # || core == "SIM")
@@ -192,11 +192,11 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   # default_settings.txt is located within system.file
   defaults <- system.file("extdata", defaults, package=packageName())
   # read in the data, adapt settings from defaults if needed
-  tmp <- read.dets.plum(core=core, coredir=coredir, n.supp=n.supp, date.sample=date.sample, sep=sep, dec=dec, cc=cc, Bqkg=Bqkg, radon.case=radon.case, suggest=suggest)
+  tmp <- read.dets.plum(core=core, coredir=coredir, n.supp=n.supp, date.sample=date.sample, sep=sep, dec=dec, cc=cc, Bqkg=Bqkg, ra.case=ra.case, suggest=suggest)
 
   dets <- tmp[[1]]
   supportedData <- tmp[[2]]
-  radon.case <- tmp[[3]]
+  ra.case <- tmp[[3]]
   date.sample <- tmp[[4]]
   detsOrig <- tmp[[5]]
   n.supp <- tmp[[6]]
@@ -292,7 +292,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     delta.R=delta.R, delta.STD=delta.STD, prob=prob, defaults=defaults, runname=runname, ssize=ssize,
     dark=dark, MinAge=MinAge, MaxAge=MaxAge, cutoff=cutoff, age.res=age.res, after=after,
     age.unit=age.unit, supportedData=supportedData, date.sample=date.sample, Al=Al, phi.shape=phi.shape,
-    phi.mean=phi.mean, s.shape=s.shape, s.mean=s.mean, radon.case=radon.case, Bqkg=Bqkg, n.supp=n.supp)
+    phi.mean=phi.mean, s.shape=s.shape, s.mean=s.mean, ra.case=ra.case, Bqkg=Bqkg, n.supp=n.supp)
 
   assign_to_global("info", info)
 

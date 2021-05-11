@@ -76,7 +76,7 @@ Plum.agedepth(
   bty = "l",
   mar.left = c(3, 3, 1, 1),
   mar.middle = c(3, 0, 1, 0.5),
-  mar.right = c(3, 3, 1, 1),
+  mar.right = c(3, 1, 1, 1),
   mar.main = c(3, 3, 1, 1),
   righthand = 3,
   mgp = c(1.7, 0.7, 0),

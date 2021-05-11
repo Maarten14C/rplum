@@ -16,7 +16,7 @@ Plum(
   Al = 0.1,
   date.sample = c(),
   n.supp = c(),
-  radon.case = c(),
+  ra.case = c(),
   Bqkg = TRUE,
   seed = NA,
   prob = 0.95,
@@ -77,7 +77,7 @@ Plum(
 )
 }
 \arguments{
-\item{core}{Name of the core, given using quotes. Defaults to one of the cores provided with rplum, \code{core="HP1C"} also reported by Aquino-Lopez et al. (2018). Also available is LL14, a core kindly provided by Dr Lysanna Anderson (USGS). LL14 has radon data (so can be run with \code{radon.case=1} or \code{radon.case=2}, see below), and also has additional C-14 and cal BP data (these can be added using \code{otherdates="LL14_14C.csv"}). The original LL14 core has more 14C data than provided here (for reasons of brevity).
+\item{core}{Name of the core, given using quotes. Defaults to one of the cores provided with rplum, \code{core="HP1C"} also reported by Aquino-Lopez et al. (2018). Also available is LL14, a core kindly provided by Dr Lysanna Anderson (USGS). LL14 has ra-226 data (so can be run with \code{ra.case=1} or \code{ra.case=2}, see below), and also has additional C-14 and cal BP data (these can be added using \code{otherdates="LL14_14C.csv"}). The original LL14 core has more 14C data than provided here (for reasons of brevity).
 To run your own core, produce a .csv file with the dates as outlined in the manual, add a folder with the core's name to the default directory for cores (see \code{coredir}), and save the .csv file there. For example, the file's location and name could be \code{Plum_runs/MyCore/MyCore.csv}. Then run Plum as follows: \code{Plum("MyCore")}.
 Note that for Pb-210 data, the depth in the .csv should be the bottom of the slice, not the mid-point. (For any non-Pb data, depths are the midpoints of their slices). Also make sure that the thickness and density are given correctly for each Pb-210 data point.}
 
@@ -102,7 +102,7 @@ Thinner (and thus more) sections will result in smoother age-models, but too man
 
 \item{n.supp}{This value will delete n.supp data points from the deepest part of the core, and these points will then be used exclusively to estimate the supported activity. If this option is used, a constant supported Pb-210 will be assumed, \code{n.supp=-1}.}
 
-\item{radon.case}{How to use radon measurements if they are provided in the core's .csv file. 1 = assume constant radon, 2 = assume varying radon and use the radon measurements as individual estimates of supported Pb-210. If no radon measurements are present, use \code{radon.case=0}.}
+\item{ra.case}{How to use radium-226 measurements if they are provided in the core's .csv file. 1 = assume constant radium, 2 = assume varying radium and use the radium measurements as individual estimates of supported Pb-210. If no radium measurements are present, use \code{ra.case=0}.}
 
 \item{Bqkg}{This variable indicates whether total Pb-210 is expressed in Bq/kg (default; \code{Bqkg=TRUE}) or dpm/g if set to FALSE.}
 
@@ -277,8 +277,8 @@ Plum also needs the date of sampling, in AD (\code{date.sample}).
 }
 \examples{
 \donttest{
-  Plum(ask=FALSE, run=FALSE, coredir=tempfile(), date.sample=2018.5, radon.case=0, n.supp=3)
-  agedepth(age.res=50, d.res=50)
+  Plum(ask=FALSE, run=FALSE, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
+  Plum.agedepth(age.res=50, d.res=50)
 }
 }
 \references{
