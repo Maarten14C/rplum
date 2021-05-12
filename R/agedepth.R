@@ -147,11 +147,11 @@ Plum.agedepth.ghost <- function(set=get('info'), d.min=set$d.min, d.max=set$d.ma
 #' @return A plot of the age-depth model, and estimated ages incl. confidence ranges for each depth.
 #' @examples
 #' \dontshow{
-#'   Bacon(run=FALSE, ask=FALSE, coredir=tempfile())
+#'   Plum(run=FALSE, ask=FALSE, coredir=tempfile())
 #'   Plum.agedepth(yr.res=50, d.res=50, d.by=10)
 #'  }
 #' \donttest{
-#'   Bacon(ask=FALSE, coredir=tempfile())
+#'   Plum(ask=FALSE, coredir=tempfile())
 #'   Plum.agedepth()
 #' }
 #' @export

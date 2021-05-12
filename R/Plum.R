@@ -525,6 +525,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
         }
 
 
-  if(close.connections)
-    closeAllConnections()
+  #if(close.connections)
+  #  close(outfile)
 }

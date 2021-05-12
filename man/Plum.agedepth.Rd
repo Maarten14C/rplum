@@ -287,11 +287,11 @@ again using the command \code{agedepth()}.
 }
 \examples{
 \dontshow{
-  Bacon(run=FALSE, ask=FALSE, coredir=tempfile())
+  Plum(run=FALSE, ask=FALSE, coredir=tempfile())
   Plum.agedepth(yr.res=50, d.res=50, d.by=10)
  }
 \donttest{
-  Bacon(ask=FALSE, coredir=tempfile())
+  Plum(ask=FALSE, coredir=tempfile())
   Plum.agedepth()
 }
 }
