@@ -1,59 +1,5 @@
 
 
-### for running Plum, but is looked for by generic agedepth() function (through draw.pbmodelled()), so is included in the rbacon code
-#' @name tmpbackground
-#' @title calculate probabilities that Pb-210 data have reached background levels
-#' @description Checks which of the Pb-210 data most likely have reached background levels and thus are below the detection limit Al (probabilities between 0 and 1)
-#' @author Maarten Blaauw
-#' @return a list of probabilities for each Pb-210 data point
-#' @param set Detailed information of the current run, stored within this session's memory as variable \code{info}.
-#' @param Al The detection limit. Default \code{Al=0.1}.
-#' @export
-tmpbackground <- function(set=get('info'), Al=set$Al) {
-  if(set$isplum) { # works with Pb-210 data only
-    pb <- 0
-    its <- nrow(set$output)
-#    dets <- set$detsOrig[,c(2,6,3)] # we need maxdepth, mindepth, density
-    dets <- set$dets[which(set$dets[,9] == 5),4:6] # should leave out any non-Pb data
-    ps <- cbind(set$ps)
-    for(i in 1:nrow(dets)) {
-      As <- A.modelled(dets[i,1]-dets[i,2], dets[i,1], dets[i,3])
-      if(set$ra.case == 2)
-        ps <- set$ps[,i] else
-          ps <- set$ps
-      bg <- which((As - ps) <= Al) # which modelled data are at or below the detection limit?
-      pb[i] <- length(bg) / its
-    }
-    return(pb)
-  }
-}
-
-# function to read plum output files into memory
-tmpPlum.AnaOut <- function(fnam, set=get('info')) {
-  out <- read.table(fnam)
-  n <- ncol(out)-1
-  set$nPs  <- n
-  set$TrPs <- nrow(out)
-  set$phi  <- out[,1]
-  set$ps   <- out[,2:(n+1)]
-  set
-}
-
-
-
-# function to read output file into memory
-tmpBacon.AnaOut <- function(fnam, set=get('info')) {
-  out <- read.table(fnam)
-  n <- ncol(out)-1
-  set$n <- n
-  set$Tr <- nrow(out)
-  set$Us <- out[,n+1]
-  set$output <- out[,1:n]
-  set
-}
-
-
-
 #' @name Plum_runs
 #' @title List the folders present in the current core directory.
 #' @description Lists all folders located within the core's directory.
