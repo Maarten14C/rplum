@@ -19,6 +19,9 @@ NULL
 
 library(rbacon) # see also import.R
 
+# accrate.age.ghost()   Error in xy.coords(x, y) : 'x' and 'y' lengths differ
+
+
 # done: removed tmp functions Plum.agedepth.ghost(), Plum.agedepth(), tmpBacon.AnaOut() & tmpPlum.AnaOut(), flux.age.ghost now works with BCAD=TRUE and gained the option to draw the median values
 
 # do plum: Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel, too much space, check if ResCor is done correctly if using a C14-file, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
