@@ -99,6 +99,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
   sdRaColumn  <- 8 # if present
 
   #check that depths are in ascending order
+ # if(nrow(dets) > 1) # some files only have 1, e.g. a historical Cs peak
   if(min(diff(dets[,depthColumn])) < 0) {
     message("Warning, the depths are not in ascending order, I will correct this.")
     dets <- dets[ order(dets[,depthColumn]),]

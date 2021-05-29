@@ -19,17 +19,17 @@ NULL
 
 library(rbacon) # see also import.R
 
-# accrate.age.ghost()   Error in xy.coords(x, y) : 'x' and 'y' lengths differ
+# SpanLk: min(diff(dets[, 4])) : no non-missing arguments to min; returning Inf
+# probable source: rbacon's read_write.R:261
 
-
-# done: removed tmp functions Plum.agedepth.ghost(), Plum.agedepth(), tmpBacon.AnaOut() & tmpPlum.AnaOut(), flux.age.ghost now works with BCAD=TRUE and gained the option to draw the median values
+# done: 
 
 # do plum: Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel, too much space, check if ResCor is done correctly if using a C14-file, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
 
 #' @name Plum
-#' @title  Main 210Pb age-depth modelling function
-#' @description  This is the main age-depth modelling function of the rplum package for 210Pb age-modelling.
-#' @details  Plum is an approach to age-depth modelling that uses Bayesian statistics in order to reconstruct
+#' @title Main 210Pb age-depth modelling function
+#' @description This is the main age-depth modelling function of the rplum package for 210Pb age-modelling.
+#' @details Plum is an approach to age-depth modelling that uses Bayesian statistics in order to reconstruct
 #' accumulation histories for 210Pb-dated deposits by taking into account prior information, and can combine 210Pb, radiocarbon and other dates (Aquino et al. 2018).
 #'
 #' Plum handles 210Pb and other dated depths within in a core, by dividing a core into many thin vertical sections (by default of \code{thick=1} cm thickness),
@@ -213,7 +213,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
 #        stop("The date must be a numeric value", call.=FALSE)
 #    date.sample = as.numeric(ans)
 #  }
-  theta0 <- 1950 - date.sample
+  theta0 <- 1950 - date.sample # date.sample should be in AD, but internally we work with cal BP
 
   # use the correct radiometric units 
   if(Bqkg)
@@ -225,7 +225,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   if(!is.na(otherdates)) { # core also has cal BP or C-14 dates
     detsBacon <- read.dets(core, coredir, otherdates, sep=sep, dec=dec, cc=cc)
     detsPlum <- dets
-
     # merge radiocarbon and 210Pb dates into the same variable dets
     dets <- merge.dets(dets, detsBacon, delta.R, delta.STD, t.a, t.b, cc)
 
@@ -266,10 +265,13 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
 
     if(suggest) { # adapt prior for mean accumulation rate?
       sugg <- sapply(c(1,2,5), function(x) x*10^(-1:2)) # some suggested "round" values
-      ballpacc <- lm(detsBacon[,2]*1.1 ~ detsBacon[,4])$coefficients[2] # very rough acc.rate estimates, uncalibrated dates
-      ballpacc <- abs(sugg - ballpacc) # get absolute differences between given acc.mean and suggested ones
-      ballpacc <- ballpacc[ballpacc > 0] # do not suggest 0
-      sugg <- sugg[order(ballpacc)[1]] # suggest rounded acc.rate with lowest absolute difference
+      if(nrow(detsBacon) < 2) # if there's only 1 entry, e.g. a Cs peak...
+        sugg <- acc.mean else { # then don't use this but simply use the prior
+          ballpacc <- lm(detsBacon[,2]*1.1 ~ detsBacon[,4])$coefficients[2] # very rough acc.rate estimates, uncalibrated dates
+          ballpacc <- abs(sugg - ballpacc) # absolute differences between given acc.mean and suggested ones
+          ballpacc <- ballpacc[ballpacc > 0] # do not suggest 0
+          sugg <- sugg[order(ballpacc)[1]] # suggest rounded acc.rate with lowest absolute difference
+        }
       if(!sugg %in% acc.mean) {
         ans <- readline(message(" Ballpark estimates suggest changing the prior for acc.mean to ", sugg, " ", age.unit, "/", depth.unit, ". OK? (y/N) "))
         if(tolower(substr(ans,1,1)) == "y")
