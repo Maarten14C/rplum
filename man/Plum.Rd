@@ -44,7 +44,7 @@ Plum(
   cc4 = "ConstCal",
   ccdir = "",
   postbomb = 0,
-  delta.R = 1,
+  delta.R = 0,
   delta.STD = 0,
   t.a = 3,
   t.b = 4,
@@ -278,7 +278,7 @@ Plum also needs the date of sampling, in AD (\code{date.sample}).
 \examples{
 \donttest{
   Plum(ask=FALSE, run=FALSE, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
-  Plum.agedepth(age.res=50, d.res=50)
+  agedepth(age.res=50, d.res=50)
 }
 }
 \references{

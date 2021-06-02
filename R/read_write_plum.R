@@ -1,4 +1,16 @@
 
+# estimate how many MCMC iterations will be ran and returned
+plum.its <- function(ssize=2e3, set=get('info'), ACCEP_EV=20, EVERY_MULT=5, BURN_IN_MULT=20) {
+  dims <- set$K + 4 # accrates, start age, accumulation rate, memory
+  if(set$ra.case == 2)
+    dims <- dims + nrow(set$supportedData)
+  store.every <- dims * EVERY_MULT # depends on the amount of parameters
+  MCMC.size <- ACCEP_EV * store.every * (ssize + BURN_IN_MULT) # all iterations
+  MCMC.kept <- MCMC.size - (store.every * BURN_IN_MULT) # removing burnin
+  MCMC.stored <- round((MCMC.kept / store.every / ACCEP_EV) * 3.5) # just an estimate
+  message(" Will run around ", MCMC.size, " iterations and store around ", MCMC.stored)
+}
+
 
 #' @name Plum_runs
 #' @title List the folders present in the current core directory.

@@ -19,8 +19,7 @@ NULL
 
 library(rbacon) # see also import.R
 
-# SpanLk: min(diff(dets[, 4])) : no non-missing arguments to min; returning Inf
-# probable source: rbacon's read_write.R:261
+# do: 
 
 # done: 
 
@@ -156,7 +155,7 @@ library(rbacon) # see also import.R
 #' @examples
 #' \donttest{
 #'   Plum(ask=FALSE, run=FALSE, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
-#'   Plum.agedepth(age.res=50, d.res=50)
+#'   agedepth(age.res=50, d.res=50)
 #' }
 #' @references
 #' Aquino-Lopez, M.A., Blaauw, M., Christen, J.A., Sanderson, N., 2018. Bayesian analysis of 210Pb dating. Journal of Agricultural, Biological, and Environmental Statistics 23, 317-333
@@ -178,7 +177,7 @@ library(rbacon) # see also import.R
 #' Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62. doi: 10.1017/RDC.2020.41
 #'
 #' @export
-Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), ra.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", ccdir="", postbomb=0, delta.R=1, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=2000, th0=c(), burnin=min(1500, ssize), MinAge=c(), MaxAge=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, verbose=TRUE, ...) {
+Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), ra.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", ccdir="", postbomb=0, delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=2000, th0=c(), burnin=min(1500, ssize), MinAge=c(), MaxAge=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, verbose=TRUE, ...) {
   # Check coredir and if required, copy example file in core directory
   coredir <- assign_coredir(coredir, core, ask, isPlum=TRUE)
   if(core == "HP1C" || core == "LL14") { # || core == "SIM")
@@ -493,6 +492,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
 
 
   cook <- function() {
+    plum.its(ssize, info) # new June 2021
     txt <- paste0(info$prefix, ".bacon")
     #bacon(txt, outfile, ssize, ccdir)
     #.Call("_rbacon_bacon", PACKAGE="rbacon", txt, outfile, ssize, ccdir)
