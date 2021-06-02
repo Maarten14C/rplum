@@ -1,5 +1,5 @@
 ## Test environments
-* local Fedora install, R 4.0.4
+* local Fedora install, R 4.0.5
 * local Mac OS, R 4.0.5
 * rhub win-builder (devel and release) 
 * devtools check-win-oldrelease, check-win-release, check-win-devel
