@@ -17,9 +17,11 @@ NULL
 
 library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal R package
 
-# do: Add ballpark estimates of accrate - what type of site is it? option to enter supported data as file (instead of in parent .csv file), change column order in .csv file??? Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel as too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
+# do: add vignettes?
 
-# done: plots are now made as expected when a hiatus is inferred, any 14C or non-14C dates are now drawn with the correct colours, no more extrapolation beyond n.supp
+# do: Add more guidance on acc.mean - what type of site is it? option to enter supported data as file (instead of in parent .csv file), change column order in .csv file??? Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel as too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set to 0 by default?
+
+# done: providing information on ballpark accrate estimates, plots are now made as expected when a hiatus is inferred, any 14C or non-14C dates are now drawn with the correct colours, no more extrapolation beyond n.supp
 
 #' @name Plum
 #' @title Main 210Pb age-depth modelling function
@@ -294,7 +296,13 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     bg <- rplum:::check.equi(detsPlum, FALSE)
     drange <- detsPlum[1:(nrow(detsPlum)-bg),4] # range of depths with unsupported Pb
     accrate <- (max(drange) - min(drange)) # assuming 100 years as fixed 210Pb limit, ugly
-    message("\nPrior for acc.mean set at ", acc.mean, " ", age.unit, "/", depth.unit, ", ballpark estimates ", round(100/accrate, 0), "-", round(150/accrate, 0), " ", age.unit, "/", depth.unit, "\n")
+    agelim <- (1/0.03114) * log(phi.mean/Al) # Eq. 7 from Aquino et al. 2018
+    message("\nPrior for acc.mean set at ", acc.mean, " ", age.unit, "/", depth.unit,
+      ", ballpark estimate ", round(agelim/accrate, 1)," ", age.unit, "/", depth.unit,
+      if(agelim/accrate < 1)
+        ", which seems quite fast. Adapt acc.mean?",
+      if(agelim/accrate > 20)
+        ", which seems quite slow. Adapt acc.mean?", "\n")
   }
 
   info <- .plum.settings(core=core, coredir=coredir, dets=dets, detsBacon=detsBacon, thick=thick,

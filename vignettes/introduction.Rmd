@@ -87,9 +87,10 @@ If your core also has other dates, e.g., radiocarbon, that's not a problem. Just
 ```
 Plum("MyCore", otherdates="MyCore_C14.csv")
 ```
+
 Much of the rest of the `rplum` package functions the same as `rbacon`.
 
-rplum is open-source software; you are free to use, copy, distribute and modify it, but please do read this manual, the help functions and accompanying paper before using the program. This software is distributed under the terms of the GNU General Public Licence. rplum does not come with any warranty and the authors do not assume any responsibility for the usefulness of any portion of this program. *Do cite this program when modifying or using it, including its version, applied settings and calibration curves used.*
+rplum is open-source software; you are free to use, copy, distribute and modify it, but please do read this tutorial, the help functions and accompanying paper before using the program. This software is distributed under the terms of the GNU General Public Licence. rplum does not come with any warranty and the authors do not assume any responsibility for the usefulness of any portion of this program. *Do cite this program when modifying or using it, including its version, applied settings and calibration curves used.*
 
 Parts of this software remain under construction. Details such as the default settings and behaviour could change between versions, so please check this manual for the latest information. You are most welcome to report bugs, ideas and missing features to Maarten <maarten.blaauw@qub.ac.uk>, Marco <aquino@cimat.mx> or Andrés <jac@cimat.mx>.
 
