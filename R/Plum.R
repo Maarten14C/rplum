@@ -17,15 +17,11 @@ NULL
 
 library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal R package
 
-# give background/tail values a depth of 1 (or whatever depth, e.g. dmin)
+# do: write checks to confirm that the depths are basedepths not midpoints (i.e. no modelled depth goes above d.min). Add ballpark estimates of accrate - what type of site is it? option to enter supported data as file (instead of in parent .csv file), change column order in .csv file???
 
-# do: write checks to confirm that the depths are basedepths not midpoints (i.e. no modelled depth goes above d.min). Add ballpark estimates of accrate - what type of site is it? Check how C14 and Pb are integrated - some weird bug related to limits chronology when combining them.
+# # do: Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel as too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
 
-# do: check if tail works (bug reported by Marco), option to enter supported data as file (instead of in parent .csv file), change column order in .csv file??? d.max doesn't seem to extrapolate
-
-# do plum: Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel, too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
-
-# done: plots are now made as expected when a hiatus is inferred, any 14C or non-14C dates are now drawn with the correct colours
+# done: plots are now made as expected when a hiatus is inferred, any 14C or non-14C dates are now drawn with the correct colours, no more extrapolation beyond n.supp
 
 #' @name Plum
 #' @title Main 210Pb age-depth modelling function
@@ -289,6 +285,12 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     if(length(acc.mean) == 1)
       acc.mean <- rep(acc.mean, length(hiatus.depths)+1)
   }
+
+  # check if the depths in the det file are bottom depths, and not, say, midpoints
+  # it does this by calculating the top depths and ensuring they are not above d.min
+  if(suggest)
+    if(min(detsPlum[,5] - detsPlum[,6]) < d.min) # the we have a problem
+      message(paste0("\nWarning, are you sure that the depths in ", core, ".csv are correct? These should be the bottom depths of the measured slices. Adapt d.min?\n"))
 
   info <- .plum.settings(core=core, coredir=coredir, dets=dets, detsBacon=detsBacon, thick=thick,
     remember=remember, d.min=d.min, d.max=d.max, d.by=d.by, depths.file=depths.file, slump=slump, acc.mean=acc.mean,

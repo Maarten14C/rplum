@@ -2,6 +2,7 @@
 * now uses the renamed rintcal package instead of the IntCal package
 * any non-210Pb dates are now drawn in more predictable colours
 * in case of hiatuses, plots are now done as expected
+* tail measurements are now dealt with better (no extrapolation beyond reasonable territory)
 
 # rplum 0.2.2
 * removed closeAllConnections() option as requested by CRAN
