@@ -1,12 +1,11 @@
 Package: rplum
 Type: Package
 Title: Bayesian Age-Depth Modelling of Cores Dated by Pb-210
-Version: 0.2.2
-Date: 2021-06-02
+Version: 0.2.3
 Authors@R: c(
-    person("Maarten", "Blaauw", email = "maarten.blaauw@qub.ac.uk", role = c("aut", "cre")),
-    person("J. Andres", "Christen", email = "jac@cimat.mx", role = c("aut", "ctb", "cph")),
-    person("Marco A.", "Aquino-Lopez", email = "Marco.AquinoLopez@mu.ie", role="aut"),
+    person("Maarten", "Blaauw", email = "maarten.blaauw@qub.ac.uk", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5680-1515")),
+    person("J. Andres", "Christen", email = "jac@cimat.mx", role = c("aut", "ctb", "cph"), comment = c(ORCID = "0000-0002-5795-4345")),
+    person("Marco A.", "Aquino-Lopez", email = "aquino@cimat.mx", role="aut", comment = c(ORCID = "0000-0002-5076-7205")),    
 	person("Judith", "Esquivel-Vazquez", email = "", role = "ctb"),
   person("Oscar M.", "Gonzalez V.", email = "", role = "ctb"),
 	person("Ted", "Belding", role = "cph"),
@@ -19,8 +18,11 @@ License: GPL (>= 2)
 NeedsCompilation: no
 Imports: Rcpp (>= 0.12.12), coda (>= 0.19-1), grDevices, graphics,
         stats, utils
-Depends: rbacon (>= 2.5.6)
-RoxygenNote: 7.1.1
+Depends: rbacon (>= 2.6.0)
+RoxygenNote: 7.2.2
+Suggests: knitr, rmarkdown, utf8
+VignetteBuilder: knitr
+Language: en-GB
 Author: Maarten Blaauw [aut, cre],
   J. Andres Christen [aut, ctb, cph],
   Marco A. Aquino-Lopez [aut],
@@ -31,6 +33,4 @@ Author: Maarten Blaauw [aut, cre],
   Brian Gough [cph],
   Charles Karney [cph]
 Maintainer: Maarten Blaauw <maarten.blaauw@qub.ac.uk>
-Repository:
-Date/Publication: 2021-06-02 13:00:00
-Packaged: 2021-06-02 11:05:22 UTC; maarten
+Repository: CRAN

@@ -2,7 +2,7 @@
 
 # these functions run c++ code and are as yet unexported (not sure how to export them)
 events <- utils::getFromNamespace("events", "rbacon")
-bacon <- utils::getFromNamespace("bacon", "rbacon")
+# bacon <- utils::getFromNamespace("bacon", "rbacon") # since already called like this within the Plum function
 
 # these functions are exported by rbacon
 agedepth <- rbacon::agedepth

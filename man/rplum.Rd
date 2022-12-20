@@ -11,5 +11,5 @@ accumulation histories for 210Pb-dated deposits using prior information, and can
 See Aquino et al. (2018) <doi:10.1007/s13253-018-0328-7>.
 }
 \author{
-Maarten Blaauw <maarten.blaauw@qub.ac.uk> J. Andres Christen <jac@cimat.mx> Marco Aquino-Lopez <Marco.AquinoLopez@mu.ie>
+Maarten Blaauw <maarten.blaauw@qub.ac.uk> J. Andres Christen <jac@cimat.mx> Marco Aquino-Lopez <aquino@cimat.mx>
 }

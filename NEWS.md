@@ -1,3 +1,8 @@
+# rplum 0.2.3
+* now uses the renamed rintcal package instead of the IntCal package
+* any non-210Pb dates are now drawn in more predictable colours
+* in case of hiatuses, plots are now done as expected
+
 # rplum 0.2.2
 * removed closeAllConnections() option as requested by CRAN
 * if there is only one date in otherdates (e.g., a historical Cs peak), acc.rate isn't set to overly low values any more

@@ -1,4 +1,4 @@
-#' rplum
+F#' rplum
 #'
 #' Plum is an approach to age-depth modelling that uses Bayesian statistics to reconstruct 
 #' accumulation histories for 210Pb-dated deposits using prior information, and can combine 
@@ -6,24 +6,26 @@
 #' See Aquino et al. (2018) <doi:10.1007/s13253-018-0328-7>.
 #'
 #' @docType package
-#' @author Maarten Blaauw <maarten.blaauw@qub.ac.uk> J. Andres Christen <jac@cimat.mx> Marco Aquino-Lopez <Marco.AquinoLopez@mu.ie>
-#' @importFrom grDevices dev.cur dev.off pdf dev.copy2pdf grey rgb dev.list extendrange
-#' @importFrom graphics abline box curve hist image layout legend lines par plot points polygon segments rect axis mtext
-#' @importFrom stats approx dbeta density dgamma dnorm dunif lm quantile rnorm weighted.mean coef median
-#' @importFrom utils read.csv read.table write.table packageName txtProgressBar setTxtProgressBar
-#' @importFrom Rcpp evalCpp
-#' @importFrom coda gelman.diag mcmc.list as.mcmc
-#' @import rbacon
+#' @author Maarten Blaauw <maarten.blaauw@qub.ac.uk> J. Andres Christen <jac@cimat.mx> Marco Aquino-Lopez <aquino@cimat.mx>
+#' @importFrom grDevices dev.off pdf dev.copy2pdf dev.list extendrange
+#' @importFrom graphics layout legend par plot rect
+#' @importFrom stats lm coef
+#' @importFrom utils read.table write.table packageName
+#' @import rbacon rintcal
 #' @name rplum
 NULL
 
-library(rbacon) # see also import.R
+library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal R package
 
-# do: 
+# give background/tail values a depth of 1 (or whatever depth, e.g. dmin)
 
-# done: 
+# do: write checks to confirm that the depths are basedepths not midpoints (i.e. no modelled depth goes above d.min). Add ballpark estimates of accrate - what type of site is it? Check how C14 and Pb are integrated - some weird bug related to limits chronology when combining them.
 
-# do plum: Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel, too much space, check if ResCor is done correctly if using a C14-file, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
+# do: check if tail works (bug reported by Marco), option to enter supported data as file (instead of in parent .csv file), change column order in .csv file??? d.max doesn't seem to extrapolate
+
+# do plum: Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel, too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
+
+# done: plots are now made as expected when a hiatus is inferred, any 14C or non-14C dates are now drawn with the correct colours
 
 #' @name Plum
 #' @title Main 210Pb age-depth modelling function
@@ -110,15 +112,15 @@ library(rbacon) # see also import.R
 #' @param postbomb Use a postbomb curve for negative (i.e. postbomb) 14C ages. \code{0 = none, 1 = NH1, 2 = NH2, 3 = NH3, 4 = SH1-2, 5 = SH3}
 #' @param delta.R Mean of core-wide age offsets (e.g., regional marine offsets).
 #' @param delta.STD Error of core-wide age offsets (e.g., regional marine offsets).
-#' @param t.a The dates are treated using the student's t distribution by default (\code{normal=FALSE}).
-#' The student's t-distribution has two parameters, t.a and t.b, set at 3 and 4 by default (see Christen and Perez, 2010).
+#' @param t.a The dates are treated using the t distribution by default (\code{normal=FALSE}).
+#' The t-distribution has two parameters, t.a and t.b, set at 3 and 4 by default (see Christen and Perez, 2009).
 #' If you want to assign narrower error distributions (more closely resembling the normal distribution), set t.a and t.b at for example 33 and 34 respectively (e.g., for specific dates in your .csv file).
 #' For symmetry reasons, t.a must always be equal to t.b-1.
-#' @param t.b The dates are treated using the student's t distribution by default (\code{normal=FALSE}).
-#' The student's t-distribution has two parameters, t.a and t.b, set at 3 and 4 by default (see Christen and Perez, 2010).
+#' @param t.b The dates are treated using the t distribution by default (\code{normal=FALSE}).
+#' The t-distribution has two parameters, t.a and t.b, set at 3 and 4 by default (see Christen and Perez, 2010).
 #' If you want to assign narrower error distributions (more closely resembling the normal distribution), set t.a and t.b at for example 33 and 34 respectively (e.g., for specific dates in your .csv file).
 #' For symmetry reasons, t.a must always be equal to t.b-1.
-#' @param normal By default, Plum uses the student's t-distribution to treat the dates. Use \code{normal=TRUE} to use the normal/Gaussian distribution. This will generally give higher weight to the dates.
+#' @param normal By default, Plum uses the t-distribution to treat the dates. Use \code{normal=TRUE} to use the normal/Gaussian distribution. This will generally give higher weight to the dates.
 #' @param suggest If initial analysis of the data indicates abnormally slow or fast accumulation rates, Plum will suggest to change the prior.
 #'  Also, if the length of the core would cause too few or too many sections with the default settings, Plum will suggest an alternative section thickness \code{thick}, and it will suggest approaches to estimating supported Pb-120. 
 #'  Accept these suggested alternative settings by typing "y" (or "yes please" if you prefer to be polite), or leave as is by typing "n" (or anything else, really). To get rid of these suggestions, use \code{suggest=FALSE}.
@@ -139,7 +141,7 @@ library(rbacon) # see also import.R
 #' @param th0 Starting years for the MCMC iterations.
 #' @param burnin Amount of initial, likely sub-optimal MCMC iterations that will be removed.
 #' @param MinAge Minimum age limit for Plum runs, default at current year in cal BP. To set plot limits, use \code{yr.min} instead.
-#' @param MaxAge Maximum age limit for Plum runs, default at 1,000,000 cal BP. To set plot limits, use \code{yr.max} instead.
+#' @param MaxAge Maximum age limit for Plum runs, default at 1,000,000 cal BP. To set plot limits, use \code{yr.max} instead. not find IntCal20 cal. curve, file not found: %s\n", filename.c_str());
 #' @param cutoff Avoid plotting very low probabilities of date distributions (default \code{cutoff=0.001}).
 #' @param rounded Rounding of calendar years. Defaults to 1 decimal. 
 #' @param plot.pdf Produce a pdf file of the age-depth plot. Defaults to \code{plot.pdf=TRUE} after a Plum run.
@@ -177,7 +179,7 @@ library(rbacon) # see also import.R
 #' Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62. doi: 10.1017/RDC.2020.41
 #'
 #' @export
-Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), ra.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", ccdir="", postbomb=0, delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=2000, th0=c(), burnin=min(1500, ssize), MinAge=c(), MaxAge=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, verbose=TRUE, ...) {
+Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), ra.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", ccdir="", postbomb=0, delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=4000, th0=c(), burnin=min(500, ssize), MinAge=c(), MaxAge=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, verbose=TRUE, ...) {
   # Check coredir and if required, copy example file in core directory
   coredir <- assign_coredir(coredir, core, ask, isPlum=TRUE)
   if(core == "HP1C" || core == "LL14") { # || core == "SIM")
@@ -188,7 +190,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
 
   # set the calibration curve
   if(ccdir=="")
-    ccdir <- system.file("extdata", package="IntCal")
+    ccdir <- system.file("extdata", package="rintcal")
   ccdir <- validateDirectoryName(ccdir)
 
   # default_settings.txt is located within system.file
@@ -214,19 +216,19 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
 #  }
   theta0 <- 1950 - date.sample # date.sample should be in AD, but internally we work with cal BP
 
-  # use the correct radiometric units 
+  # use the correct radiometric units # Mar 2022: check if correct. Should also allow for other conversions. 
   if(Bqkg)
     dets[,6] <- dets[,6]*10.0 else {
       dets[,6] <- dets[,6]*500./3.
       Al <- Al*500./3.
     }
 
+  detsBacon <- c()
   if(!is.na(otherdates)) { # core also has cal BP or C-14 dates
     detsBacon <- read.dets(core, coredir, otherdates, sep=sep, dec=dec, cc=cc)
     detsPlum <- dets
     # merge radiocarbon and 210Pb dates into the same variable dets
     dets <- merge.dets(dets, detsBacon, delta.R, delta.STD, t.a, t.b, cc)
-
   } else {
     detsPlum <- dets
     for(i in (ncol(dets)+1):9) {
@@ -288,8 +290,8 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
       acc.mean <- rep(acc.mean, length(hiatus.depths)+1)
   }
 
-  info <- .plum.settings(core=core, coredir=coredir, dets=dets, thick=thick, remember=remember,
-    d.min=d.min, d.max=d.max, d.by=d.by, depths.file=depths.file, slump=slump, acc.mean=acc.mean,
+  info <- .plum.settings(core=core, coredir=coredir, dets=dets, detsBacon=detsBacon, thick=thick,
+    remember=remember, d.min=d.min, d.max=d.max, d.by=d.by, depths.file=depths.file, slump=slump, acc.mean=acc.mean,
     acc.shape=acc.shape, mem.mean=mem.mean, mem.strength=mem.strength, boundary=boundary,
     hiatus.depths=hiatus.depths, hiatus.max=hiatus.max, BCAD=BCAD, cc=cc, postbomb=postbomb,
     cc1=cc1, cc2=cc2, cc3=cc3, cc4=cc4, depth.unit=depth.unit, normal=normal, t.a=t.a, t.b=t.b,
@@ -331,7 +333,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
       ncol(info$detsBacon)>4 && max(info$detsBacon[,5]) > 0 && min(info$detsBacon[info$detsBacon[,5] > 0,2]) < 0))
         stop("you have negative C14 ages so should select a postbomb curve", call.=FALSE)
   if(info$hasBaconData)  # only calibrate radiocarbon dates
-   info$calib <- bacon.calib(info$detsBacon, info, date.res, ccdir=ccdir)
+    info$calib <- bacon.calib(info$detsBacon, info, date.res, ccdir=ccdir)
 
   ### find some relevant values
   info$rng <- c()
@@ -341,7 +343,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
       info$rng <- range(info$rng, tmp[which(tmp[,2]>cutoff),1])
     }
 
-  if(length(th0)==0) # provide two ball-park/initial age estimates
+  if(length(th0) == 0) # provide two ball-park/initial age estimates
     info$th0 <- c(theta0-.01, theta0+.01)
   info$th0[info$th0 < info$MinAge] <- info$MinAge # otherwise twalk will not start
 
@@ -382,18 +384,18 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     }
   }
 
-   ans <- "n"
-    if(suggest)
-      if(length(reswarn) == 2)
-        if(info$K < min(reswarn)) {
-          sugg <- pretty(thick*(info$K/min(reswarn)), 10)
-          sugg <- min(sugg[sugg>0])
-          ans <- readline(message(" Warning, the current value for thick, ", thick, ", will result in very few age-model sections (", info$K, ", not very flexible). Suggested maximum value for thick: ", sugg, " OK? (y/n) "))
-        } else
-          if(info$K > max(reswarn)) {
-            sugg <- max(pretty(thick*(info$K/max(reswarn))))
-            ans <- readline(message(" Warning, the current value for thick, ", thick, ", will result in very many age-model sections (", info$K, ", possibly hard to run). Suggested minimum value for thick: ", sugg, " OK? (y/n) "))
-          }
+  ans <- "n"
+  if(suggest)
+    if(length(reswarn) == 2)
+      if(info$K < min(reswarn)) {
+        sugg <- pretty(thick*(info$K/min(reswarn)), 10)
+        sugg <- min(sugg[sugg>0])
+        ans <- readline(message(" Warning, the current value for thick, ", thick, ", will result in very few age-model sections (", info$K, ", not very flexible). Suggested maximum value for thick: ", sugg, " OK? (y/n) "))
+      } else
+        if(info$K > max(reswarn)) {
+          sugg <- max(pretty(thick*(info$K/max(reswarn))))
+          ans <- readline(message(" Warning, the current value for thick, ", thick, ", will result in very many age-model sections (", info$K, ", possibly hard to run). Suggested minimum value for thick: ", sugg, " OK? (y/n) "))
+        }
     if(tolower(substr(ans, 1, 1)) == "y") {
       message(" OK, setting thick to ", sugg, "\n")
       thick <- sugg
@@ -484,12 +486,10 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     PlotSuppPrior(info)
 
     if(info$hasBaconData)
-      calib.plot(info, BCAD=BCAD, new.plot=T, plot.dists=T, height=1)
+      rbacon::calib.plot(info, dets=info$detsBacon, BCAD=BCAD, new.plot=TRUE, plot.dists=TRUE, height=1)
     draw.pbmeasured(info)
     legend("top", core, bty="n", cex=1.5)
   }
-
-
 
   cook <- function() {
     plum.its(ssize, info) # new June 2021
@@ -509,7 +509,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
         if(length(dev.list()) > 0)
           dev.copy2pdf(file=paste0(info$prefix, ".pdf")) else {
             pdf(file=paste0(info$prefix, ".pdf"))
-            agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=FALSE, age.unit=age.unit, depth.unit=depth.unit, rounded=rounded, ...)
+            rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=FALSE, age.unit=age.unit, depth.unit=depth.unit, rounded=rounded, ...)
             # Plum.agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=FALSE, age.unit=age.unit, depth.unit=depth.unit, rounded=rounded, ...) # tmp May 21
             dev.off()
           }
@@ -528,7 +528,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
             cook() else
               message("  OK. Please adapt settings.\n")
         }
-
 
   #if(close.connections)
   #  close(outfile)
