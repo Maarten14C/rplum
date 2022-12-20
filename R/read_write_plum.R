@@ -27,8 +27,8 @@ Plum_runs <- function(coredir=get('info')$coredir)
 
 # Do a regression to determine the optimal number of supported data to use; the minimum is 3
 check.equi <- function(dets, suggest=TRUE) {
-  rawdata <- dets[,4] #210Pb
-  rawsd <- dets[,5] #sd(210pb)
+  rawdata <- dets[,2] #210Pb
+  rawsd <- dets[,3] #sd(210pb)
   # deps    <- dets[,2] #depth
 
   lendat <- length(rawdata)
@@ -62,7 +62,7 @@ check.equi <- function(dets, suggest=TRUE) {
   }
 
   if(suggest) {
-    ans <- readline(message("The regression process proposes using the last ", as.integer(coe), " data points as estimates of the supported activity, with a p-value of ", round((reg),3), ", OK? (Y/n) "))
+    ans <- readline(message("The regression process proposes using the bottom ", as.integer(coe), " data points as estimates of the supported activity, with a p-value of ", round((reg),3), ", OK? (Y/n) "))
     if(!(ans=="y" || ans=="")) {
       message("  OK. Please provide correct n.supp (as Plum option or in the .csv file).")
       stopQuietly()

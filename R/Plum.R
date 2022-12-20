@@ -17,9 +17,7 @@ NULL
 
 library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal R package
 
-# do: write checks to confirm that the depths are basedepths not midpoints (i.e. no modelled depth goes above d.min). Add ballpark estimates of accrate - what type of site is it? option to enter supported data as file (instead of in parent .csv file), change column order in .csv file???
-
-# # do: Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel as too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
+# do: Add ballpark estimates of accrate - what type of site is it? option to enter supported data as file (instead of in parent .csv file), change column order in .csv file??? Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel as too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set at 0 by default?
 
 # done: plots are now made as expected when a hiatus is inferred, any 14C or non-14C dates are now drawn with the correct colours, no more extrapolation beyond n.supp
 
@@ -286,11 +284,18 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
       acc.mean <- rep(acc.mean, length(hiatus.depths)+1)
   }
 
-  # check if the depths in the det file are bottom depths, and not, say, midpoints
-  # it does this by calculating the top depths and ensuring they are not above d.min
-  if(suggest)
-    if(min(detsPlum[,5] - detsPlum[,6]) < d.min) # the we have a problem
+  if(suggest) {
+    # check if the depths in the det file are bottom depths, and not, say, midpoints
+    # it does this by calculating the top depths and ensuring they are not above d.min
+    if(min(detsPlum[,4] - detsPlum[,5]) < d.min) # the we have a problem
       message(paste0("\nWarning, are you sure that the depths in ", core, ".csv are correct? These should be the bottom depths of the measured slices. Adapt d.min?\n"))
+
+    # check if accrates might need adaptation
+    bg <- rplum:::check.equi(detsPlum, FALSE)
+    drange <- detsPlum[1:(nrow(detsPlum)-bg),4] # range of depths with unsupported Pb
+    accrate <- (max(drange) - min(drange)) # assuming 100 years as fixed 210Pb limit, ugly
+    message("\nPrior for acc.mean set at ", acc.mean, " ", age.unit, "/", depth.unit, ", ballpark estimates ", round(100/accrate, 0), "-", round(150/accrate, 0), " ", age.unit, "/", depth.unit, "\n")
+  }
 
   info <- .plum.settings(core=core, coredir=coredir, dets=dets, detsBacon=detsBacon, thick=thick,
     remember=remember, d.min=d.min, d.max=d.max, d.by=d.by, depths.file=depths.file, slump=slump, acc.mean=acc.mean,
@@ -524,7 +529,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
       if(!ask)
         cook() else {
           prepare()
-          ans <- readline(message(" Run ", core, " with ", info$K, " sections? (Y/n) "))
+          ans <- readline(message("Run ", core, " with ", info$K, " sections? (Y/n) "))
           ans <- tolower(substr(ans,1,1))[1]
           if(ans=="y" || ans=="")
             cook() else
