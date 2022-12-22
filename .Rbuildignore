@@ -1,3 +1,5 @@
 ^cran-comments\.md$
 ^.gitignore$
 ^CRAN-RELEASE$
+^checkTheseRunCommands.txt$
+^CRAN-SUBMISSION$

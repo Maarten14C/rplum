@@ -1,4 +1,4 @@
-
+#
 # estimate how many MCMC iterations will be ran and returned
 plum.its <- function(ssize=2e3, set=get('info'), ACCEP_EV=20, EVERY_MULT=5, BURN_IN_MULT=20) {
   dims <- set$K + 4 # accrates, start age, accumulation rate, memory
@@ -403,7 +403,7 @@ Plum.cleanup <- function(set=get('info')) {
 
 
 # read in default values, values from previous run, any specified values, and report the desired one. Internal function. Differs from Bacon.settings because it requires Pb-specific settings.
-.plum.settings <- function(core, coredir, dets, detsBacon, thick, remember=TRUE, d.min, d.max, d.by, depths.file,
+.plum.settings <- function(core, coredir, dets, detsPlum, detsBacon, thick, remember=TRUE, d.min, d.max, d.by, depths.file,
   slump, acc.mean, acc.shape, mem.mean, mem.strength, boundary, hiatus.depths, hiatus.max, hiatus.shape,
   BCAD, cc, postbomb, cc1, cc2, cc3, cc4, depth.unit, normal, t.a, t.b, delta.R, delta.STD, prob,
   defaults, runname, ssize, dark, MinAge, MaxAge, cutoff, age.res, after, age.unit,
@@ -449,13 +449,12 @@ Plum.cleanup <- function(set=get('info')) {
   }
 
   if(is.na(d.min) || d.min=="NA")
-    d.min <- min(dets[,4])
-  if(is.na(d.max) || d.max=="NA") {
-    #d.max <- max(dets[,4]) # tmp
+    d.min <- min(detsPlum[,4])
+  if(is.na(d.max) || d.max=="NA")
     if(length(detsBacon) == 0)  # Dec 2022. Should this only be if ra.case=0?
-      d.max <- max(dets[1:(nrow(dets)-n.supp),4]) else
-        d.max <- max(dets[1:(nrow(dets)-n.supp),4], detsBacon[,4])
-    }
+        d.max <- max(detsPlum[1:(nrow(detsPlum)-n.supp),4])+(thick/5) else
+          d.max <- max(detsPlum[1:(nrow(detsPlum)-n.supp),4], detsBacon[,4])+(thick/5)
+
   if(length(acc.shape) < length(acc.mean))
     acc.shape <- rep(acc.shape, length(acc.mean)) else
       if(length(acc.shape) > length(acc.mean))
@@ -522,7 +521,7 @@ merge.dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc) {
 
   if(ncol(detsBacon) < 9 ) {
     for(i in(ncol(detsBacon)+1):9) {
-      if(i==5) {
+      if(i==5) {detsPlum
         col <- array(delta.R, dim=c(nrow(detsBacon),1))
       } else if(i==6) {
         col <- array(delta.STD, dim=c(nrow(detsBacon),1))
@@ -582,11 +581,11 @@ write.plum.file <- function(set=get('info')) {
     dets[1,3] <- max(1e5, 1e3*dets[,4], 1e3*dets[,3])
     dets[1,depthColumn] <- set$d.min
     bg <- set$supportedData[,3] # now reassign depths of the data in the tail
-    # tail measurements do not require depths, so we reassign them
+    # tail measurements do not require depths, so we reassign them to dummy depths
     if(set$ra.case < 2) # or <2?
       for(i in 1:length(bg)) {
           d_i <- which(dets[,depthColumn] == bg[i])
-          dets[d_i,depthColumn] <- set$d.min+1
+          dets[d_i,depthColumn] <- set$d.min-10 # dummy depths, outside of the range of the core depths
         }
   }
 

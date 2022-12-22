@@ -1,10 +1,10 @@
-# rplum 0.2.3
+# rplum 0.3.0
 * now uses the renamed rintcal package instead of the IntCal package
 * any non-210Pb dates are now drawn in more predictable colours
 * in case of hiatuses, plots are now done as expected
 * tail measurements are now dealt with better (no extrapolation beyond reasonable territory)
 * information is provided on ballpark accumulation rates and how they compare to the prior settings
-* a warning is given if it seems that the depths in the dets file might not be the bottom depths of the slices
+* If the depths in the dets file appear not be the bottom depths of the slices, this now results in an error
 
 # rplum 0.2.2
 * removed closeAllConnections() option as requested by CRAN

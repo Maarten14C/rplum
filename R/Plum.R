@@ -17,9 +17,9 @@ NULL
 
 library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal R package
 
-# do: add vignettes?
+# do:
 
-# do: Add more guidance on acc.mean - what type of site is it? option to enter supported data as file (instead of in parent .csv file), change column order in .csv file??? Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel as too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set to 0 by default?
+# do: check if Plum(run=F) followed by agedepth works (Error in read.table(fnam, ...) : no lines available in input), add more guidance on acc.mean - what type of site is it? option to enter supported data as file (instead of in parent .csv file), change column order in .csv file??? Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel as too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set to 0 by default?
 
 # done: providing information on ballpark accrate estimates, plots are now made as expected when a hiatus is inferred, any 14C or non-14C dates are now drawn with the correct colours, no more extrapolation beyond n.supp
 
@@ -137,7 +137,7 @@ library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal
 #' @param th0 Starting years for the MCMC iterations.
 #' @param burnin Amount of initial, likely sub-optimal MCMC iterations that will be removed.
 #' @param MinAge Minimum age limit for Plum runs, default at current year in cal BP. To set plot limits, use \code{yr.min} instead.
-#' @param MaxAge Maximum age limit for Plum runs, default at 1,000,000 cal BP. To set plot limits, use \code{yr.max} instead. not find IntCal20 cal. curve, file not found: %s\n", filename.c_str());
+#' @param MaxAge Maximum age limit for Plum runs, default at 1,000,000 cal BP. To set plot limits, use \code{yr.max} instead.
 #' @param cutoff Avoid plotting very low probabilities of date distributions (default \code{cutoff=0.001}).
 #' @param rounded Rounding of calendar years. Defaults to 1 decimal. 
 #' @param plot.pdf Produce a pdf file of the age-depth plot. Defaults to \code{plot.pdf=TRUE} after a Plum run.
@@ -152,8 +152,7 @@ library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal
 #' @return An age-depth model graph, its age estimates, and a summary.
 #' @examples
 #' \donttest{
-#'   Plum(ask=FALSE, run=FALSE, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
-#'   agedepth(age.res=50, d.res=50)
+#'   Plum(ask=FALSE, ssize=100, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
 #' }
 #' @references
 #' Aquino-Lopez, M.A., Blaauw, M., Christen, J.A., Sanderson, N., 2018. Bayesian analysis of 210Pb dating. Journal of Agricultural, Biological, and Environmental Statistics 23, 317-333
@@ -178,7 +177,7 @@ library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal
 Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), ra.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", ccdir="", postbomb=0, delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=4000, th0=c(), burnin=min(500, ssize), MinAge=c(), MaxAge=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, verbose=TRUE, ...) {
   # Check coredir and if required, copy example file in core directory
   coredir <- assign_coredir(coredir, core, ask, isPlum=TRUE)
-  if(core == "HP1C" || core == "LL14") { # || core == "SIM")
+  if(core == "HP1C" || core == "LL14") {
     dir.create(paste0(coredir, core, "/"), showWarnings = FALSE, recursive = TRUE)
     fileCopy <- system.file(paste0("extdata/Cores/", core), package="rplum")
     file.copy(fileCopy, coredir, recursive = TRUE, overwrite=FALSE)
@@ -244,7 +243,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     colnames(dets) <- c("labID", "X210Pb.Bq.kg.", "sd.210Pb.", "depth.cm.", "thickness.cm.", "density.g.cm.3.",  "t.a", "t.b", "cc")  
   }
 
-  if(!is.na(otherdates)) {
+  if(!is.na(otherdates)) { # if other, non-210Pb dates are to be included
     # give feedback about calibration curves used
     if(ncol(detsBacon) > 4 && length(cc) > 0) {
       cc.csv <- unique(detsBacon[,5])
@@ -290,10 +289,10 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     # check if the depths in the det file are bottom depths, and not, say, midpoints
     # it does this by calculating the top depths and ensuring they are not above d.min
     if(min(detsPlum[,4] - detsPlum[,5]) < d.min) # the we have a problem
-      message(paste0("\nWarning, are you sure that the depths in ", core, ".csv are correct? These should be the bottom depths of the measured slices. Adapt d.min?\n"))
+      stop(paste0("The depths in ", core, ".csv should be the bottom depths of the measured slices. Not the midpoints! Or adapt d.min?\n"), call.=TRUE)
 
     # check if accrates might need adaptation
-    bg <- rplum:::check.equi(detsPlum, FALSE)
+    bg <- check.equi(detsPlum, FALSE)
     drange <- detsPlum[1:(nrow(detsPlum)-bg),4] # range of depths with unsupported Pb
     accrate <- (max(drange) - min(drange)) # assuming 100 years as fixed 210Pb limit, ugly
     agelim <- (1/0.03114) * log(phi.mean/Al) # Eq. 7 from Aquino et al. 2018
@@ -305,7 +304,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
         ", which seems quite slow. Adapt acc.mean?", "\n")
   }
 
-  info <- .plum.settings(core=core, coredir=coredir, dets=dets, detsBacon=detsBacon, thick=thick,
+  info <- .plum.settings(core=core, coredir=coredir, dets=dets, detsPlum=detsPlum, detsBacon=detsBacon, thick=thick,
     remember=remember, d.min=d.min, d.max=d.max, d.by=d.by, depths.file=depths.file, slump=slump, acc.mean=acc.mean,
     acc.shape=acc.shape, mem.mean=mem.mean, mem.strength=mem.strength, boundary=boundary,
     hiatus.depths=hiatus.depths, hiatus.max=hiatus.max, BCAD=BCAD, cc=cc, postbomb=postbomb,

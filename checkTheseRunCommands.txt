@@ -1,0 +1,7 @@
+require(rplum)
+
+Plum(ssize=1e3, ask=FALSE)
+Plum(ssize=1e3, ask=FALSE, BCAD=TRUE, d.max=50)
+Plum("LL14", ask=FALSE, ssize=1e3, ra.case=2)
+Plum("LL14", ask=FALSE, ssize=1e3, otherdates="LL14_14C.csv", ra.case=2, acc.mean=5)
+

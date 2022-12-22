@@ -223,7 +223,7 @@ try running your core again with \code{remember=FALSE}, or, start cleanly by typ
 
 \item{MinAge}{Minimum age limit for Plum runs, default at current year in cal BP. To set plot limits, use \code{yr.min} instead.}
 
-\item{MaxAge}{Maximum age limit for Plum runs, default at 1,000,000 cal BP. To set plot limits, use \code{yr.max} instead. not find IntCal20 cal. curve, file not found: %s\n", filename.c_str());}
+\item{MaxAge}{Maximum age limit for Plum runs, default at 1,000,000 cal BP. To set plot limits, use \code{yr.max} instead.}
 
 \item{cutoff}{Avoid plotting very low probabilities of date distributions (default \code{cutoff=0.001}).}
 
@@ -277,8 +277,7 @@ Plum also needs the date of sampling, in AD (\code{date.sample}).
 }
 \examples{
 \donttest{
-  Plum(ask=FALSE, run=FALSE, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
-  agedepth(age.res=50, d.res=50)
+  Plum(ask=FALSE, ssize=100, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
 }
 }
 \references{
