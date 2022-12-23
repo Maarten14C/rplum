@@ -3,3 +3,6 @@
 ^CRAN-RELEASE$
 ^checkTheseRunCommands.txt$
 ^CRAN-SUBMISSION$
+^doc$
+^Meta$
+^.DS_Store
