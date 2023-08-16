@@ -1,17 +1,23 @@
 ---
-title: "rplum"
-output: rmarkdown::html_vignette
+title: rplum
+output:
+  html_vignette:
+    toc: true
+    toc_depth: 2
+    number_sections: true
 vignette: >
   %\VignetteIndexEntry{rplum}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
+# Introduction
 
+*rplum* produces Bayesian age-depth models from sediment cores dated with Pb-210 (Aquino et al. 2018[^1]). 
 
-*rplum* produces Bayesian age-depth models from sediment cores dated with Pb-210 (Aquino et al. 2018). 
+In short, like the commonly used CRS or constant-flux model, *Plum* assumes a constant rate of supply of unsupported Pb-210 (flux), and also either assumes a constant supported Pb-210 or estimates the supported levels from measurements of other isotopes. Both parameters are constrained by prior information on the flux and the supported Pb-210 (both are gamma distributions, which ensure that the values are always positive). It uses the Bacon (Blaauw and Christen 2011[^2]) age-model approach (piece-wise linear interpolation of sections of equal thickness (default 1 cm), constrained by prior information on accumulation rate and its variability) to assign ages to each depth, using millions of Markov chain Monte Carlo (MCMC) iterations. The output includes an age-depth model and posterior estimates for the flux, the supported Pb-210, the accumulation rate and its variability.
 
-In short, like the commonly used CRS or constant-flux model, *Plum* (Aquino-López et al. 2018[^1]) assumes a constant rate of supply of unsupported Pb-210 (flux), and also either assumes a constant supported Pb-210 or estimates the supported levels from measurements of other isotopes. Both parameters are constrained by prior information on the flux and the supported Pb-210 (both are gamma distributions, which ensure that the values are always positive). It uses the Bacon (Blaauw and Christen 2011[^2]) age-model approach (piece-wise linear interpolation of sections of equal thickness (default 1 cm), constrained by prior information on accumulation rate and its variability) to assign ages to each depth, using millions of Markov chain Monte Carlo (MCMC) iterations. The output includes an age-depth model and posterior estimates for the flux, the supported Pb-210, the accumulation rate and its variability.
+# Installation and loading
 
 If the R package isn't installed yet on your computer (or if you wish to update it), install it like this:
 
@@ -25,6 +31,7 @@ To load it, type:
 library(rplum)
 ```
 
+# Running rplum
 
 To get started, run *Plum* like this (using the default core, accepting all options, going for a short and fast run, and storing the results in a temporary directory):
 
@@ -34,7 +41,7 @@ Plum(ask=FALSE, suggest=FALSE, ssize=100, coredir=tempdir())
 
 When asked, provide the date when the samples were measured (2018), accept the suggested tail measurements to estimate supported Pb (n.supp = 3), and set ra.case to 0 (no radium present; see below).
 
-This produces an age-depth model for HP1C (Aquino-Lopez et al. 2018[^1]), the core that ships with *rplum*, and should hopefully look like the following graph:
+This produces an age-depth model for HP1C (Aquino-Lopez et al. 2018), the core that ships with *rplum*, and should hopefully look like the following graph:
 ![a Plum age-depth model](./images/chron.png)
 
 The top panels show, from left to right, the MCMC series (this should show white noise, without much noticable structure), and the prior (green) and posterior (grey) distributions for, respectively, the accumulation rate (in yr/cm), the accumulation variability or memory, the flux of Pb-210 (phi), and the level of supported Pb-210 (s). Red text indicates the settings. (these panels are very important in order to assess the quality of the run and to allow for others to reproduce it, so please **don't cut them from your plots in your papers!**). Then finally, in the main panel below we have the age-depth model. Blue-scale indicates the modelled Pb-210 values (based on the posterior values for the age-model and the Pb-210 parameters), blue boxes indicate the measured values, grey-scale is the age-depth model, grey dashes are the 95% range, and red dashes are the mean age-depth model. 
@@ -42,6 +49,8 @@ The top panels show, from left to right, the MCMC series (this should show white
 This core has no accompanying measurements to estimate the level of supported Pb-210, so instead it models supported Pb-210 as constant. The parameters for supported and unsupported 210Pb are then estimated from the data (especially the tail-end, bottom-most data points), constrained by the prior information. That is radon case 0.
 
 If you don't specify a core directory (`coredir=c()`), then Plum will look for a folder called Plum_runs in the directory where it is currently working. If no such folder is found, Plum will ask if it can make one. Make a note of where this folder is, as this is where Plum will expect to find other cores, including yours. 
+
+# Files
 
 Now we take a closer look at the structure of the data file of core HP1C. 
 ```{r}
@@ -66,6 +75,8 @@ Plum("MyCore", sample.date=2014.5)
 
 The default is to use the units Bq/kg for the Pb210 measurements. If yours are in dpm/g instead, use `Bqkg=FALSE`.
 
+## Providing information on supported lead
+
 If radon measurements are available as estimates of supported Pb-210, these can be added as additional columns (mean, error) in the .csv file, after the columns for Pb-210. 
 
 After the data columns of the .csv file, you can optionally add 3 lines of additional information (each row again separated by a comma):
@@ -81,11 +92,13 @@ Alternatively, this information can be provided within the Plum command, e.g., a
 
 It is not possible to both assume varying radon and select bottom samples for estimating radon, as the latter assumes constant radon whereas the former assumes it is varying. 
   
-If your core also has other dates, e.g., radiocarbon, that's not a problem. Just use a file with the same formatting as that of rbacon (Blaauw and Christen 2011[^2]), save it in the directory of the core, and provide its name as an option, e.g.:
+If your core also has other dates, e.g., radiocarbon, that's not a problem. Just use a file with the same formatting as that of rbacon ([^3]), save it in the directory of the core, and provide its name as an option, e.g.:
 
 ```{r, eval=FALSE}
 Plum("MyCore", otherdates="MyCore_C14.csv")
 ```
+
+# Further information
 
 Much of the rest of the `rplum` package functions the same as `rbacon` (check its vignettes [here](https://cran.r-project.org/package=rbacon)).
 
@@ -93,10 +106,9 @@ rplum is open-source software; you are free to use, copy, distribute and modify 
 
 Parts of this software remain under construction. Details such as the default settings and behaviour could change between versions, so please check this manual for the latest information. You are most welcome to report bugs, ideas and missing features to Maarten <maarten.blaauw@qub.ac.uk>, Marco <aquino@cimat.mx> or Andrés <jac@cimat.mx>.
 
----
-
-**References**
 
 [^1]: Aquino-Lopez, M.A., Blaauw, M., Christen, J.A., Sanderson, N., 2018. Bayesian analysis of 210Pb dating. Journal of Agricultural, Biological, and Environmental Statistics 23, 317-333
 
 [^2]: Blaauw, M. and Christen, J.A., 2011. Flexible paleoclimate age-depth models using an autoregressive gamma process. Bayesian Analysis 6(3), 457-474
+
+[^3]: [cran.r-project.org/package=rbacon](https://cran.r-project.org/package=rbacon)

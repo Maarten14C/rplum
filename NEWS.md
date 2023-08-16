@@ -1,3 +1,7 @@
+# rplum 0.3.1
+* rplum now requires at least rbacon's version 3.1.1 (this version corrects a bug with postbomb dates)
+* renamed the options MinAge and MaxAge to the hopefully less confusing youngest.age and oldest.age
+
 # rplum 0.3.0
 * now uses the renamed rintcal package instead of the IntCal package
 * any non-210Pb dates are now drawn in more predictable colours

@@ -1,7 +1,7 @@
 Package: rplum
 Type: Package
 Title: Bayesian Age-Depth Modelling of Cores Dated by Pb-210
-Version: 0.3.0
+Version: 0.3.1
 Author: Maarten Blaauw [aut, cre] (<https://orcid.org/0000-0002-5680-1515>),
   J. Andres Christen [aut, ctb, cph]
     (<https://orcid.org/0000-0002-5795-4345>),
@@ -50,8 +50,8 @@ Description: An approach to age-depth modelling that uses Bayesian statistics to
 Encoding: UTF-8
 License: GPL (>= 2)
 NeedsCompilation: no
-Imports: grDevices, graphics, stats, utils, rintcal (>= 0.5.2)
-Depends: rbacon (>= 3.0.0)
+Imports: grDevices, graphics, stats, utils, rintcal (>= 0.6.0)
+Depends: rbacon (>= 3.1.1)
 RoxygenNote: 7.2.3
 Suggests: knitr, rmarkdown, utf8
 VignetteBuilder: knitr

@@ -64,7 +64,9 @@ Plum(
   th0 = c(),
   burnin = min(500, ssize),
   MinAge = c(),
+  youngest.age = c(),
   MaxAge = c(),
+  oldest.age = c(),
   cutoff = 0.001,
   rounded = 1,
   plot.pdf = TRUE,
@@ -72,6 +74,9 @@ Plum(
   date.res = 100,
   age.res = 200,
   close.connections = TRUE,
+  older.than = c(),
+  younger.than = c(),
+  save.ages = FALSE,
   verbose = TRUE,
   ...
 )
@@ -221,9 +226,13 @@ try running your core again with \code{remember=FALSE}, or, start cleanly by typ
 
 \item{burnin}{Amount of initial, likely sub-optimal MCMC iterations that will be removed.}
 
-\item{MinAge}{Minimum age limit for Plum runs, default at current year in cal BP. To set plot limits, use \code{yr.min} instead.}
+\item{MinAge}{Deprecated - use youngest.age instead.}
 
-\item{MaxAge}{Maximum age limit for Plum runs, default at 1,000,000 cal BP. To set plot limits, use \code{yr.max} instead.}
+\item{youngest.age}{Minimum age limit for Bacon runs, default at current year in cal BP. To set plot limits, use \code{age.min} instead.}
+
+\item{MaxAge}{Deprecated - use oldest.age instead.}
+
+\item{oldest.age}{Maximum age limit for Bacon runs, default at 1,000,000 cal BP. To set plot limits, use \code{age.max} instead.}
 
 \item{cutoff}{Avoid plotting very low probabilities of date distributions (default \code{cutoff=0.001}).}
 
@@ -239,6 +248,12 @@ Lower values will result in lighter grey but values >1 are not allowed.}
 \item{age.res}{Resolution or amount of greyscale pixels to cover the age scale of the age-model plot. Default \code{yr.res=200}.}
 
 \item{close.connections}{Internal option to close connections after a run. Default \code{close.connections=TRUE}.}
+
+\item{older.than}{an option to enable dates at the limit of C-14 dating. If there are older.than dates, they tell us that the core should be older than a certain age at that depth. For example, if the 7th and 8th dates in the core's .csv file are older-than dates, use as \code{older.than=c(7,8)}. The MCMC run could be problematic if the older-than ages do not fit with the other information.}
+
+\item{younger.than}{an option to provide younger-than ages, for example a historical pollen marker. If there are younger-than dates, they tell us that the core should be younger than a certain age at that depth. For example, if the 7th and 8th dates in the core's .csv file are younger.than dates, use as \code{younger.than=c(7,8)}. The MCMC run could be problematic if the younger.than ages do not fit with the other information.}
+
+\item{save.ages}{If you want to have a file with the MCMC-derived ages for all the age-depth model's elbows, set \code{save.ages=TRUE} and a file with the ages will be saved in the core's folder, ending in "_elbowages.txt".}
 
 \item{verbose}{Provide feedback on what is happening (default \code{verbose=TRUE}).}
 

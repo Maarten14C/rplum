@@ -406,7 +406,7 @@ Plum.cleanup <- function(set=get('info')) {
 .plum.settings <- function(core, coredir, dets, detsPlum, detsBacon, thick, remember=TRUE, d.min, d.max, d.by, depths.file,
   slump, acc.mean, acc.shape, mem.mean, mem.strength, boundary, hiatus.depths, hiatus.max, hiatus.shape,
   BCAD, cc, postbomb, cc1, cc2, cc3, cc4, depth.unit, normal, t.a, t.b, delta.R, delta.STD, prob,
-  defaults, runname, ssize, dark, MinAge, MaxAge, cutoff, age.res, after, age.unit,
+  defaults, runname, ssize, dark, youngest.age, oldest.age, cutoff, age.res, after, age.unit,
   supportedData, date.sample, Al, phi.shape, phi.mean, s.shape, s.mean, ra.case, Bqkg, n.supp) {
 
   vals <- list(d.min, d.max, d.by, depths.file, slump, acc.mean, acc.shape, mem.mean, mem.strength, boundary, hiatus.depths, hiatus.max, BCAD, cc, postbomb, cc1, cc2, cc3, cc4, depth.unit, normal, t.a, t.b, delta.R, delta.STD, prob, age.unit)
@@ -489,12 +489,12 @@ Plum.cleanup <- function(set=get('info')) {
 
   close(prevfile)
 
-  if(length(MinAge) == 0)
-    MinAge <- min(1950 - as.integer(format(Sys.time(), "%Y")), round(dets[,2] - (5*dets[,3])))
-  if(length(MaxAge) == 0)
-    MaxAge <- max(1e6, round(dets[,2] + (5*dets[,3])))
+#  if(length(MinAge) == 0)
+#    MinAge <- 1950 - as.integer(format(Sys.time(), "%Y"))#, round(dets[,2] - (5*dets[,3])))
+#  if(length(MaxAge) == 0)
+#    MaxAge <- max(1e6, round(dets[,2] + (5*dets[,3])))
 
-  theta0 <- 1950 - date.sample
+  theta0 <- max(1950 - date.sample, youngest.age)
 
   list(core=core, thick=thick, dets=dets, d.min=d.min, d.max=d.max, coredir=coredir, # was coredir=core
     d.by=d.by, depths.file=depths.file, slump=slump,
@@ -504,7 +504,7 @@ Plum.cleanup <- function(set=get('info')) {
     BCAD=BCAD, cc=cc, postbomb=postbomb,
     cc1=cc1, cc2=cc2, cc3=cc3, cc4=cc4, depth.unit=noquote(depth.unit), unit=depth.unit, age.unit=noquote(age.unit), normal=normal,
     t.a=t.a, t.b=t.b, delta.R=delta.R, delta.STD=delta.STD, prob=prob, date=date(),
-    runname=runname, ssize=ssize, dark=dark, MinAge=MinAge, MaxAge=MaxAge,
+    runname=runname, ssize=ssize, dark=dark, youngest.age=youngest.age, oldest.age=oldest.age,
     cutoff=cutoff, age.res=age.res, after=after,
     supportedData=supportedData, theta0=theta0, Al=Al, phi.shape=phi.shape, phi.mean=phi.mean, s.shape=s.shape, s.mean=s.mean, ra.case=ra.case, Bqkg=Bqkg)
 }
@@ -610,9 +610,9 @@ write.plum.file <- function(set=get('info')) {
   if(set$cc4=="ConstCal" || set$cc4=="\"ConstCal\"") set$cc4 <- c()
     else
       paste0("\nCal 4 : GenericCal, ", set$cc4, ";"), sep="", file=fl)
-  cat("\nCal 4 : ConstCal;", sep="", file=fl)
-  cat("\n##          alPhi mPhi  alS  mS     Al   theta0  Radon_case  supported_data_file", file=fl)
-  cat("\nCal 5 : Plum, ", set$phi.shape, ", ",  set$phi.mean, ", ",  set$s.shape, ", ", set$s.mean, ", ", set$Al, ", ", set$theta0, ", ",
+  #cat("\nCal 4 : ConstCal;", sep="", file=fl)
+  cat("\n\n##          alPhi mPhi  alS  mS     Al   theta0  Radon_case  supported_data_file", file=fl)
+  cat("\n\nCal 5 : Plum, ", set$phi.shape, ", ",  set$phi.mean, ", ",  set$s.shape, ", ", set$s.mean, ", ", set$Al, ", ", set$theta0, ", ",
         set$ra.case, ", ", set$plum.file,";", sep="", file=fl)
   cat("\n##    ", colnames(dets), " ... Plum: 210Pb data",sep=", ", file=fl)
 
@@ -654,14 +654,14 @@ write.plum.file <- function(set=get('info')) {
   if( is.na(set$seed) ) {
   wrapup <- paste0("\n\n##\t\t K   MinAge   MaxAge   th0   th0p   w.a   w.b   alpha  beta  dmin  dmax",
     "\nBacon 0: ", ifelse(set$normal, "FixNor", "FixT"), ", ", set$K,
-    ",  ", set$theta0-.02, ",  ", 26500, ",  ", set$theta0-0.01, ",  ", set$theta0+0.01,
+    ",  ", set$theta0, ",  ", set$oldest.age, ",  ", set$theta0+0.01, ",  ", set$theta0+0.02,
     ",  ", set$mem.strength*set$mem.mean, ",  ", set$mem.strength*(1-set$mem.mean),
     ",  ", set$acc.shape[1], ",  ", set$acc.shape[1]/set$acc.mean[1], ", ", set$d.min,
     ", ", cK, ";\n")
   } else {
     wrapup <- paste0("\n\n##\t\t K   MinAge   MaxAge   th0   th0p   w.a   w.b   alpha  beta  dmin  dmax  seed",
       "\nBacon 0: ", ifelse(set$normal, "FixNor", "FixT"), ", ", set$K,
-      ",  ", set$theta0-.02, ",  ", 26500, ",  ", set$theta0-0.01, ",  ", set$theta0+0.01,
+      ",  ", set$theta0, ",  ", set$oldest.age, ",  ", set$theta0+0.01, ",  ", set$theta0+0.02,
       ",  ", set$mem.strength*set$mem.mean, ",  ", set$mem.strength*(1-set$mem.mean),
       ",  ", set$acc.shape[1], ",  ", set$acc.shape[1]/set$acc.mean[1], ", ", set$d.min,
       ", ", cK, ", ", set$seed, ";\n")
