@@ -22,9 +22,8 @@ library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal
 
 # do: add more guidance on acc.mean - what type of site is it? option to enter supported data as file (instead of in parent .csv file), change column order in .csv file??? Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel as too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set to 0 by default?
 
-# done: renamed ccdir to cc.dir, youngest.age and date.sample now work more robustly
+# done: renamed ccdir to cc.dir, youngest.age and date.sample now work more robustly, solved bug where R crashed if cc=4 was used
 
-# Bacon("QUI", cc.dir="ccurves", other.dates="QUI_14C.csv", cc4="mixed.14C") crashes R if cc=4. Does not happen in rbacon.
 
 #' @name Plum
 #' @title Main 210Pb age-depth modelling function
