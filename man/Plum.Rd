@@ -42,7 +42,7 @@ Plum(
   cc2 = "Marine20",
   cc3 = "SHCal20",
   cc4 = "ConstCal",
-  ccdir = "",
+  cc.dir = "",
   postbomb = 0,
   delta.R = 0,
   delta.STD = 0,
@@ -103,7 +103,7 @@ Thinner (and thus more) sections will result in smoother age-models, but too man
 
 \item{Al}{Parameter used to limit the chronologies described in Aquino-Lopez et al. (2018) for the minimum distinguishable unsupported activity; default \code{Al=0.1}.}
 
-\item{date.sample}{Date at which the core was measured for Pb-120. This date will be used as a surface date and is assumed to have no uncertainty, \code{date.sample=NA}. If the date is not provided (in the .csv file or as \code{date.sample}), Plum will ask for it.}
+\item{date.sample}{Date (in calendar years, e.g., AD 2023) at which the core was measured for Pb-120. This date will be used as a surface date and is assumed to have no uncertainty. If the date is not provided (in the .csv file or as \code{date.sample}), Plum will ask for it.}
 
 \item{n.supp}{This value will delete n.supp data points from the deepest part of the core, and these points will then be used exclusively to estimate the supported activity. If this option is used, a constant supported Pb-210 will be assumed, \code{n.supp=-1}.}
 
@@ -169,10 +169,10 @@ allow for a large range of posterior memory values.}
 
 \item{cc3}{For southern hemisphere 14C dates (SHCal20).}
 
-\item{cc4}{Use an alternative curve (3 columns: cal BP, 14C age, error, separated by white spaces and saved as a plain-text file). See \code{ccdir}.}
+\item{cc4}{Use an alternative curve (3 columns: cal BP, 14C age, error, separated by white spaces and saved as a plain-text file). See \code{cc.dir}.}
 
-\item{ccdir}{Directory where the calibration curves for C14 dates \code{cc} are located. By default \code{ccdir=""} since they are loaded into R's memory.
-For example, use \code{ccdir="."} to choose current working directory, or \code{ccdir="Curves/"} to choose sub-folder \code{Curves/}. Note that all calibration curves should reside in the same directory. If you want to add a custom-built curve, put it in the directory where the default calibration curves are (probably \code{list.files(paste0(.libPaths(), "/IntCal/extdata/"))}).
+\item{cc.dir}{Directory where the calibration curves for C14 dates \code{cc} are located. By default \code{cc.dir=""} since they are loaded into R's memory.
+For example, use \code{cc.dir="."} to choose current working directory, or \code{cc.dir="Curves/"} to choose sub-folder \code{Curves/}. Note that all calibration curves should reside in the same directory. If you want to add a custom-built curve, put it in the directory where the default calibration curves are (probably \code{list.files(paste0(.libPaths(), "/IntCal/extdata/"))}).
 Alternatively produce a new folder, and add your curve as well as the default calibration curves there (cc1, cc2 and cc3; e.g., \code{write.table(copyCalibrationCurve(1), "./3Col_intcal20.14C", sep="\t")}.)}
 
 \item{postbomb}{Use a postbomb curve for negative (i.e. postbomb) 14C ages. \code{0 = none, 1 = NH1, 2 = NH2, 3 = NH3, 4 = SH1-2, 5 = SH3}}
