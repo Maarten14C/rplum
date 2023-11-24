@@ -2,11 +2,13 @@
 
 # these functions run c++ code and are as yet unexported (not sure how to export them)
 events <- utils::getFromNamespace("events", "rbacon")
-# bacon <- utils::getFromNamespace("bacon", "rbacon") # since already called like this within the Plum function
+bacon <- utils::getFromNamespace("bacon", "rbacon") # since already called like this within the Plum function
 
 # these functions are exported by rbacon
-agedepth <- rbacon::agedepth
-proxy.ghost <- rbacon::proxy.ghost
+#agedepth <- rbacon::agedepth
+#proxy.ghost <- rbacon::proxy.ghost
+#importFrom(rbacon, agedepth)
+#importFrom(rbacon, proxy.ghost)
 
 # these are R functions in rbacon which are not exported (because they are internal)
 draw.pbmeasured <- utils::getFromNamespace("draw.pbmeasured", "rbacon")

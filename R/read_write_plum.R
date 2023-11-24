@@ -494,6 +494,7 @@ Plum.cleanup <- function(set=get('info')) {
 #  if(length(MaxAge) == 0)
 #    MaxAge <- max(1e6, round(dets[,2] + (5*dets[,3])))
 
+  #theta0 <- 1950 - date.sample
   theta0 <- max(1950 - date.sample, youngest.age)
 
   list(core=core, thick=thick, dets=dets, d.min=d.min, d.max=d.max, coredir=coredir, # was coredir=core
@@ -610,9 +611,9 @@ write.plum.file <- function(set=get('info')) {
   if(set$cc4=="ConstCal" || set$cc4=="\"ConstCal\"") set$cc4 <- c()
     else
       paste0("\nCal 4 : GenericCal, ", set$cc4, ";"), sep="", file=fl)
-  #cat("\nCal 4 : ConstCal;", sep="", file=fl)
+  cat("\nCal 4 : ConstCal;", sep="", file=fl)
   cat("\n\n##          alPhi mPhi  alS  mS     Al   theta0  Radon_case  supported_data_file", file=fl)
-  cat("\n\nCal 5 : Plum, ", set$phi.shape, ", ",  set$phi.mean, ", ",  set$s.shape, ", ", set$s.mean, ", ", set$Al, ", ", set$theta0, ", ",
+  cat("\nCal 5 : Plum, ", set$phi.shape, ", ",  set$phi.mean, ", ",  set$s.shape, ", ", set$s.mean, ", ", set$Al, ", ", set$theta0, ", ",
         set$ra.case, ", ", set$plum.file,";", sep="", file=fl)
   cat("\n##    ", colnames(dets), " ... Plum: 210Pb data",sep=", ", file=fl)
 

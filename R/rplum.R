@@ -1,21 +1,4 @@
-#' rplum
-#'
-#' Plum is an approach to age-depth modelling that uses Bayesian statistics to reconstruct 
-#' accumulation histories for 210Pb-dated deposits using prior information, and can combine 
-#' 210Pb, radiocarbon, and other dates in the chronologies. 
-#' See Aquino et al. (2018) <doi:10.1007/s13253-018-0328-7>.
-#'
-#' @docType package
-#' @author Maarten Blaauw <maarten.blaauw@qub.ac.uk> J. Andres Christen <jac@cimat.mx> Marco Aquino-Lopez <aquino@cimat.mx>
-#' @importFrom grDevices dev.off pdf dev.copy2pdf dev.list extendrange
-#' @importFrom graphics layout legend par plot rect
-#' @importFrom stats lm coef
-#' @importFrom utils read.table write.table packageName
-#' @import rbacon rintcal
-#' @name rplum
-NULL
-
-library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal R package
+#library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal R package
 
 # write an R package to download and plot climate data (grip, ngrip, gisp2, hulu, cariaco, EPICA, ...) working name icecream, pickles, or cream. check pangaear package, also check what rioja provides
 # do: check Plum("LKRE") without the artificially added tail, goes wrong: don't use Marco's tailfinding tool if there are Ra data
@@ -358,6 +341,8 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   if(info$hasBaconData)  # only calibrate radiocarbon dates
     info$calib <- bacon.calib(info$detsBacon, info, date.res, cc.dir=cc.dir)
 
+
+
   ### find some relevant values
   info$rng <- c()
   if(info$hasBaconData)
@@ -453,6 +438,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     info$slumpdets <- slumpdets[!is.na(slumpdets[,4]),]
   }
 
+  cat("info$K ", info$K, "\n")
   ### produce files
   info$prefix <- paste0(coredir, core, "/", core, runname, "_", info$K)
   info$coredir <- coredir
@@ -466,6 +452,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     file.create(plumOutFile)
   if(!file.exists(baconTmpOutFile <- paste0(info$prefix, "_bacon.out") ))
     file.create(baconTmpOutFile)
+  cat("info$K ", info$K, "\n")
 
   ### store values (again) for future manipulations
   if(BCAD)
@@ -513,14 +500,18 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     draw.pbmeasured(info)
     legend("top", core, bty="n", cex=1.5)
   }
+  cat("info$K ", info$K, "\n")
 
   cook <- function() {
     plum.its(ssize, info) # new June 2021
     txt <- paste0(info$prefix, ".bacon")
     #bacon(txt, outfile, ssize, cc.dir)
     #.Call("_rbacon_bacon", PACKAGE="rbacon", txt, outfile, ssize, cc.dir)
-    bacon <- utils::getFromNamespace("bacon", "rbacon")
+    #bacon <- utils::getFromNamespace("bacon", "rbacon")
+    ssize <- as.integer(ssize)
+    cat("starting!", typeof(txt), ", ", typeof(outfile), "ssize, ", typeof(ssize), "dir,", typeof(cc.dir), "\n")
     bacon(txt, outfile, ssize, cc.dir)
+cat("done")
 
     rbacon::scissors(burnin, info)
 
@@ -537,6 +528,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
             dev.off()
           }
   }
+  cat("info$K ", info$K, "\n")
 
   ### run plum if initial graphs seem OK; run automatically, not at all, or only plot the age-depth model
   write.plum.file(info)
