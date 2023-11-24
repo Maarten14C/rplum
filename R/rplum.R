@@ -438,7 +438,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     info$slumpdets <- slumpdets[!is.na(slumpdets[,4]),]
   }
 
-  cat("info$K ", info$K, "\n")
   ### produce files
   info$prefix <- paste0(coredir, core, "/", core, runname, "_", info$K)
   info$coredir <- coredir
@@ -452,7 +451,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     file.create(plumOutFile)
   if(!file.exists(baconTmpOutFile <- paste0(info$prefix, "_bacon.out") ))
     file.create(baconTmpOutFile)
-  cat("info$K ", info$K, "\n")
 
   ### store values (again) for future manipulations
   if(BCAD)
@@ -500,7 +498,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     draw.pbmeasured(info)
     legend("top", core, bty="n", cex=1.5)
   }
-  cat("info$K ", info$K, "\n")
 
   cook <- function() {
     plum.its(ssize, info) # new June 2021
@@ -511,7 +508,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     ssize <- as.integer(ssize)
     cat("starting!", typeof(txt), ", ", typeof(outfile), "ssize, ", typeof(ssize), "dir,", typeof(cc.dir), "\n")
     bacon(txt, outfile, ssize, cc.dir)
-cat("done")
 
     rbacon::scissors(burnin, info)
 
