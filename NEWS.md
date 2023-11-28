@@ -1,10 +1,8 @@
-# rplum 0.3.2
+# rplum 0.4.0
 * repaired a bug which crashed the session if cc=4 was specified
 * renamed ccdir to cc.dir
 * youngest.age and date.sample now work more robustly
-
-# rplum 0.3.1
-* rplum now requires at least rbacon's version 3.1.1 (this version corrects a bug with postbomb dates)
+* rplum now requires at least rbacon's version 3.2.0 (corrects bugs with postbomb dates and with the naming of cc.dir)
 * renamed the options MinAge and MaxAge to the hopefully less confusing youngest.age and oldest.age
 
 # rplum 0.3.0

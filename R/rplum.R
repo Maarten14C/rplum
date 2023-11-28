@@ -5,8 +5,6 @@
 
 # do: add more guidance on acc.mean - what type of site is it? option to enter supported data as file (instead of in parent .csv file), change column order in .csv file??? Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel as too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set to 0 by default?
 
-# done: renamed ccdir to cc.dir, youngest.age and date.sample now work more robustly, solved bug where R crashed if cc=4 was used
-
 
 #' @name Plum
 #' @title Main 210Pb age-depth modelling function
@@ -370,7 +368,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   if(min(depths) < info$d.min)
     info$d.min <- min(depths)
   if(max(depths) > info$d.max)
-    info$d.max <- max(depths)
+    info$d.max <- max(depths)+thick # added +thick as per David Hatton's bug report
 
   info$elbows <- seq(info$d.min, info$d.max, by=thick)
   info$K <- length(info$elbows)
@@ -524,7 +522,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
             dev.off()
           }
   }
-  cat("info$K ", info$K, "\n")
 
   ### run plum if initial graphs seem OK; run automatically, not at all, or only plot the age-depth model
   write.plum.file(info)
