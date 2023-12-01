@@ -260,7 +260,7 @@ Lower values will result in lighter grey but values >1 are not allowed.}
 \item{...}{options for the age-depth graph. See \link{agedepth} and \link{calib.plot}}
 }
 \value{
-An age-depth model graph, its age estimates, and a summary.
+An age-depth model graph, its age estimates, a summary, and the info variable which contains all relevant information.
 }
 \description{
 This is the main age-depth modelling function of the rplum package for 210Pb age-modelling.
@@ -282,7 +282,7 @@ Radiocarbon dates should be calibrated using either IntCal20
 (for terrestrial northern hemisphere material; Reimer et al., 2020), Marine20 (for marine dates; Hughen et al., 2020),
 SHCal20 (for southern hemisphere dates; Hogg et al., 2020) or any other calibration curve (see below), while modern 14C
 dates are calibrated using one of the post-bomb calibration curves (NH1, NH2 or NH3 for the northern hemisphere,
-SH1-2 or SH3 for the southern hemisphere; Hua et al., 2013). See \url{http://calib.org/CALIBomb/} if you are unsure which
+SH1-2 or SH3 for the southern hemisphere; Hua et al., 2022). See \url{http://calib.org/CALIBomb/} if you are unsure which
 postbomb curve you need. If Plum finds postbomb dates (negative 14C ages) and you haven't specified a postbomb curve,
 you will be prompted. Provide postbomb curves as, e.g., \code{postbomb=1} for the NH1 postbomb curve (2 for NH2, 3 for NH3,
 4 for SH1-2, 5 for SH3).
@@ -292,27 +292,26 @@ Plum also needs the date of sampling, in AD (\code{date.sample}).
 }
 \examples{
 \donttest{
-  Plum(ask=FALSE, ssize=100, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
+  Plum(ask=FALSE, ssize=1000, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
 }
 }
 \references{
-Aquino-Lopez, M.A., Blaauw, M., Christen, J.A., Sanderson, N., 2018. Bayesian analysis of 210Pb dating. Journal of Agricultural, Biological, and Environmental Statistics 23, 317-333
+Aquino-Lopez, M.A., Blaauw, M., Christen, J.A., Sanderson, N., 2018. Bayesian analysis of 210Pb dating. Journal of Agricultural, Biological, and Environmental Statistics 23, 317-333.
 
-Blaauw, M. and Christen, J.A., Flexible paleoclimate age-depth models using an autoregressive gamma process. Bayesian Analysis 6 (2011), no. 3, 457--474.
+Blaauw, M. and Christen, J.A., 2011. Flexible paleoclimate age-depth models using an autoregressive gamma process. Bayesian Analysis 6, 457-474.
 
-Christen, J.A., Perez E., S., 2010. A new robust statistical model for radiocarbon data. Radiocarbon 51, 1047-1059.
+Christen, J.A., Perez E.S., 2010. A new robust statistical model for radiocarbon data. Radiocarbon 51, 1047-1059.
 
-Hogg et al. 2020 SHCal20 Southern Hemisphere calibration, 0-55,000 years cal BP. Radiocarbon 62. doi: 10.1017/RDC.2020.59
+Hogg et al., 2020. SHCal20 Southern Hemisphere calibration, 0-55,000 years cal BP. Radiocarbon 62, 759-778.
 
-Hua, Q., Barbetti, M., Rakowski, A.Z., 2013. Atmospheric radiocarbon for the period 1950-2010.
-Radiocarbon 55(4), <doi:10.2458/azu_js_rc.v55i2.16177>.
+Hua et al., 2022. Atmospheric radiocarbon for the period 1950-2019. Radiocarbon 64(4), 723-745, \doi{10.1017/RDC.2021.95}
 
-Hughen et al. 2020 Marine20-the marine radiocarbon age calibration curve (0-55,000 cal BP). Radiocarbon 62. doi: 10.1017/RDC.2020.68.
+Hughen et al., 2020. Marine20-the marine radiocarbon age calibration curve (0-55,000 cal BP). Radiocarbon 62, 779-820.
 
 Jones, V.J., Stevenson, A.C., Battarbee, R.W., 1989. Acidification of lakes in Galloway, south west Scotland - a diatom and pollen study of the post-glacial history of the Round Loch of Glenhead.
-Journal of Ecology 77: 1-23.
+Journal of Ecology 77, 1-23.
 
-Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62. doi: 10.1017/RDC.2020.41
+Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62, 725-757.
 }
 \author{
 Maarten Blaauw, J. Andres Christen, Marco A. Aquino L.

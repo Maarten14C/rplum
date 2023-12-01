@@ -25,7 +25,7 @@
 #' (for terrestrial northern hemisphere material; Reimer et al., 2020), Marine20 (for marine dates; Hughen et al., 2020),
 #' SHCal20 (for southern hemisphere dates; Hogg et al., 2020) or any other calibration curve (see below), while modern 14C
 #' dates are calibrated using one of the post-bomb calibration curves (NH1, NH2 or NH3 for the northern hemisphere,
-#' SH1-2 or SH3 for the southern hemisphere; Hua et al., 2013). See \url{http://calib.org/CALIBomb/} if you are unsure which
+#' SH1-2 or SH3 for the southern hemisphere; Hua et al., 2022). See \url{http://calib.org/CALIBomb/} if you are unsure which
 #' postbomb curve you need. If Plum finds postbomb dates (negative 14C ages) and you haven't specified a postbomb curve,
 #' you will be prompted. Provide postbomb curves as, e.g., \code{postbomb=1} for the NH1 postbomb curve (2 for NH2, 3 for NH3,
 #' 4 for SH1-2, 5 for SH3).
@@ -137,29 +137,28 @@
 #' @param verbose Provide feedback on what is happening (default \code{verbose=TRUE}).
 #' @param ... options for the age-depth graph. See \link{agedepth} and \link{calib.plot}
 #' @author Maarten Blaauw, J. Andres Christen, Marco A. Aquino L.
-#' @return An age-depth model graph, its age estimates, and a summary.
+#' @return An age-depth model graph, its age estimates, a summary, and the info variable which contains all relevant information.
 #' @examples
 #' \donttest{
-#'   Plum(ask=FALSE, ssize=100, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
+#'   Plum(ask=FALSE, ssize=1000, coredir=tempfile(), date.sample=2018.5, ra.case=0, n.supp=3)
 #' }
 #' @references
-#' Aquino-Lopez, M.A., Blaauw, M., Christen, J.A., Sanderson, N., 2018. Bayesian analysis of 210Pb dating. Journal of Agricultural, Biological, and Environmental Statistics 23, 317-333
+#' Aquino-Lopez, M.A., Blaauw, M., Christen, J.A., Sanderson, N., 2018. Bayesian analysis of 210Pb dating. Journal of Agricultural, Biological, and Environmental Statistics 23, 317-333.
 #'
-#' Blaauw, M. and Christen, J.A., Flexible paleoclimate age-depth models using an autoregressive gamma process. Bayesian Analysis 6 (2011), no. 3, 457--474.
+#' Blaauw, M. and Christen, J.A., 2011. Flexible paleoclimate age-depth models using an autoregressive gamma process. Bayesian Analysis 6, 457-474.
 #'
-#' Christen, J.A., Perez E., S., 2010. A new robust statistical model for radiocarbon data. Radiocarbon 51, 1047-1059.
+#' Christen, J.A., Perez E.S., 2010. A new robust statistical model for radiocarbon data. Radiocarbon 51, 1047-1059.
 #'
-#' Hogg et al. 2020 SHCal20 Southern Hemisphere calibration, 0-55,000 years cal BP. Radiocarbon 62. doi: 10.1017/RDC.2020.59
+#' Hogg et al., 2020. SHCal20 Southern Hemisphere calibration, 0-55,000 years cal BP. Radiocarbon 62, 759-778.
 #'
-#' Hua, Q., Barbetti, M., Rakowski, A.Z., 2013. Atmospheric radiocarbon for the period 1950-2010.
-#' Radiocarbon 55(4), <doi:10.2458/azu_js_rc.v55i2.16177>.
+#' Hua et al., 2022. Atmospheric radiocarbon for the period 1950-2019. Radiocarbon 64(4), 723-745, \doi{10.1017/RDC.2021.95}
 #'
-#' Hughen et al. 2020 Marine20-the marine radiocarbon age calibration curve (0-55,000 cal BP). Radiocarbon 62. doi: 10.1017/RDC.2020.68.
+#' Hughen et al., 2020. Marine20-the marine radiocarbon age calibration curve (0-55,000 cal BP). Radiocarbon 62, 779-820.
 #'
 #' Jones, V.J., Stevenson, A.C., Battarbee, R.W., 1989. Acidification of lakes in Galloway, south west Scotland - a diatom and pollen study of the post-glacial history of the Round Loch of Glenhead.
-#' Journal of Ecology 77: 1-23.
+#' Journal of Ecology 77, 1-23.
 #'
-#' Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62. doi: 10.1017/RDC.2020.41
+#' Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62, 725-757.
 #'
 #' @export
 Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), ra.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", cc.dir="", postbomb=0, delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=4000, th0=c(), burnin=min(500, ssize), MinAge=c(), youngest.age=c(), MaxAge=c(), oldest.age=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, older.than=c(), younger.than=c(), save.ages=FALSE, verbose=TRUE, ...) {
@@ -500,15 +499,9 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   cook <- function() {
     plum.its(ssize, info) # new June 2021
     txt <- paste0(info$prefix, ".bacon")
-    #bacon(txt, outfile, ssize, cc.dir)
-    #.Call("_rbacon_bacon", PACKAGE="rbacon", txt, outfile, ssize, cc.dir)
-    #bacon <- utils::getFromNamespace("bacon", "rbacon")
     ssize <- as.integer(ssize)
-    cat("starting!", typeof(txt), ", ", typeof(outfile), "ssize, ", typeof(ssize), "dir,", typeof(cc.dir), "\n")
     bacon(txt, outfile, ssize, cc.dir)
-
     rbacon::scissors(burnin, info)
-
     rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...)
     #Plum.agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # tmp May 21
 
