@@ -513,8 +513,6 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
       rbacon::calib.plot(info, dets=info$detsBacon, BCAD=BCAD, new.plot=TRUE, plot.dists=TRUE, height=1)
     draw.pbmeasured(info)
     legend("top", core, bty="n", cex=1.5)
-	if(max(info$detsBacon[,4]) > max(info$detsOrig[,2])) # April 2024
-      remove.tail <- FALSE
   }
 
   cook <- function() {
@@ -536,6 +534,12 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
             dev.off()
           }
   }
+
+  # no need to cut off tails if we have dates below the above-background 210Pb data
+  if(info$hasBaconData)
+    if(max(info$detsBacon[,4]) > max(info$dets[which(info$dets$cc==5),2])) 
+      remove.tail <- FALSE
+  
 
   ### run plum if initial graphs seem OK; run automatically, not at all, or only plot the age-depth model
   write.plum.file(info, younger.than=younger.than, older.than=older.than, save.info=save.info)
