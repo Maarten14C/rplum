@@ -67,7 +67,7 @@
 #' @param Al Parameter used to limit the chronologies described in Aquino-Lopez et al. (2018) for the minimum distinguishable unsupported activity; default \code{Al=0.1}.
 #' @param date.sample Date (in calendar years, e.g., AD 2023) at which the core was measured for Pb-120. This date will be used as a surface date and is assumed to have no uncertainty. If the date is not provided (in the .csv file or as \code{date.sample}), Plum will ask for it.
 #' @param n.supp This value will delete n.supp data points from the deepest part of the core, and these points will then be used exclusively to estimate the supported activity. If this option is used, a constant supported Pb-210 will be assumed, \code{n.supp=-1}.
-#' @param remove.tail Whether or not to remove the tail measurements when plotting. Sometimes automated removal might go wrong, or additional dates exist further down, so then this option can be used to avoid removing the tail 210Pb measurements. 
+#' @param remove.tail Whether or not to remove the tail measurements when plotting. Sometimes automated removal might go wrong, or additional dates exist further down, so then this option can be used to avoid removing the tail 210Pb measurements. Is set to FALSE if there are non-210Pb data further down the core.
 #' @param ra.case How to use radium-226 measurements if they are provided in the core's .csv file. 1 = assume constant radium, 2 = assume varying radium and use the radium measurements as individual estimates of supported Pb-210. If no radium measurements are present, use \code{ra.case=0}.
 #' @param Bqkg This variable indicates whether total Pb-210 is expressed in Bq/kg (default; \code{Bqkg=TRUE}) or dpm/g if set to FALSE.
 #' @param seed Seed used for C++ executions; if it is not assigned then the seed is set by system. Default \code{seed=NA}.
@@ -411,7 +411,7 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
   ans <- "n"
   if(suggest)
     if(length(reswarn) == 2)
-      if(info$K < min(reswarn)) {
+      if(info$K < min(reswarn)) {v
         sugg <- pretty(thick*(info$K/min(reswarn)), 10)
         sugg <- min(sugg[sugg>0])
         ans <- readline(message(" Warning, the current value for thick, ", thick, ", will result in very few age-model sections (", info$K, ", not very flexible). Suggested maximum value for thick: ", sugg, " OK? (y/n) "))
@@ -513,6 +513,8 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
       rbacon::calib.plot(info, dets=info$detsBacon, BCAD=BCAD, new.plot=TRUE, plot.dists=TRUE, height=1)
     draw.pbmeasured(info)
     legend("top", core, bty="n", cex=1.5)
+	if(max(info$detsBacon[,4]) > max(info$detsOrig[,2])) # April 2024
+      remove.tail <- FALSE
   }
 
   cook <- function() {
