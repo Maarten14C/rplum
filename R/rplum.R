@@ -1,5 +1,13 @@
 #library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal R package
 
+# add censored data (older/younger than) as done in rbacon
+
+# add set.initvals function from rbacon
+
+# add save.info option
+
+# check extrapolation feature - d.max?
+
 # write an R package to download and plot climate data (grip, ngrip, gisp2, hulu, cariaco, EPICA, ...) working name icecream, pickles, or cream. check pangaear package, also check what rioja provides
 # do: check Plum("LKRE") without the artificially added tail, goes wrong: don't use Marco's tailfinding tool if there are Ra data
 
@@ -33,6 +41,18 @@
 #' For calendar dates, i.e. dates that are already on the calendar scale and thus should not be calibrated, set\code{cc=0}. 
 #' Plum also needs the date of sampling, in AD (\code{date.sample}). 
 #'
+#' rplum works by calling the rbacon package. Since version 3.1.0, Bacon can also handle younger-than and older-than ages, with the model aiming to either go 'above'
+#' or 'below' such dates as requested. If the resulting combination of parameters becomes problematic (e.g., no initial
+#' combination of parameters can be found that obeys the priors or is in chronological order), then the output will often be wrong.
+#' If so, using the function \link{set.initvals} could help.
+#'
+#' By default, the initial MCMC values of the Bacon age-depth model (upper ages and accumulation rate for each model section)
+#' are estimated randomly. Since version 3.1.0, these starting values can also be provided in a file with extension _bacon.init,
+#' placed within the core's folder. This file will need to have two rows, each for one of the two initial sets of parameters required
+#' (the t-walk requires two starting estimates for all MCMC parameters).
+#' If such a file is found (and correctly formatted), Bacon will use the values within this file
+#' as starting points for the MCMC run. See function \link{set.initvals} for more information.
+#'
 #' @param core Name of the core, given using quotes. Defaults to one of the cores provided with rplum, \code{core="HP1C"} also reported by Aquino-Lopez et al. (2018). Also available is LL14, a core kindly provided by Dr Lysanna Anderson (USGS). LL14 has ra-226 data (so can be run with \code{ra.case=1} or \code{ra.case=2}, see below), and also has additional C-14 and cal BP data (these can be added using \code{otherdates="LL14_14C.csv"}). The original LL14 core has more 14C data than provided here (for reasons of brevity).
 #' To run your own core, produce a .csv file with the dates as outlined in the manual, add a folder with the core's name to the default directory for cores (see \code{coredir}), and save the .csv file there. For example, the file's location and name could be \code{Plum_runs/MyCore/MyCore.csv}. Then run Plum as follows: \code{Plum("MyCore")}.
 #' Note that for Pb-210 data, the depth in the .csv should be the bottom of the slice, not the mid-point. (For any non-Pb data, depths are the midpoints of their slices). Also make sure that the thickness and density are given correctly for each Pb-210 data point.
@@ -47,6 +67,7 @@
 #' @param Al Parameter used to limit the chronologies described in Aquino-Lopez et al. (2018) for the minimum distinguishable unsupported activity; default \code{Al=0.1}.
 #' @param date.sample Date (in calendar years, e.g., AD 2023) at which the core was measured for Pb-120. This date will be used as a surface date and is assumed to have no uncertainty. If the date is not provided (in the .csv file or as \code{date.sample}), Plum will ask for it.
 #' @param n.supp This value will delete n.supp data points from the deepest part of the core, and these points will then be used exclusively to estimate the supported activity. If this option is used, a constant supported Pb-210 will be assumed, \code{n.supp=-1}.
+#' @param remove.tail Whether or not to remove the tail measurements when plotting. Sometimes automated removal might go wrong, or additional dates exist further down, so then this option can be used to avoid removing the tail 210Pb measurements. 
 #' @param ra.case How to use radium-226 measurements if they are provided in the core's .csv file. 1 = assume constant radium, 2 = assume varying radium and use the radium measurements as individual estimates of supported Pb-210. If no radium measurements are present, use \code{ra.case=0}.
 #' @param Bqkg This variable indicates whether total Pb-210 is expressed in Bq/kg (default; \code{Bqkg=TRUE}) or dpm/g if set to FALSE.
 #' @param seed Seed used for C++ executions; if it is not assigned then the seed is set by system. Default \code{seed=NA}.
@@ -131,9 +152,9 @@
 #' @param date.res Date distributions are plotted using \code{date.res=100} segments by default.
 #' @param age.res Resolution or amount of greyscale pixels to cover the age scale of the age-model plot. Default \code{yr.res=200}.
 #' @param close.connections Internal option to close connections after a run. Default \code{close.connections=TRUE}.
-#' @param older.than an option to enable dates at the limit of C-14 dating. If there are older.than dates, they tell us that the core should be older than a certain age at that depth. For example, if the 7th and 8th dates in the core's .csv file are older-than dates, use as \code{older.than=c(7,8)}. The MCMC run could be problematic if the older-than ages do not fit with the other information.
-#' @param younger.than an option to provide younger-than ages, for example a historical pollen marker. If there are younger-than dates, they tell us that the core should be younger than a certain age at that depth. For example, if the 7th and 8th dates in the core's .csv file are younger.than dates, use as \code{younger.than=c(7,8)}. The MCMC run could be problematic if the younger.than ages do not fit with the other information.
-#' @param save.ages If you want to have a file with the MCMC-derived ages for all the age-depth model's elbows, set \code{save.ages=TRUE} and a file with the ages will be saved in the core's folder, ending in "_elbowages.txt".
+#' @param older.than an option to enable dates at the limit of C-14 dating. If there are older.than dates (works only for non-210Pb data), they tell us that the core should be older than a certain age at that depth. For example, if the 7th and 8th dates in the core's 'otherdates' .csv file are older-than dates, use as \code{older.than=c(7,8)}. The MCMC run could be problematic if the older-than ages do not fit with the other information.
+#' @param younger.than an option to provide younger-than ages, for example a historical pollen marker. If there are younger-than dates (works only for non-210Pb data), they tell us that the core should be younger than a certain age at that depth. For example, if the 7th and 8th dates in the core's 'otherdates' .csv file are younger.than dates, use as \code{younger.than=c(7,8)}. The MCMC run could be problematic if the younger.than ages do not fit with the other information.
+#' @param save.elbowages If you want to have a file with the MCMC-derived ages for all the age-depth model's elbows, set \code{save.elbowages=TRUE} and a file with the ages will be saved in the core's folder, ending in "_elbowages.txt".
 #' @param verbose Provide feedback on what is happening (default \code{verbose=TRUE}).
 #' @param ... options for the age-depth graph. See \link{agedepth} and \link{calib.plot}
 #' @author Maarten Blaauw, J. Andres Christen, Marco A. Aquino L.
@@ -161,7 +182,7 @@
 #' Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62, 725-757.
 #'
 #' @export
-Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape = 2, phi.mean = 50, s.shape = 5, s.mean = 10, Al = 0.1, date.sample = c(), n.supp = c(), ra.case=c(), Bqkg = TRUE, seed = NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", cc.dir="", postbomb=0, delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=4000, th0=c(), burnin=min(500, ssize), MinAge=c(), youngest.age=c(), MaxAge=c(), oldest.age=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, older.than=c(), younger.than=c(), save.ages=FALSE, verbose=TRUE, ...) {
+Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, phi.mean=50, s.shape=5, s.mean=10, Al=0.1, date.sample=c(), n.supp=c(), remove.tail=TRUE, ra.case=c(), Bqkg=TRUE, seed=NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", cc.dir="", postbomb=0, delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=4000, th0=c(), burnin=min(500, ssize), MinAge=c(), youngest.age=c(), MaxAge=c(), oldest.age=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, older.than=c(), younger.than=c(), save.elbowages=FALSE, verbose=TRUE, ...) {
   # Check coredir and if required, copy example file in core directory
   coredir <- assign_coredir(coredir, core, ask, isPlum=TRUE)
   if(core == "HP1C" || core == "LL14") {
@@ -338,8 +359,6 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   if(info$hasBaconData)  # only calibrate radiocarbon dates
     info$calib <- bacon.calib(info$detsBacon, info, date.res, cc.dir=cc.dir)
 
-
-
   ### find some relevant values
   info$rng <- c()
   if(info$hasBaconData)
@@ -502,7 +521,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
     ssize <- as.integer(ssize)
     bacon(txt, outfile, ssize, cc.dir)
     rbacon::scissors(burnin, info)
-    rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...)
+    rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, remove.tail=remove.tail, ...)
     #Plum.agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # tmp May 21
 
     if(plot.pdf)
@@ -517,7 +536,7 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
   }
 
   ### run plum if initial graphs seem OK; run automatically, not at all, or only plot the age-depth model
-  write.plum.file(info)
+  write.plum.file(info, younger.than=younger.than, older.than=older.than, save.info=save.info)
   if(!run)
     prepare() else
       if(!ask)
@@ -531,5 +550,12 @@ Plum <- function(core="HP1C", thick = 1, otherdates=NA, coredir = "", phi.shape 
         }
 
   #if(close.connections)
-  #  close(outfile)
+  #  close(outfile)  
+  
+  if(save.elbowages) {
+    saved <- sapply(info$elbows, Bacon.Age.d)
+    write.table(saved, paste0(info$prefix, "_",info$d.min, "_", thick, "_elbowages.txt"), row.names=FALSE, col.names=FALSE)
+  }
+
+  invisible(info) # MB April 2024
 }
