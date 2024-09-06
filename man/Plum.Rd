@@ -263,7 +263,7 @@ Lower values will result in lighter grey but values >1 are not allowed.}
 
 \item{verbose}{Provide feedback on what is happening (default \code{verbose=TRUE}).}
 
-\item{...}{options for the age-depth graph. See \link{agedepth} and \link{calib.plot}}
+\item{...}{options for the age-depth graph. See the agedepth and calib.plot functions.}
 }
 \value{
 An age-depth model graph, its age estimates, a summary, and the info variable which contains all relevant information.
@@ -299,7 +299,7 @@ Plum also needs the date of sampling, in AD (\code{date.sample}).
 rplum works by calling the rbacon package. Since version 3.1.0, Bacon can also handle younger-than and older-than ages, with the model aiming to either go 'above'
 or 'below' such dates as requested. If the resulting combination of parameters becomes problematic (e.g., no initial
 combination of parameters can be found that obeys the priors or is in chronological order), then the output will often be wrong.
-If so, using the function \link{set.initvals} could help.
+If so, using the function set.initvals could help.
 
 By default, the initial MCMC values of the Bacon age-depth model (upper ages and accumulation rate for each model section)
 are estimated randomly. Since version 3.1.0, these starting values can also be provided in a file with extension _bacon.init,

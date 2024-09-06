@@ -44,7 +44,7 @@
 #' rplum works by calling the rbacon package. Since version 3.1.0, Bacon can also handle younger-than and older-than ages, with the model aiming to either go 'above'
 #' or 'below' such dates as requested. If the resulting combination of parameters becomes problematic (e.g., no initial
 #' combination of parameters can be found that obeys the priors or is in chronological order), then the output will often be wrong.
-#' If so, using the function \link{set.initvals} could help.
+#' If so, using the function set.initvals could help.
 #'
 #' By default, the initial MCMC values of the Bacon age-depth model (upper ages and accumulation rate for each model section)
 #' are estimated randomly. Since version 3.1.0, these starting values can also be provided in a file with extension _bacon.init,
@@ -157,7 +157,7 @@
 #' @param younger.than an option to provide younger-than ages, for example a historical pollen marker. If there are younger-than dates (works only for non-210Pb data), they tell us that the core should be younger than a certain age at that depth. For example, if the 7th and 8th dates in the core's 'otherdates' .csv file are younger.than dates, use as \code{younger.than=c(7,8)}. The MCMC run could be problematic if the younger.than ages do not fit with the other information.
 #' @param save.elbowages If you want to have a file with the MCMC-derived ages for all the age-depth model's elbows, set \code{save.elbowages=TRUE} and a file with the ages will be saved in the core's folder, ending in "_elbowages.txt".
 #' @param verbose Provide feedback on what is happening (default \code{verbose=TRUE}).
-#' @param ... options for the age-depth graph. See \link{agedepth} and \link{calib.plot}
+#' @param ... options for the age-depth graph. See the agedepth and calib.plot functions. 
 #' @author Maarten Blaauw, J. Andres Christen, Marco A. Aquino L.
 #' @return An age-depth model graph, its age estimates, a summary, and the info variable which contains all relevant information.
 #' @examples
