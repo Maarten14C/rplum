@@ -1,7 +1,8 @@
 # rplum 0.5.0
 * save.ages has been renamed to save.elbowages (for consistency with rbacon)
 * 'olderthan' and 'youngerthan' ages can now be used (only non-210Pb)
-
+* now links to the new 'rice' package
+* if there are 7 or fewer data points, a warning will be provided (instead of an obscure error). This has to do with there being a need for at least 4 datapoints to estimate background levels.
 
 # rplum 0.4.0
 * repaired a bug which crashed the session if cc=4 was specified

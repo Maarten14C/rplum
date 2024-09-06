@@ -16,6 +16,7 @@ Plum(
   Al = 0.1,
   date.sample = c(),
   n.supp = c(),
+  remove.tail = TRUE,
   ra.case = c(),
   Bqkg = TRUE,
   seed = NA,
@@ -74,9 +75,10 @@ Plum(
   date.res = 100,
   age.res = 200,
   close.connections = TRUE,
+  save.info = TRUE,
   older.than = c(),
   younger.than = c(),
-  save.ages = FALSE,
+  save.elbowages = FALSE,
   verbose = TRUE,
   ...
 )
@@ -106,6 +108,8 @@ Thinner (and thus more) sections will result in smoother age-models, but too man
 \item{date.sample}{Date (in calendar years, e.g., AD 2023) at which the core was measured for Pb-120. This date will be used as a surface date and is assumed to have no uncertainty. If the date is not provided (in the .csv file or as \code{date.sample}), Plum will ask for it.}
 
 \item{n.supp}{This value will delete n.supp data points from the deepest part of the core, and these points will then be used exclusively to estimate the supported activity. If this option is used, a constant supported Pb-210 will be assumed, \code{n.supp=-1}.}
+
+\item{remove.tail}{Whether or not to remove the tail measurements when plotting. Sometimes automated removal might go wrong, or additional dates exist further down, so then this option can be used to avoid removing the tail 210Pb measurements. Is set to FALSE if there are non-210Pb data further down the core.}
 
 \item{ra.case}{How to use radium-226 measurements if they are provided in the core's .csv file. 1 = assume constant radium, 2 = assume varying radium and use the radium measurements as individual estimates of supported Pb-210. If no radium measurements are present, use \code{ra.case=0}.}
 
@@ -249,11 +253,13 @@ Lower values will result in lighter grey but values >1 are not allowed.}
 
 \item{close.connections}{Internal option to close connections after a run. Default \code{close.connections=TRUE}.}
 
-\item{older.than}{an option to enable dates at the limit of C-14 dating. If there are older.than dates, they tell us that the core should be older than a certain age at that depth. For example, if the 7th and 8th dates in the core's .csv file are older-than dates, use as \code{older.than=c(7,8)}. The MCMC run could be problematic if the older-than ages do not fit with the other information.}
+\item{save.info}{By default, a variable called `info' with relevant information about the run (e.g., core name, priors, settings, ages, output) is saved into the working directory. Note that this will overwrite any existing variable with the same name - as an alternative, one could run, e.g., \code{myvar <- Bacon()}, followed by supplying the variable \code{myvar} in any subsequent commands.}
 
-\item{younger.than}{an option to provide younger-than ages, for example a historical pollen marker. If there are younger-than dates, they tell us that the core should be younger than a certain age at that depth. For example, if the 7th and 8th dates in the core's .csv file are younger.than dates, use as \code{younger.than=c(7,8)}. The MCMC run could be problematic if the younger.than ages do not fit with the other information.}
+\item{older.than}{an option to enable dates at the limit of C-14 dating. If there are older.than dates (works only for non-210Pb data), they tell us that the core should be older than a certain age at that depth. For example, if the 7th and 8th dates in the core's 'otherdates' .csv file are older-than dates, use as \code{older.than=c(7,8)}. The MCMC run could be problematic if the older-than ages do not fit with the other information.}
 
-\item{save.ages}{If you want to have a file with the MCMC-derived ages for all the age-depth model's elbows, set \code{save.ages=TRUE} and a file with the ages will be saved in the core's folder, ending in "_elbowages.txt".}
+\item{younger.than}{an option to provide younger-than ages, for example a historical pollen marker. If there are younger-than dates (works only for non-210Pb data), they tell us that the core should be younger than a certain age at that depth. For example, if the 7th and 8th dates in the core's 'otherdates' .csv file are younger.than dates, use as \code{younger.than=c(7,8)}. The MCMC run could be problematic if the younger.than ages do not fit with the other information.}
+
+\item{save.elbowages}{If you want to have a file with the MCMC-derived ages for all the age-depth model's elbows, set \code{save.elbowages=TRUE} and a file with the ages will be saved in the core's folder, ending in "_elbowages.txt".}
 
 \item{verbose}{Provide feedback on what is happening (default \code{verbose=TRUE}).}
 
@@ -288,7 +294,19 @@ you will be prompted. Provide postbomb curves as, e.g., \code{postbomb=1} for th
 4 for SH1-2, 5 for SH3).
 
 For calendar dates, i.e. dates that are already on the calendar scale and thus should not be calibrated, set\code{cc=0}. 
-Plum also needs the date of sampling, in AD (\code{date.sample}).
+Plum also needs the date of sampling, in AD (\code{date.sample}). 
+
+rplum works by calling the rbacon package. Since version 3.1.0, Bacon can also handle younger-than and older-than ages, with the model aiming to either go 'above'
+or 'below' such dates as requested. If the resulting combination of parameters becomes problematic (e.g., no initial
+combination of parameters can be found that obeys the priors or is in chronological order), then the output will often be wrong.
+If so, using the function \link{set.initvals} could help.
+
+By default, the initial MCMC values of the Bacon age-depth model (upper ages and accumulation rate for each model section)
+are estimated randomly. Since version 3.1.0, these starting values can also be provided in a file with extension _bacon.init,
+placed within the core's folder. This file will need to have two rows, each for one of the two initial sets of parameters required
+(the t-walk requires two starting estimates for all MCMC parameters).
+If such a file is found (and correctly formatted), Bacon will use the values within this file
+as starting points for the MCMC run. See function \link{set.initvals} for more information.
 }
 \examples{
 \donttest{

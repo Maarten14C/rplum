@@ -2,8 +2,8 @@
 % Please edit documentation in R/rplum-package.R
 \docType{package}
 \name{rplum}
-\alias{rplum}
 \alias{rplum-package}
+\alias{rplum}
 \title{rplum}
 \description{
 Plum is an approach to age-depth modelling that uses Bayesian statistics to reconstruct

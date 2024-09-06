@@ -50,9 +50,9 @@ Description: An approach to age-depth modelling that uses Bayesian statistics to
 Encoding: UTF-8
 License: GPL (>= 2)
 NeedsCompilation: no
-Imports: grDevices, graphics, stats, utils, rintcal (>= 0.6.4)
-Depends: rbacon (>= 3.2.0)
-RoxygenNote: 7.2.3
+Imports: grDevices, graphics, stats, utils
+Depends: rbacon (>= 3.3.0)
+RoxygenNote: 7.3.2
 Suggests: knitr, rmarkdown, utf8
 VignetteBuilder: knitr
 Language: en-GB

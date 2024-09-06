@@ -32,7 +32,7 @@ check.equi <- function(dets, suggest=TRUE) {
   # deps    <- dets[,2] #depth
 
   lendat <- length(rawdata)
-  numdat <- as.integer(.5*lendat) # why 0.5?
+  numdat <- ceiling(.5*lendat) # half of the data
   usedat <- rawdata[(lendat-3):lendat]
   usesd  <- rawsd[(lendat-3):lendat]
   usex   <- 1:length(usedat)
@@ -117,6 +117,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
     dets <- dets[ order(dets[,depthColumn]),]
     changed <- TRUE
   }
+  
   date.infile <- NA; nsupp.infile <- NA; racase.infile <- NA #; Bqkg.infile <- NA
   if(ncol(dets) == 6 || ncol(dets) == 8) # no additional information in file
     detsOrig <- dets else
@@ -178,7 +179,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
     if(length(racase.asoption) == 0)
       message("No radium-226 data, setting ra.case to 0, using tail data to estimate supported Pb-210") else {
         if(racase.asoption != 0)
-          message("Setting ra.case to 0 as no radium-226 data provided, using tail data to estimate supported Pb-210") else
+          message("Setting ra.case to 0 since no radium-226 data provided, using tail data to estimate supported Pb-210") else
             message("No radium-226 data, setting ra.case to 0")
         }
     ra.case <- 0
@@ -260,24 +261,31 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
     }
   }
 
-  if(ra.case < 2) { # n.supp cannot be used if ra.case 2 (check with Marco that this is correct!)
-    if(ra.case == 1)
-      message("Besides using the radium data, the tail Pb-210 data can also be used to estimate supported Pb-210. ")
+  # decide on which measurements to use as 'tail' or 'background'
+  if(ra.case == 2) # n.supp cannot be used if ra.case 2 (check with Marco that this is correct!)
+    n.supp <- 0 else
+    if(ra.case < 2) { 
+      if(ra.case == 1)
+        message("Besides using the radium data, the tail Pb-210 data can also be used to estimate supported Pb-210. ")
+      if(ra.case == 0)
+       if(nrow(dets) < 7) {
+	      message("Warning! Very few data points. Setting the bottom one to be background - scary stuff.")
+		  nsupp.asoption <- 1
+	   } 
+    }
     n.supp <- choice(nsupp.infile, nsupp.asoption, "number of supported data", "",, check.equi(dets))
-  }
-  if(ra.case == 2)
-    n.supp <- 0
-
+	
+	
   if(length(Bqkg) == 0 || !(Bqkg %in% c(0, 1))) {
     message("Assuming that the Pb units are in Bq/kg, Bqkg=1")
     Bqkg <- 1
   }
 
   # now put the chosen options into the .csv file if they differ from what's in there already
-  choices <- c(date.sample, n.supp, ra.case, rep("", nrow(dets)-3)) # empty after line 4
+  choices <- c(date.sample, n.supp, ra.case, rep("", max(0, nrow(dets)-3))) # empty after line 4
   suggested.names <- c("labID", "depth(cm)","density(g/cm^3)","210Pb(Bq/kg)","sd(210Pb)","thickness(cm)", "226Ra(Bq/kg)", "sd(226Ra)", "settings")
   if(ra.case == 0) # then no radium columns
-   suggested.names <- suggested.names[-(7:8)]
+    suggested.names <- suggested.names[-(7:8)]
 
   if(ncol(dets) %in% c(6,8)) { # no data provided in the .csv file
     changed <- TRUE
@@ -317,7 +325,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
         supportedData <- supportedData[-elim,]
       }
 
-      if(length(n.supp) > 0)
+     if(length(n.supp) > 0)
         if(n.supp > 0) {
           raColumn <- 4
           sdRaColumn <- 5
@@ -512,8 +520,8 @@ Plum.cleanup <- function(set=get('info')) {
 
 
 
-#function to merge dets of plum and bacon data
-merge.dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc) {
+#internal function to merge dets of plum and bacon data
+merge_dets <- function(detsPlum, detsBacon, delta.R, delta.STD, t.a, t.b, cc) {
   if(ncol(detsBacon) >= 5) {
     cc <- detsBacon[,5]
     detsBacon <- detsBacon[,-5]

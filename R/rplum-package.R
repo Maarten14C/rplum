@@ -11,7 +11,7 @@
 #' @importFrom graphics layout legend par plot rect
 #' @importFrom stats lm coef
 #' @importFrom utils read.table write.table packageName
-#' @import rbacon rintcal
+#' @import rbacon
 #' @name rplum
 #' @keywords internal
 "_PACKAGE"

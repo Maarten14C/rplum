@@ -1,4 +1,4 @@
-#library(rbacon) # see also import.R; rbacon itself imports and loads the rintcal R package
+#library(rbacon) # see also import.R; rbacon itself imports and loads the rice and rintcal R packages
 
 # add censored data (older/younger than) as done in rbacon
 
@@ -152,6 +152,7 @@
 #' @param date.res Date distributions are plotted using \code{date.res=100} segments by default.
 #' @param age.res Resolution or amount of greyscale pixels to cover the age scale of the age-model plot. Default \code{yr.res=200}.
 #' @param close.connections Internal option to close connections after a run. Default \code{close.connections=TRUE}.
+#' @param save.info By default, a variable called `info' with relevant information about the run (e.g., core name, priors, settings, ages, output) is saved into the working directory. Note that this will overwrite any existing variable with the same name - as an alternative, one could run, e.g., \code{myvar <- Bacon()}, followed by supplying the variable \code{myvar} in any subsequent commands.
 #' @param older.than an option to enable dates at the limit of C-14 dating. If there are older.than dates (works only for non-210Pb data), they tell us that the core should be older than a certain age at that depth. For example, if the 7th and 8th dates in the core's 'otherdates' .csv file are older-than dates, use as \code{older.than=c(7,8)}. The MCMC run could be problematic if the older-than ages do not fit with the other information.
 #' @param younger.than an option to provide younger-than ages, for example a historical pollen marker. If there are younger-than dates (works only for non-210Pb data), they tell us that the core should be younger than a certain age at that depth. For example, if the 7th and 8th dates in the core's 'otherdates' .csv file are younger.than dates, use as \code{younger.than=c(7,8)}. The MCMC run could be problematic if the younger.than ages do not fit with the other information.
 #' @param save.elbowages If you want to have a file with the MCMC-derived ages for all the age-depth model's elbows, set \code{save.elbowages=TRUE} and a file with the ages will be saved in the core's folder, ending in "_elbowages.txt".
@@ -182,7 +183,7 @@
 #' Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62, 725-757.
 #'
 #' @export
-Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, phi.mean=50, s.shape=5, s.mean=10, Al=0.1, date.sample=c(), n.supp=c(), remove.tail=TRUE, ra.case=c(), Bqkg=TRUE, seed=NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", cc.dir="", postbomb=0, delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=4000, th0=c(), burnin=min(500, ssize), MinAge=c(), youngest.age=c(), MaxAge=c(), oldest.age=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, older.than=c(), younger.than=c(), save.elbowages=FALSE, verbose=TRUE, ...) {
+Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, phi.mean=50, s.shape=5, s.mean=10, Al=0.1, date.sample=c(), n.supp=c(), remove.tail=TRUE, ra.case=c(), Bqkg=TRUE, seed=NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", cc.dir="", postbomb=0, delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=4000, th0=c(), burnin=min(500, ssize), MinAge=c(), youngest.age=c(), MaxAge=c(), oldest.age=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, save.info=TRUE, older.than=c(), younger.than=c(), save.elbowages=FALSE, verbose=TRUE, ...) {
   # Check coredir and if required, copy example file in core directory
   coredir <- assign_coredir(coredir, core, ask, isPlum=TRUE)
   if(core == "HP1C" || core == "LL14") {
@@ -195,7 +196,7 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
   if(cc.dir=="")
     cc.dir <- system.file("extdata", package="rintcal")
   cc.dir <- validateDirectoryName(cc.dir)
-
+cat(1)
   # default_settings.txt is located within system.file
   defaults <- system.file("extdata", defaults, package=packageName())
   # read in the data, adapt settings from defaults if needed
@@ -239,7 +240,7 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
     detsBacon <- read.dets(core, coredir, otherdates, sep=sep, dec=dec, cc=cc)
     detsPlum <- dets
     # merge radiocarbon and 210Pb dates into the same variable dets
-    dets <- merge.dets(dets, detsBacon, delta.R, delta.STD, t.a, t.b, cc)
+    dets <- merge_dets(dets, detsBacon, delta.R, delta.STD, t.a, t.b, cc)
   } else {
     detsPlum <- dets
     for(i in (ncol(dets)+1):9) {
@@ -263,7 +264,7 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
     # give feedback about calibration curves used
     if(ncol(detsBacon) > 4 && length(cc) > 0) {
       cc.csv <- unique(detsBacon[,5])
-	  if(verbose) {
+      if(verbose) {
         if(length(cc.csv) == 1) {
           if(cc.csv != cc)
             message(" Using calibration curve specified within the .csv file,", cc[cc.csv], "\n")
@@ -301,14 +302,27 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
       acc.mean <- rep(acc.mean, length(hiatus.depths)+1)
   }
 
+
+  n.supp <<- n.supp
+
+  if(nrow(detsPlum) <= 7) {
+    message("Warning! Very few data points. Setting the bottom one to be background - scary.")
+
+    # replace with request for chosen number of background
+    bg <- min(1, n.supp)
+  } else
+    bg <- check.equi(detsPlum, FALSE)
+
+
   if(suggest) {
     # check if the depths in the det file are bottom depths, and not, say, midpoints
     # it does this by calculating the top depths and ensuring they are not above d.min
-    if(min(detsPlum[,4] - detsPlum[,5]) < d.min) # the we have a problem
+    if(min(detsPlum[,4] - detsPlum[,5]) < d.min) # then we have a problem
       stop(paste0("The depths in ", core, ".csv should be the bottom depths of the measured slices. Not the midpoints! Or adapt d.min?\n"), call.=TRUE)
 
     # check if accrates might need adaptation
-    bg <- check.equi(detsPlum, FALSE)
+    # only check if n.supp not provided
+
     drange <- detsPlum[1:(nrow(detsPlum)-bg),4] # range of depths with unsupported Pb
     accrate <- (max(drange) - min(drange)) # assuming 100 years as fixed 210Pb limit, ugly
     agelim <- (1/0.03114) * log(phi.mean/Al) # Eq. 7 from Aquino et al. 2018
@@ -411,7 +425,7 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
   ans <- "n"
   if(suggest)
     if(length(reswarn) == 2)
-      if(info$K < min(reswarn)) {v
+      if(info$K < min(reswarn)) {
         sugg <- pretty(thick*(info$K/min(reswarn)), 10)
         sugg <- min(sugg[sugg>0])
         ans <- readline(message(" Warning, the current value for thick, ", thick, ", will result in very few age-model sections (", info$K, ", not very flexible). Suggested maximum value for thick: ", sugg, " OK? (y/n) "))
