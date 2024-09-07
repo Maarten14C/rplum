@@ -51,7 +51,7 @@
 #' placed within the core's folder. This file will need to have two rows, each for one of the two initial sets of parameters required
 #' (the t-walk requires two starting estimates for all MCMC parameters).
 #' If such a file is found (and correctly formatted), Bacon will use the values within this file
-#' as starting points for the MCMC run. See function \link{set.initvals} for more information.
+#' as starting points for the MCMC run. See function set.initvals for more information.
 #'
 #' @param core Name of the core, given using quotes. Defaults to one of the cores provided with rplum, \code{core="HP1C"} also reported by Aquino-Lopez et al. (2018). Also available is LL14, a core kindly provided by Dr Lysanna Anderson (USGS). LL14 has ra-226 data (so can be run with \code{ra.case=1} or \code{ra.case=2}, see below), and also has additional C-14 and cal BP data (these can be added using \code{otherdates="LL14_14C.csv"}). The original LL14 core has more 14C data than provided here (for reasons of brevity).
 #' To run your own core, produce a .csv file with the dates as outlined in the manual, add a folder with the core's name to the default directory for cores (see \code{coredir}), and save the .csv file there. For example, the file's location and name could be \code{Plum_runs/MyCore/MyCore.csv}. Then run Plum as follows: \code{Plum("MyCore")}.

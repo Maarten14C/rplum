@@ -306,7 +306,7 @@ are estimated randomly. Since version 3.1.0, these starting values can also be p
 placed within the core's folder. This file will need to have two rows, each for one of the two initial sets of parameters required
 (the t-walk requires two starting estimates for all MCMC parameters).
 If such a file is found (and correctly formatted), Bacon will use the values within this file
-as starting points for the MCMC run. See function \link{set.initvals} for more information.
+as starting points for the MCMC run. See function set.initvals for more information.
 }
 \examples{
 \donttest{
