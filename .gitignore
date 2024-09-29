@@ -3,7 +3,19 @@ inst/doc
 /Meta/
 .DS_Store
 
-# GitHub and CI/CD files
-.github/
+# R-related files
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+*.Rhistory
 
+# Build files
+*.Rbuildignore
+*.tar.gz
+*.Rcheck/
+*.Rproj
+
+# Other files
+.DS_Store
 
