@@ -1,7 +1,6 @@
 # rplum 0.5.1
 * further measures to link to the new 'rice' package (and not 'rintcal')
 
-
 # rplum 0.5.0
 * save.ages has been renamed to save.elbowages (for consistency with rbacon)
 * 'olderthan' and 'youngerthan' ages can now be used (only non-210Pb)
