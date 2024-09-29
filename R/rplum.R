@@ -302,8 +302,7 @@ cat(1)
       acc.mean <- rep(acc.mean, length(hiatus.depths)+1)
   }
 
-
-  n.supp <<- n.supp
+  n.supp <<- n.supp # tmp?
 
   if(nrow(detsPlum) <= 7) {
     message("Warning! Very few data points. Setting the bottom one to be background - scary.")
@@ -327,10 +326,10 @@ cat(1)
     accrate <- (max(drange) - min(drange)) # assuming 100 years as fixed 210Pb limit, ugly
     agelim <- (1/0.03114) * log(phi.mean/Al) # Eq. 7 from Aquino et al. 2018
     message("\nPrior for acc.mean set at ", acc.mean, " ", age.unit, "/", depth.unit,
-      ", ballpark estimate ", round(agelim/accrate, 1)," ", age.unit, "/", depth.unit,
-      if(agelim/accrate < 1)
+      ", ballpark estimate ", abs(round(agelim/accrate, 1))," ", age.unit, "/", depth.unit,
+      if(abs(agelim/accrate) < 1)
         ", which seems quite fast. Adapt acc.mean?",
-      if(agelim/accrate > 20)
+      if(abs(agelim/accrate) > 20)
         ", which seems quite slow. Adapt acc.mean?", "\n")
   }
 
