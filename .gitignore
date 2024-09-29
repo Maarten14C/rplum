@@ -3,3 +3,7 @@ inst/doc
 /Meta/
 .DS_Store
 
+# GitHub and CI/CD files
+.github/
+
+
