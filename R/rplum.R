@@ -2,6 +2,8 @@
 
 # add censored data (older/younger than) as done in rbacon
 
+# add F14C option as in rbacon
+
 # add set.initvals function from rbacon
 
 # add save.info option
@@ -551,8 +553,7 @@ cat(1)
   # no need to cut off tails if we have dates below the above-background 210Pb data
   if(info$hasBaconData)
     if(max(info$detsBacon[,4]) > max(info$dets[which(info$dets$cc==5),2])) 
-      remove.tail <- FALSE
-  
+      remove.tail <- FALSE 
 
   ### run plum if initial graphs seem OK; run automatically, not at all, or only plot the age-depth model
   write.plum.file(info, younger.than=younger.than, older.than=older.than, save.info=save.info)

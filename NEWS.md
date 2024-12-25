@@ -1,3 +1,6 @@
+# rplum 0.5.2
+* it is now an error if no radium measurements are provided (ra.case=0) and n.supp is set to 0
+
 # rplum 0.5.1
 * further measures to link to the new 'rice' package (and not 'rintcal')
 

@@ -275,7 +275,9 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
     }
     n.supp <- choice(nsupp.infile, nsupp.asoption, "number of supported data", "",, check.equi(dets))
 	
-	
+  if(n.supp == 0 && ra.case==0)
+	stop("If ra.case=0 (no radium measurements), then n.supp should be 1 or more")
+
   if(length(Bqkg) == 0 || !(Bqkg %in% c(0, 1))) {
     message("Assuming that the Pb units are in Bq/kg, Bqkg=1")
     Bqkg <- 1
