@@ -45,6 +45,8 @@ Plum(
   cc4 = "ConstCal",
   cc.dir = "",
   postbomb = 0,
+  F14C = c(),
+  pMC = c(),
   delta.R = 0,
   delta.STD = 0,
   t.a = 3,
@@ -180,6 +182,10 @@ For example, use \code{cc.dir="."} to choose current working directory, or \code
 Alternatively produce a new folder, and add your curve as well as the default calibration curves there (cc1, cc2 and cc3; e.g., \code{write.table(copyCalibrationCurve(1), "./3Col_intcal20.14C", sep="\t")}.)}
 
 \item{postbomb}{Use a postbomb curve for negative (i.e. postbomb) 14C ages. \code{0 = none, 1 = NH1, 2 = NH2, 3 = NH3, 4 = SH1-2, 5 = SH3}}
+
+\item{F14C}{Radiocarbon ages can be provided as F14C values. If doing so, please indicate here which dates were entered as F14C (e.g., if the first 4 dates are in F14C, write \code{F14C=1:4}). The F14C values in your .csv file will then be replaced by their corresponding C14 ages.}
+
+\item{pMC}{Radiocarbon ages can be provided as pMC values. If doing so, please indicate here which dates were entered as pMC (e.g., if the first 4 dates are in pMC, write \code{pMC=1:4}). The pMC values in your .csv file will then be replaced by their corresponding C14 ages.}
 
 \item{delta.R}{Mean of core-wide age offsets (e.g., regional marine offsets).}
 

@@ -12,6 +12,7 @@
 #' @importFrom stats lm coef
 #' @importFrom utils read.table write.table packageName
 #' @import rbacon
+#' @importFrom rice F14CtoC14 pMCtoC14
 #' @name rplum
 #' @keywords internal
 "_PACKAGE"

@@ -12,6 +12,7 @@ plum.its <- function(ssize=2e3, set=get('info'), ACCEP_EV=20, EVERY_MULT=5, BURN
 }
 
 
+
 #' @name Plum_runs
 #' @title List the folders present in the current core directory.
 #' @description Lists all folders located within the core's directory.
@@ -402,12 +403,16 @@ Plum.cleanup <- function(set=get('info')) {
   files <- c(paste0(set$prefix, ".bacon"), paste0(set$prefix, ".out"),
     paste0(set$prefix, ".pdf"), paste0(set$prefix, "_ages.txt"),
     paste0(set$coredir,set$core, "/", set$core, "_settings.txt"))
-  for(i in files)
-    if(file.exists(i))
-      tmp <- file.remove(i)
-  if(exists("tmp"))
-    rm(tmp)
-  message("Previous Plum runs of core ", set$core, " with thick=", set$thick, " deleted. Now try running the core again\n")
+	
+	for(i in files) 
+	  if(file.exists(i)) {
+	    result <- try(file.remove(i), silent = TRUE)
+	    if(inherits(result, "try-error")) 
+	      message("Could not remove file: ", i) else 
+	      if(!result) 
+	        message("File does not exist or could not be deleted: ", file)
+	  }
+  message("Previous Plum runs of core ", set$core, " with thick=", set$thick, " deleted. Now try running the core again")
 }
 
 
@@ -653,8 +658,8 @@ write.plum.file <- function(set=get('info'), younger.than=c(), older.than=c(), s
     if(length(set$acc.mean)==1)
       set$acc.mean <- rep(set$acc.mean, length(hiatus.depths)+1)
     if(length(set$hiatus.max)==1)
-      set$hiatus.max <- rep(set$hiatus.max, length(hiatus.depths))
-    if(save.info)
+      set$hiatus.max <- rep(set$hiatus.max, length(hiatus.depths))    
+	if(save.info)
       assign_to_global("info", set)
     cat("\n\n### Depths and priors for fixed hiatuses, in descending order",
       "\n##### cm  alpha beta      ha     hb", file=fl)

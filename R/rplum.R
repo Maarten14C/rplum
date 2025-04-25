@@ -1,20 +1,9 @@
-#library(rbacon) # see also import.R; rbacon itself imports and loads the rice and rintcal R packages
 
-# add censored data (older/younger than) as done in rbacon
-
-# add F14C option as in rbacon
-
-# add set.initvals function from rbacon
-
-# add save.info option
-
-# check extrapolation feature - d.max?
+# set.initvals from rbacon doesn't work as expected in rplum. The function makes the bottom-left panel active and initial age-depth points can be selected, but the selected initial values do not run as expected. Probably because additional initvals are also required for Pb-210 pars?
 
 # write an R package to download and plot climate data (grip, ngrip, gisp2, hulu, cariaco, EPICA, ...) working name icecream, pickles, or cream. check pangaear package, also check what rioja provides
-# do: check Plum("LKRE") without the artificially added tail, goes wrong: don't use Marco's tailfinding tool if there are Ra data
 
 # do: add more guidance on acc.mean - what type of site is it? option to enter supported data as file (instead of in parent .csv file), change column order in .csv file??? Adapt default value of dark? .01 works well if a Pb core also has C14 dates. check par righthand toppanel as too much space, A.rng and Ai in calibrate.plum.plot cannot be saved to info (needed to provide post-run info on fit 210Pb data), is it OK that d.min is set to 0 by default?
-
 
 #' @name Plum
 #' @title Main 210Pb age-depth modelling function
@@ -112,6 +101,8 @@
 #' For example, use \code{cc.dir="."} to choose current working directory, or \code{cc.dir="Curves/"} to choose sub-folder \code{Curves/}. Note that all calibration curves should reside in the same directory. If you want to add a custom-built curve, put it in the directory where the default calibration curves are (probably \code{list.files(paste0(.libPaths(), "/IntCal/extdata/"))}).
 #' Alternatively produce a new folder, and add your curve as well as the default calibration curves there (cc1, cc2 and cc3; e.g., \code{write.table(copyCalibrationCurve(1), "./3Col_intcal20.14C", sep="\t")}.)
 #' @param postbomb Use a postbomb curve for negative (i.e. postbomb) 14C ages. \code{0 = none, 1 = NH1, 2 = NH2, 3 = NH3, 4 = SH1-2, 5 = SH3}
+#' @param F14C Radiocarbon ages can be provided as F14C values. If doing so, please indicate here which dates were entered as F14C (e.g., if the first 4 dates are in F14C, write \code{F14C=1:4}). The F14C values in your .csv file will then be replaced by their corresponding C14 ages.
+#' @param pMC Radiocarbon ages can be provided as pMC values. If doing so, please indicate here which dates were entered as pMC (e.g., if the first 4 dates are in pMC, write \code{pMC=1:4}). The pMC values in your .csv file will then be replaced by their corresponding C14 ages.
 #' @param delta.R Mean of core-wide age offsets (e.g., regional marine offsets).
 #' @param delta.STD Error of core-wide age offsets (e.g., regional marine offsets).
 #' @param t.a The dates are treated using the t distribution by default (\code{normal=FALSE}).
@@ -185,7 +176,7 @@
 #' Reimer et al., 2020. The IntCal20 Northern Hemisphere radiocarbon age calibration curve (0–55 cal kBP). Radiocarbon 62, 725-757.
 #'
 #' @export
-Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, phi.mean=50, s.shape=5, s.mean=10, Al=0.1, date.sample=c(), n.supp=c(), remove.tail=TRUE, ra.case=c(), Bqkg=TRUE, seed=NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", cc.dir="", postbomb=0, delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=4000, th0=c(), burnin=min(500, ssize), MinAge=c(), youngest.age=c(), MaxAge=c(), oldest.age=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, save.info=TRUE, older.than=c(), younger.than=c(), save.elbowages=FALSE, verbose=TRUE, ...) {
+Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, phi.mean=50, s.shape=5, s.mean=10, Al=0.1, date.sample=c(), n.supp=c(), remove.tail=TRUE, ra.case=c(), Bqkg=TRUE, seed=NA, prob=0.95, d.min=0, d.max=NA, d.by=1, depths.file=FALSE, depths=c(), depth.unit="cm", age.unit="yr", unit=depth.unit, acc.shape=1.5, acc.mean=10, mem.strength=10, mem.mean=0.5, boundary=NA, hiatus.depths=NA, hiatus.max=10000, add=c(), after=.0001/thick, cc=1, cc1="IntCal20", cc2="Marine20", cc3="SHCal20", cc4="ConstCal", cc.dir="", postbomb=0, F14C=c(), pMC=c(), delta.R=0, delta.STD=0, t.a=3, t.b=4, normal=FALSE, suggest=TRUE, reswarn=c(10,200), remember=TRUE, ask=TRUE, run=TRUE, defaults="defaultPlum_settings.txt", sep=",", dec=".", runname="", slump=c(), BCAD=FALSE, ssize=4000, th0=c(), burnin=min(500, ssize), MinAge=c(), youngest.age=c(), MaxAge=c(), oldest.age=c(), cutoff=.001, rounded=1, plot.pdf=TRUE, dark=1, date.res=100, age.res=200, close.connections=TRUE, save.info=TRUE, older.than=c(), younger.than=c(), save.elbowages=FALSE, verbose=TRUE, ...) {
   # Check coredir and if required, copy example file in core directory
   coredir <- assign_coredir(coredir, core, ask, isPlum=TRUE)
   if(core == "HP1C" || core == "LL14") {
@@ -198,7 +189,7 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
   if(cc.dir=="")
     cc.dir <- system.file("extdata", package="rintcal")
   cc.dir <- validateDirectoryName(cc.dir)
-cat(1)
+
   # default_settings.txt is located within system.file
   defaults <- system.file("extdata", defaults, package=packageName())
   # read in the data, adapt settings from defaults if needed
@@ -236,10 +227,31 @@ cat(1)
       dets[,6] <- dets[,6]*500./3.
       Al <- Al*500./3.
     }
-
+	
   detsBacon <- c()
   if(!is.na(otherdates)) { # core also has cal BP or C-14 dates
-    detsBacon <- read.dets(core, coredir, otherdates, sep=sep, dec=dec, cc=cc)
+    csv.file <- paste0(coredir, core, "/", otherdates)
+	detsBacon <- read.dets(core, coredir, otherdates, sep=sep, dec=dec, cc=cc)
+
+    if(length(F14C) > 0) { # April 2025
+  	  if(min(detsBacon[F14C,2]) < 0 || max(detsBacon[F14C,2]) > 3) 
+        stop("The F14C values cannot be negative and are unlikely to be >3. Are you sure these values are in F14C?")		
+      asC14 <- rice::F14CtoC14(detsBacon[F14C,2], detsBacon[F14C,3])
+  	  detsBacon[F14C,2] <- round(asC14[,1],0)
+  	  detsBacon[F14C,3] <- round(asC14[,2],0)
+  	  rbacon:::fastwrite(as.data.frame(detsBacon), csv.file, sep=sep, dec=dec, row.names=FALSE, quote=FALSE) 
+  	  message(paste("replaced F14C values with C14 ages in", csv.file))  
+    }
+    if(length(pMC) > 0) { # April 2025
+  	  if(min(detsBacon[pMC,2]) < 0 || max(detsBacon[pMC,2]) > 300) 
+        stop("The pMC values cannot be negative and are unlikely to be >300. Are you sure these values are in pMC?")		
+      asC14 <- rice::pMCtoC14(detsBacon[pMC,2], detsBacon[pMC,3])
+  	  detsBacon[pMC,2] <- round(asC14[,1])
+  	  detsBacon[pMC,3] <- round(asC14[,2])
+  	  rbacon:::fastwrite(as.data.frame(detsBacon), csv.file, sep=sep, dec=dec, row.names=FALSE, quote=FALSE) 
+  	  message(paste("replaced pMC values with C14 ages in", csv.file))  
+    }
+
     detsPlum <- dets
     # merge radiocarbon and 210Pb dates into the same variable dets
     dets <- merge_dets(dets, detsBacon, delta.R, delta.STD, t.a, t.b, cc)
@@ -261,7 +273,7 @@ cat(1)
     }
     colnames(dets) <- c("labID", "X210Pb.Bq.kg.", "sd.210Pb.", "depth.cm.", "thickness.cm.", "density.g.cm.3.",  "t.a", "t.b", "cc")  
   }
-
+  
   if(!is.na(otherdates)) { # if other, non-210Pb dates are to be included
     # give feedback about calibration curves used
     if(ncol(detsBacon) > 4 && length(cc) > 0) {
@@ -304,16 +316,16 @@ cat(1)
       acc.mean <- rep(acc.mean, length(hiatus.depths)+1)
   }
 
-  n.supp <<- n.supp # tmp?
+  #n.supp <<- n.supp # tmp?
+  #set$n.supp <- n.supp
 
   if(nrow(detsPlum) <= 7) {
     message("Warning! Very few data points. Setting the bottom one to be background - scary.")
 
     # replace with request for chosen number of background
     bg <- min(1, n.supp)
-  } else
-    bg <- check.equi(detsPlum, FALSE)
-
+  } else 
+      bg <- check.equi(detsPlum, FALSE)
 
   if(suggest) {
     # check if the depths in the det file are bottom depths, and not, say, midpoints
@@ -336,7 +348,11 @@ cat(1)
   }
 
   info <- .plum.settings(core=core, coredir=coredir, dets=dets, detsPlum=detsPlum, detsBacon=detsBacon, thick=thick, remember=remember, d.min=d.min, d.max=d.max, d.by=d.by, depths.file=depths.file, slump=slump, acc.mean=acc.mean, acc.shape=acc.shape, mem.mean=mem.mean, mem.strength=mem.strength, boundary=boundary, hiatus.depths=hiatus.depths, hiatus.max=hiatus.max, BCAD=BCAD, cc=cc, postbomb=postbomb, cc1=cc1, cc2=cc2, cc3=cc3, cc4=cc4, depth.unit=depth.unit, normal=normal, t.a=t.a, t.b=t.b, delta.R=delta.R, delta.STD=delta.STD, prob=prob, defaults=defaults, runname=runname, ssize=ssize, dark=dark, youngest.age=youngest.age, oldest.age=oldest.age, cutoff=cutoff, age.res=age.res, after=after, age.unit=age.unit, supportedData=supportedData, date.sample=date.sample, Al=Al, phi.shape=phi.shape, phi.mean=phi.mean, s.shape=s.shape, s.mean=s.mean, ra.case=ra.case, Bqkg=Bqkg, n.supp=n.supp)
-  assign_to_global("info", info)
+
+  info$n.supp <- n.supp
+  
+  if(save.info)
+    assign_to_global("info", info)
 
   info$isplum <- TRUE # identify this as a plum run
   info$th0 <- th0
@@ -494,7 +510,9 @@ cat(1)
       add <- info$acc.mean # then add a short (max)hiatus, large enough not to crash Bacon but not affect the chronology much. Needs more work
     info$hiatus.max <- add
   }
-  assign_to_global("info", info)
+  
+  if(save.info)
+    assign_to_global("info", info)
 
   prepare <- function() {
     oldpar <- par(mar=c(3,3,1,1), mgp=c(1.5,.7,.0), bty="l", xaxs="i")
@@ -532,11 +550,16 @@ cat(1)
 
   cook <- function() {
     plum.its(ssize, info) # new June 2021
+  message(1)
     txt <- paste0(info$prefix, ".bacon")
     ssize <- as.integer(ssize)
+    message(2)
     bacon(txt, outfile, ssize, cc.dir)
-    rbacon::scissors(burnin, info)
-    rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, remove.tail=remove.tail, ...)
+    message(3)
+    rbacon::scissors(burnin, info, save.info=save.info)
+  message(4)
+
+    rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, remove.tail=remove.tail, save.info=save.info, ...)
     #Plum.agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # tmp May 21
 
     if(plot.pdf)
