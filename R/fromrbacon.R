@@ -2,9 +2,21 @@
 
 # temporarily adding PlotSuppPost to do unlist(set$ps)
 
+# temporarily addind PlotLogPost to deal with axis limits (removing Inf values)
+
 # temporarily adding draw.pbmodelled, owing to changes in how images are plotted (implemented in rbacon version 3.4.1 but this has problems when BCAD=TRUE)
 
 # temporarily adding rbacon's agedepth, to accommodate set <- draw.pbmodelled() (a post-3.4.1 change) (adding rbacon::: where needed)
+
+# Time series of the log of the posterior
+PlotLogPost <- function(set, from=0, to=set$Tr, xaxs="i", yaxs="i", panel.size=.9, col=grey(0.4)) {
+  y <- -set$Us[(from+1):to]
+  y[is.infinite(y)] <- NA
+  plot(from:(to-1), y, type="l",
+    ylab="Log of Objective", xlab="Iteration", main="", xaxs=xaxs, yaxs=yaxs, col=col, cex.axis=panel.size)
+}
+
+
 
 # plot the Supported data (for plum)
 PlotSuppPost_repaired <- function(set=get('info'), xaxs="i", yaxs="i", legend=TRUE, supp.xlim=c(), supp.ylim=c(), yaxt="n", prior.size=.9, panel.size=.9, line.col=3, line.width=2, text.col=2, hist.col=grey(0.8), hist.border=grey(0.4), data.col=rgb(.5,0,.5,.5)) {
