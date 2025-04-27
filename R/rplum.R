@@ -1,4 +1,5 @@
 
+
 # set.initvals from rbacon doesn't work as expected in rplum. The function makes the bottom-left panel active and initial age-depth points can be selected, but the selected initial values do not run as expected. Probably because additional initvals are also required for Pb-210 pars?
 
 # write an R package to download and plot climate data (grip, ngrip, gisp2, hulu, cariaco, EPICA, ...) working name icecream, pickles, or cream. check pangaear package, also check what rioja provides
@@ -351,6 +352,8 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
 
   info$n.supp <- n.supp
   
+  # optionally, make the info variable available in the working environment (default, but will overwrite any existing variable with the name 'info')
+  info$save.info <- save.info
   if(save.info)
     assign_to_global("info", info)
 
@@ -550,14 +553,10 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
 
   cook <- function() {
     plum.its(ssize, info) # new June 2021
-  message(1)
     txt <- paste0(info$prefix, ".bacon")
     ssize <- as.integer(ssize)
-    message(2)
     bacon(txt, outfile, ssize, cc.dir)
-    message(3)
     rbacon::scissors(burnin, info, save.info=save.info)
-  message(4)
 
     rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, remove.tail=remove.tail, save.info=save.info, ...)
     #Plum.agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # tmp May 21

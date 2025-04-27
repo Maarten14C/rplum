@@ -404,13 +404,22 @@ Plum.cleanup <- function(set=get('info')) {
     paste0(set$prefix, ".pdf"), paste0(set$prefix, "_ages.txt"),
     paste0(set$coredir,set$core, "/", set$core, "_settings.txt"))
 	
+    safe_remove <- function(file) 
+      tryCatch( if(file.exists(file)) file.remove(file),
+        warning = function(w) 
+          message("Warning while trying to remove ", file, ": ", conditionMessage(w)), 
+        error = function(e) 
+          message("Error while trying to remove ", file, ": ", conditionMessage(e))
+      )
+	
 	for(i in files) 
 	  if(file.exists(i)) {
-	    result <- try(file.remove(i), silent = TRUE)
-	    if(inherits(result, "try-error")) 
-	      message("Could not remove file: ", i) else 
-	      if(!result) 
-	        message("File does not exist or could not be deleted: ", file)
+    #    result <- try(file.remove(i), silent = TRUE)
+        result <- safe_remove(i)
+        if(inherits(result, "try-error")) 
+          message("Could not remove file: ", i) else 
+        if(!result) 
+          message("File does not exist or could not be deleted: ", file)
 	  }
   message("Previous Plum runs of core ", set$core, " with thick=", set$thick, " deleted. Now try running the core again")
 }
