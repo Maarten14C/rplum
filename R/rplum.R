@@ -558,7 +558,7 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
     bacon(txt, outfile, ssize, cc.dir)
     rbacon::scissors(burnin, info, save.info=save.info)
 
-    rbacon::agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, remove.tail=remove.tail, save.info=save.info, ...)
+    agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, remove.tail=remove.tail, save.info=save.info, ...)
     #Plum.agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, ...) # tmp May 21
 
     if(plot.pdf)

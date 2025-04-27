@@ -1,8 +1,67 @@
 # tmp file to repair functions with bugs in rbacon
 
-# adding draw.pbmodelled, owing to changes in how images are plotted (implemented in rbacon version 3.4.1 but this has problems when BCAD=TRUE)
+# temporarily adding PlotSuppPost to do unlist(set$ps)
 
-# adding rbacon's agedepth, to accommodate set <- draw.pbmodelled() (a post-3.4.1 change) (adding rbacon:: where needed)
+# temporarily adding draw.pbmodelled, owing to changes in how images are plotted (implemented in rbacon version 3.4.1 but this has problems when BCAD=TRUE)
+
+# temporarily adding rbacon's agedepth, to accommodate set <- draw.pbmodelled() (a post-3.4.1 change) (adding rbacon::: where needed)
+
+# plot the Supported data (for plum)
+PlotSuppPost_repaired <- function(set=get('info'), xaxs="i", yaxs="i", legend=TRUE, supp.xlim=c(), supp.ylim=c(), yaxt="n", prior.size=.9, panel.size=.9, line.col=3, line.width=2, text.col=2, hist.col=grey(0.8), hist.border=grey(0.4), data.col=rgb(.5,0,.5,.5)) {
+  lab <- ifelse(set$Bqkg, "Bq/kg", "dpm/g")
+
+  if(length(supp.xlim) == 0)
+    supp.xlim <- c(min( set$detsPlum[,4]), max(set$detsPlum[,4]))
+
+  post.mn <- mean(unlist(set$ps)) # added unlist April 2025
+  post.shape <- post.mn^2 / var(unlist(set$ps))
+
+  if(set$nPs > 1) {
+    rng <- array(NA, dim=c(set$nPs, 22)) # 22 is the number of segments to draw. Always???
+    for(i in 1:set$nPs) {
+      rng[i,1:21] <- quantile( set$ps[,i] , seq(0,2,0.1)/2)
+      rng[i,22] <- mean( set$ps[,i] )
+    }
+
+    if(length(supp.ylim) == 0)
+      supp.ylim <- c(min( rng[,1]), max(rng[,21]))
+
+    plot(0, type="n", ylim=supp.ylim, xlim=supp.xlim, main="", xlab="Depth (cm)", ylab=lab, yaxt=yaxt, cex.axis=panel.size)
+    n = 21
+    colorby = 1.0 / (n/2)
+    for(i in 1:(n/2)) {
+      segments(set$detsPlum[,4], rng[,i], set$detsPlum[,4], rng[,(i+1)], grey(1.0-colorby*i), lwd=3)
+      segments(set$detsPlum[,4], rng[,n-i], set$detsPlum[,4], rng[,n-(i-1)], grey(1.0-colorby*i), lwd=3)
+    }
+    lines(set$detsPlum[,4], rng[,22], col="red", lty=12) # mean
+
+  } else {
+    post <- density(set$ps)
+    suppdata <- set$supportedData[,1:2]
+    rng <- range(post$x, suppdata[,1]-suppdata[,2], suppdata[,1]+suppdata[,2])
+
+    if(length(supp.ylim) == 0)
+      supp.ylim <- c(0, max(post$y))
+
+    plot(post, type="n", xlab=lab, xlim=rng, main="", ylab="", yaxt=yaxt, cex.axis=panel.size)
+    polygon(post, col=hist.col, border=hist.border)
+    lines(seq(min(set$ps),max(set$ps),.05), dgamma(seq(min(set$ps), max(set$ps), .05), shape=set$s.shape, scale=set$s.mean/set$s.shape), col=line.col, lwd=line.width)
+
+    # plot the measurements of supported
+    # extend the plot's horizontal axis, range(...)
+    y <- seq(0, max(post$y), length=nrow(suppdata)+50)[1+(1:nrow(suppdata))] # at bottom graph
+    segments(suppdata[,1]-suppdata[,2], y, suppdata[,1]+suppdata[,2], y, col=data.col)
+    points(suppdata[,1], y, pch=20, col=data.col)
+  }
+  txt <- paste0("supported", "\ns.shape: ", set$s.shape, "\ns.mean: ", set$s.mean)  
+
+  if(legend)
+    legend("topright", txt, bty="n", cex=prior.size, text.col=text.col, adj=c(0,.2))
+  
+  invisible(c(post.mn, post.shape))
+}
+
+
 
 #' @name draw.pbmodelled
 #' @title Plot the 210Pb data
@@ -115,6 +174,7 @@ draw.pbmodelled <- function(set=get('info'), BCAD=set$BCAD, rotate.axes=FALSE, r
           image(ages, d_slice, z, add=TRUE, col=modelled_col, useRaster=TRUE) else
             image(ages, d_slice, z, add=TRUE, col=modelled_col, useRaster=TRUE)
         } else {
+		d_slice <<- d_slice; ages <<- ages; z <<- z	
 	     if(BCAD)  
   	       image(d_slice, ages, z, add=TRUE, col=modelled_col, useRaster=TRUE) else
 	         image(d_slice, ages, z, add=TRUE, col=modelled_col, useRaster=TRUE)
@@ -322,7 +382,7 @@ agedepth <- function(set=get('info'), BCAD=set$BCAD, depth.unit=set$depth.unit, 
        if(set$nPs > 1)
          prior.ticks <- "s" # because with varying supported Pb, the y-axis is important
        par(mar=mar.right)
-       set$post.supp <- PlotSuppPost(set, xaxs=xaxs, yaxs=yaxs, yaxt=prior.ticks, prior.size=prior.fontsize, panel.size=toppanel.fontsize, supp.xlim=supp.xlim, supp.ylim=supp.ylim, line.col=prior.col, line.width=prior.lwd, text.col=prior.fontcol, hist.col=post.col, hist.border=post.border, data.col=supp.col)
+       set$post.supp <- PlotSuppPost_repaired(set, xaxs=xaxs, yaxs=yaxs, yaxt=prior.ticks, prior.size=prior.fontsize, panel.size=toppanel.fontsize, supp.xlim=supp.xlim, supp.ylim=supp.ylim, line.col=prior.col, line.width=prior.lwd, text.col=prior.fontcol, hist.col=post.col, hist.border=post.border, data.col=supp.col)
        mar.main[4] <- mar.main[4] + righthand # to enable space for righthand axis
     }
     par(mar=mar.main) # new May 2021
