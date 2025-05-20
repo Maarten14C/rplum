@@ -6,4 +6,4 @@
 
 0 errors | 0 warnings | 0 notes
 
-This version corrects the 'Additional Issues' (save.info was not always available) as alerted per CRAN e-mail (27 April 2025). 
+
