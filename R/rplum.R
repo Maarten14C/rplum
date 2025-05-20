@@ -1,4 +1,4 @@
-
+# updated to rbacon 3.5.2, removed temporary commands within fromrbacon.R
 
 # set.initvals from rbacon doesn't work as expected in rplum. The function makes the bottom-left panel active and initial age-depth points can be selected, but the selected initial values do not run as expected. Probably because additional initvals are also required for Pb-210 pars?
 

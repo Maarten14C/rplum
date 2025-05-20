@@ -3,8 +3,6 @@
 export(Plum)
 export(Plum.cleanup)
 export(Plum_runs)
-export(agedepth)
-export(draw.pbmodelled)
 import(rbacon)
 importFrom(grDevices,dev.copy2pdf)
 importFrom(grDevices,dev.cur)

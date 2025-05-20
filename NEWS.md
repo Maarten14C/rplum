@@ -1,3 +1,6 @@
+# rplum 1.0.0
+* updated to rbacon 3.5.2 (which changes how greyscale images are plotted). Removed temporary code copied from rbacon code that caused issues with plotting.
+
 # rplum 0.5.2
 * it is now an error if no radium measurements are provided (ra.case=0) while n.supp is set to 0
 * through rbacon (version >=3.4.1), posterior values for phi and supported are now provided

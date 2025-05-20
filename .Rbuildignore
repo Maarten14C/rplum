@@ -5,6 +5,9 @@
 ^CRAN-SUBMISSION$
 ^doc$
 ^Meta$
+^dev$
 ^\.github$
 ^.DS_Store
+^testBaconplots\.Rmd$
+^testBaconplots\.html$
 
