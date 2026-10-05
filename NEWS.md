@@ -1,3 +1,9 @@
+# rplum 1.1.0
+* now depends on rbacon 4.0.0 and imports all its functions for usage in rplum sessions. 
+* added accept.suggestions as option in the `Plum` command (as is done in rbacon's `Bacon` command).
+* cleaned up 'orphan' variables.
+* the default age-scale for rplum is now `BCAD=TRUE` (rbacon's default remains `cal BP`).
+
 # rplum 1.0.0
 * updated to rbacon 3.5.2 (which changes how greyscale images are plotted). Removed temporary code copied from rbacon code that caused issues with plotting.
 

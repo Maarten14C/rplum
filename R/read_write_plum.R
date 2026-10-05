@@ -39,7 +39,7 @@ check.equi <- function(dets, suggest=TRUE) {
   usex   <- 1:length(usedat)
   usereg <- lm(usedat ~ usex, weights=1/(usesd^2))
   reg    <- coef(summary(usereg))[2,4]
-  est    <- coef(summary(usereg))[1,1]
+  #est    <- coef(summary(usereg))[1,1]
   coe    <- 3
 
   for(i in 1:numdat) {
@@ -52,7 +52,7 @@ check.equi <- function(dets, suggest=TRUE) {
     if(reg1 > reg) {
       reg  <- reg1
       coe  <- (3+i)
-      est  <- est1
+      #est  <- est1
     }
   }
   
@@ -76,13 +76,30 @@ check.equi <- function(dets, suggest=TRUE) {
 
 
 # read the 210Pb dets file
-read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=".", cc=1, Bqkg=TRUE, ra.case=c(), suggest=TRUE) {
+read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=".", cc=1, Bqkg=TRUE, ra.case=c(), suggest=TRUE, fast=TRUE) {
 
   # read the file. Removing the option to read and convert dat files because this is moot for Pb210
   csv.file <- paste0(coredir,  core, "/", core, ".csv")
   changed <- FALSE
   if(file.exists(csv.file)) {
-    dets <- read.table(csv.file, header=TRUE, sep=sep)
+    # then first do some cleaning of the .csv file if necessary
+    txt <- readLines(csv.file, warn=FALSE)
+    orig <- txt
+    # normalise legacy encodings (happens in Scandinavian computers)
+    txt <- iconv(txt, from="latin1", to="ASCII", sub=" ")
+    #txt <- iconv(txt, from="latin1", to="UTF-8")
+    txt <- gsub('"', "", txt) # remove quotation marks
+    txt <- gsub("\u00A0", " ", txt) # and invisible spaces
+    txt <- gsub(" *,", ",", txt) # and spaces before commas
+    txt <- gsub(";;", "", txt) # and double ;
+    txt <- gsub(",,", "", txt) # and double ,
+    lastline <- txt[length(txt)]
+    if(nchar(lastline) > 0 && !grepl("\n$", lastline))
+      txt <- c(txt, "") # the last line should be empty
+    if(!identical(txt, orig))
+      message("cleaned up the .csv file")
+
+    dets <- read.table(text=txt, header=TRUE, sep=sep)
     message("Reading ", csv.file)
   } else {
     if(file.exists(paste0(csv.file, ".txt"))) {
@@ -143,7 +160,7 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
   date.asoption <- date.sample
   nsupp.asoption <- n.supp
   racase.asoption <- ra.case
-  Bqkg.asoption <- Bqkg
+  # Bqkg.asoption <- Bqkg
 
   # now decide which options to use
   choice <- function(infile, asoption, string1, string2, testnumeric=TRUE, test=c()) {

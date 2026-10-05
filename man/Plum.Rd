@@ -53,6 +53,7 @@ Plum(
   t.b = 4,
   normal = FALSE,
   suggest = TRUE,
+  accept.suggestions = FALSE,
   reswarn = c(10, 200),
   remember = TRUE,
   ask = TRUE,
@@ -206,6 +207,8 @@ For symmetry reasons, t.a must always be equal to t.b-1.}
 \item{suggest}{If initial analysis of the data indicates abnormally slow or fast accumulation rates, Plum will suggest to change the prior.
 Also, if the length of the core would cause too few or too many sections with the default settings, Plum will suggest an alternative section thickness \code{thick}, and it will suggest approaches to estimating supported Pb-120. 
 Accept these suggested alternative settings by typing "y" (or "yes please" if you prefer to be polite), or leave as is by typing "n" (or anything else, really). To get rid of these suggestions, use \code{suggest=FALSE}.}
+
+\item{accept.suggestions}{Automatically accept the suggested values. Use with care. Default \code{accept.suggestions=FALSE}.}
 
 \item{reswarn}{Plum will warn you if the number of sections lies outside the safe range (default between 10 and 200 sections;
 \code{reswarn=c(10,200)}). Too few sections could lead to an `elbowy' model while with too many sections the modelling process can get lost,
