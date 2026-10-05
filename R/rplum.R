@@ -181,7 +181,7 @@
 #' Christen, J.A., Perez E.S., 2010. A new robust statistical model for radiocarbon data. Radiocarbon 51, 1047-1059.
 #'
 #' Hogg et al., 2020. SHCal20 Southern Hemisphere calibration, 0-55,000 years cal BP. Radiocarbon 62, 759-778.
-#'
+#'fast
 #' Hua et al., 2022. Atmospheric radiocarbon for the period 1950-2019. Radiocarbon 64(4), 723-745, \doi{10.1017/RDC.2021.95}
 #'
 #' Hughen et al., 2020. Marine20-the marine radiocarbon age calibration curve (0-55,000 cal BP). Radiocarbon 62, 779-820.
@@ -247,7 +247,7 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
   detsBacon <- c()
   if(!is.na(otherdates)) { # core also has cal BP or C-14 dates
     csv.file <- paste0(coredir, core, "/", otherdates)
-  detsBacon <- read.dets(core, coredir, otherdates, sep=sep, dec=dec, cc=cc)
+  detsBacon <- read.dets(core, coredir, otherdates, fast=fast, sep=sep, dec=dec, cc=cc)
 
     if(length(F14C) > 0) { # April 2025
       if(min(detsBacon[F14C,2]) < 0 || max(detsBacon[F14C,2]) > 3)
