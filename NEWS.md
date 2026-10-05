@@ -3,6 +3,7 @@
 * added accept.suggestions as option in the `Plum` command (as is done in rbacon's `Bacon` command).
 * cleaned up 'orphan' variables.
 * the default age-scale for rplum is now `BCAD=TRUE` (rbacon's default remains `cal BP`).
+* new option `fast`, which enables (TRUE; default) or disables (FALSE) the use of the fread and fwrite functions within the data.table R package to speed up reading/writing to files. Disabling can help with issues in reading files in uncommon encoding (e.g. Latin-1).
 
 # rplum 1.0.0
 * updated to rbacon 3.5.2 (which changes how greyscale images are plotted). Removed temporary code copied from rbacon code that caused issues with plotting.
