@@ -1,6 +1,3 @@
-# made reading of the .csv file more robust to unexpected characters.
-
-# set default for rplum to BCAD=TRUE?
 
 # if a user gets a warning about n.supp, and proposes a value (e.g., 6), and the user says 'Y', then this value is NOT being adopted. 
 
