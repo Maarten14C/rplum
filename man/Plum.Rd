@@ -61,9 +61,10 @@ Plum(
   defaults = "defaultPlum_settings.txt",
   sep = ",",
   dec = ".",
+  fast = TRUE,
   runname = "",
   slump = c(),
-  BCAD = FALSE,
+  BCAD = TRUE,
   ssize = 4000,
   th0 = c(),
   burnin = min(500, ssize),
@@ -227,11 +228,13 @@ try running your core again with \code{remember=FALSE}, or, start cleanly by typ
 
 \item{dec}{Character for decimal points. Default to \code{dec="."}.}
 
+\item{fast}{Whether or not to use the fread function to read files quickly. Set to FALSE if there are problems with your core's .csv file (e.g. unexpected encoding).}
+
 \item{runname}{Text to add to the corename for specific runs, e.g., \code{runname="MyCore_Test1"}.}
 
 \item{slump}{Upper and lower depths of any sections of assumed abrupt accumulation, that require excising before age-modelling (and adding after age-modelling). Requires pairs of depths, e.g., \code{slump=c(10,15,60,67)} for slumps at 67-60 and 15-10 cm core depth.}
 
-\item{BCAD}{The calendar scale of graphs and age output-files is in cal BP (calendar or calibrated years before the present, where the present is AD 1950) by default, but can be changed to BC/AD using \code{BCAD=TRUE}.}
+\item{BCAD}{The calendar scale of graphs and age output-files is in cal BC/AD (also known as BCE/CE) by default. It can also be set to cal BP (calendar or calibrated years before the present, where the present is AD 1950) using \code{BCAD=FALSE}.}
 
 \item{ssize}{The approximate amount of iterations to store at the end of the MCMC run. Default 2000; decrease for faster (but less reliable) runs or increase for cores where the MCMC mixing (panel at upper-left corner of age-model graph) appears problematic.}
 
@@ -330,7 +333,7 @@ Blaauw, M. and Christen, J.A., 2011. Flexible paleoclimate age-depth models usin
 Christen, J.A., Perez E.S., 2010. A new robust statistical model for radiocarbon data. Radiocarbon 51, 1047-1059.
 
 Hogg et al., 2020. SHCal20 Southern Hemisphere calibration, 0-55,000 years cal BP. Radiocarbon 62, 759-778.
-
+fast
 Hua et al., 2022. Atmospheric radiocarbon for the period 1950-2019. Radiocarbon 64(4), 723-745, \doi{10.1017/RDC.2021.95}
 
 Hughen et al., 2020. Marine20-the marine radiocarbon age calibration curve (0-55,000 cal BP). Radiocarbon 62, 779-820.

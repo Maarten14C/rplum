@@ -1,36 +1,40 @@
 # to enable running rbacon functions from within rplum
 
-# these functions run c++ code and are as yet unexported (not sure how to export them)
-events <- utils::getFromNamespace("events", "rbacon")
-bacon <- utils::getFromNamespace("bacon", "rbacon") # since already called like this within the Plum function
+require(rbacon)
 
-# these functions are exported by rbacon
+# these functions run c++ code and are unexported
+events <- utils::getFromNamespace("events", "rbacon")
+#bacon <- utils::getFromNamespace("bacon", "rbacon") # since already called like this within the Plum function
+
+# these functions are loaded through import rbacon
 #agedepth <- rbacon::agedepth
 #proxy.ghost <- rbacon::proxy.ghost
 #importFrom(rbacon, agedepth)
 #importFrom(rbacon, proxy.ghost)
 
-# these are R functions in rbacon which are not exported (because they are internal)
-draw.pbmeasured <- utils::getFromNamespace("draw.pbmeasured", "rbacon")
-bacon.calib <- utils::getFromNamespace("bacon.calib", "rbacon")
-calib.plot <- utils::getFromNamespace("calib.plot", "rbacon")
-read.dets <- utils::getFromNamespace("read.dets", "rbacon")
-toslump <- utils::getFromNamespace("toslump", "rbacon")
-PlotAccPrior <- utils::getFromNamespace("PlotAccPrior", "rbacon")
-PlotMemPrior <- utils::getFromNamespace("PlotMemPrior", "rbacon")
-PlotHiatusPrior <- utils::getFromNamespace("PlotHiatusPrior", "rbacon")
-PlotPhiPrior <- utils::getFromNamespace("PlotPhiPrior", "rbacon")
-PlotSuppPrior <- utils::getFromNamespace("PlotSuppPrior", "rbacon")
-PlotAccPost <- utils::getFromNamespace("PlotAccPost", "rbacon")
-PlotMemPost <- utils::getFromNamespace("PlotMemPost", "rbacon")
-PlotHiatusPost <- utils::getFromNamespace("PlotHiatusPost", "rbacon")
-PlotPhiPost <- utils::getFromNamespace("PlotPhiPost", "rbacon")
-PlotSuppPost <- utils::getFromNamespace("PlotSuppPost", "rbacon")
-PlotLogPost <- utils::getFromNamespace("PlotLogPost", "rbacon")
-Plum.AnaOut <- utils::getFromNamespace("Plum.AnaOut", "rbacon")
-agedepth.ghost <- utils::getFromNamespace("agedepth.ghost", "rbacon")
-Bacon.rng <- utils::getFromNamespace("Bacon.rng", "rbacon")
-hiatus.slopes <- utils::getFromNamespace("hiatus.slopes", "rbacon")
-assign_to_global <- utils::getFromNamespace("assign_to_global", "rbacon")
-assign_coredir <- utils::getFromNamespace("assign_coredir", "rbacon")
-validateDirectoryName <- utils::getFromNamespace("validateDirectoryName", "rbacon")
+rbacon_internal <- function(fun)
+  getFromNamespace(fun, "rbacon")
+draw.pbmeasured <- rbacon_internal("draw.pbmeasured")
+bacon.calib <- rbacon_internal("bacon.calib")
+calib.plot <- rbacon_internal("calib.plot")
+fastwrite <- rbacon_internal("fastwrite")
+read.dets <- rbacon_internal("read.dets")
+toslump <- rbacon_internal("toslump")
+PlotAccPrior <- rbacon_internal("PlotAccPrior")
+PlotMemPrior <- rbacon_internal("PlotMemPrior")
+PlotHiatusPrior <- rbacon_internal("PlotHiatusPrior")
+PlotPhiPrior <- rbacon_internal("PlotPhiPrior")
+PlotSuppPrior <- rbacon_internal("PlotSuppPrior")
+PlotAccPost <- rbacon_internal("PlotAccPost")
+PlotMemPost <- rbacon_internal("PlotMemPost")
+PlotHiatusPost <- rbacon_internal("PlotHiatusPost")
+PlotPhiPost <- rbacon_internal("PlotPhiPost")
+PlotSuppPost <- rbacon_internal("PlotSuppPost")
+PlotLogPost <- rbacon_internal("PlotLogPost")
+Plum.AnaOut <- rbacon_internal("Plum.AnaOut")
+agedepth.ghost <- rbacon_internal("agedepth.ghost")
+Bacon.rng <- rbacon_internal("Bacon.rng")
+hiatus.slopes <- rbacon_internal("hiatus.slopes")
+assign_to_global <- rbacon_internal("assign_to_global")
+assign_coredir <- rbacon_internal("assign_coredir")
+validateDirectoryName <- rbacon_internal("validateDirectoryName")

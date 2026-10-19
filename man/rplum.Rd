@@ -11,6 +11,13 @@ accumulation histories for 210Pb-dated deposits using prior information, and can
 210Pb, radiocarbon, and other dates in the chronologies.
 See Aquino et al. (2018) <doi:10.1007/s13253-018-0328-7>.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/Maarten14C/rplum}
+}
+
+}
 \author{
 Maarten Blaauw <maarten.blaauw@qub.ac.uk> J. Andres Christen <jac@cimat.mx> Marco Aquino-Lopez <aquino@cimat.mx>
 }

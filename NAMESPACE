@@ -3,39 +3,53 @@
 export(Plum)
 export(Plum.cleanup)
 export(Plum_runs)
+export(agedepth)
+export(mass.acc.ghost)
 import(rbacon)
-importFrom(grDevices,dev.copy2pdf)
-importFrom(grDevices,dev.cur)
-importFrom(grDevices,dev.list)
-importFrom(grDevices,dev.off)
-importFrom(grDevices,extendrange)
-importFrom(grDevices,grey)
-importFrom(grDevices,pdf)
-importFrom(grDevices,rgb)
-importFrom(graphics,abline)
-importFrom(graphics,axis)
-importFrom(graphics,box)
-importFrom(graphics,image)
-importFrom(graphics,layout)
-importFrom(graphics,legend)
-importFrom(graphics,lines)
-importFrom(graphics,mtext)
-importFrom(graphics,par)
-importFrom(graphics,plot)
-importFrom(graphics,points)
-importFrom(graphics,polygon)
-importFrom(graphics,rect)
-importFrom(graphics,segments)
-importFrom(graphics,text)
-importFrom(rice,F14CtoC14)
-importFrom(rice,pMCtoC14)
-importFrom(stats,approx)
-importFrom(stats,coef)
-importFrom(stats,density)
-importFrom(stats,dgamma)
-importFrom(stats,lm)
-importFrom(stats,quantile)
-importFrom(stats,var)
-importFrom(utils,packageName)
-importFrom(utils,read.table)
-importFrom(utils,write.table)
+importFrom(grDevices,
+  dev.copy2pdf,
+  dev.cur,
+  dev.list,
+  dev.off,
+  extendrange,
+  grey,
+  pdf,
+  rgb
+)
+importFrom(graphics,
+  abline,
+  axis,
+  box,
+  image,
+  layout,
+  legend,
+  lines,
+  mtext,
+  par,
+  plot,
+  points,
+  polygon,
+  rect,
+  segments,
+  text
+)
+importFrom(rbacon,agedepth)
+importFrom(rice,
+  F14CtoC14,
+  pMCtoC14
+)
+importFrom(stats,
+  approx,
+  coef,
+  density,
+  dgamma,
+  lm,
+  quantile,
+  var
+)
+importFrom(utils,
+  getFromNamespace,
+  packageName,
+  read.table,
+  write.table
+)

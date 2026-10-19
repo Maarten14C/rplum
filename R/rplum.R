@@ -1,3 +1,5 @@
+# wrote function mass.acc.ghost which takes the flux function and density and depth to plot a greyscale mass accumulation (and return results). Written but needs checking.
+
 
 # if a user gets a warning about n.supp, and proposes a value (e.g., 6), and the user says 'Y', then this value is NOT being adopted. 
 
@@ -9,11 +11,10 @@
 
 
 
-# # make important rbacon functions available when rplum is loaded:
-# #' @importFrom rbacon agedepth
-# #' @export
-# rbacon::agedepth
-
+# make important rbacon functions available when rplum is loaded:
+#' @importFrom rbacon agedepth
+#' @export
+rbacon::agedepth
 
 
 #' @name Plum
@@ -571,7 +572,7 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
     plum.its(ssize, info) # new June 2021
     txt <- paste0(info$prefix, ".bacon")
     ssize <- as.integer(ssize)
-    bacon(txt, outfile, ssize, cc.dir)
+    rbacon::bacon(txt, outfile, ssize, cc.dir)
     rbacon::scissors(burnin, info, save.info=save.info)
 
     agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, remove.tail=remove.tail, save.info=save.info, ...)
@@ -616,4 +617,32 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
   }
 
   invisible(info) # MB April 2024
+}
+
+
+
+#' @name mass.acc.ghost
+#' @title plot mass accumulation rate
+#' @description Plot a grey-scale representation of mass accumulation rates against calendar age.
+#' @details To plot mass accumulation rates as greyscalethe measured densities and depth of the core's .csv file are taken and applied to the function `flux.age.ghost`. 
+#' @param set Detailed information of the current run, stored within this session's memory as variable info.
+#' @param acc.lab Axis labels. Defaults to \code{flux.lab="flux"}.
+#' @param ... any additional parmeters to be transferred to the function flux.age.ghost
+#' @author Maarten Blaauw
+#' @return A plot of mass accumulation rates, and the underlying greyscales, means, medians and ranges (invisibly).
+#' @examples
+#' \dontrun{
+#'   Plum(run=FALSE, coredir=tempfile())
+#'   agedepth(yr.res=50)
+#'   mass.age.ghost()
+#' }
+#' @export
+mass.acc.ghost <- function(set=get("info"), acc.lab="mass accumulation (g/yr)", ...) {
+  dens <- set$detsPlum[,c(4,6)]
+  dens <- dens[which(dens[,1] <= set$d.max),]
+  myflux <- flux.age.ghost(flux=dens, flux.lab=acc.lab, ...)
+  
+  summ <- cbind(myflux$ranges, median=myflux$medians[,2], mean=myflux$means[,2])
+  rbacon:::fastwrite(summ, paste0(set$prefix, "_massacc.csv", sep=","), row.names=FALSE, quote=FALSE)
+  invisible(summ)
 }
