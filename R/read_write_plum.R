@@ -287,14 +287,14 @@ read.dets.plum <- function(core, coredir, n.supp=c(), date.sample, sep=",", dec=
         message("Besides using the radium data, the tail Pb-210 data can also be used to estimate supported Pb-210. ")
       if(ra.case == 0)
        if(nrow(dets) < 7) {
-	      message("Warning! Very few data points. Setting the bottom one to be background - scary stuff.")
-		  nsupp.asoption <- 1
-	   } 
+          message("Warning! Very few data points. Setting the bottom one to be background - scary stuff.")
+          nsupp.asoption <- 1
+       }
     }
     n.supp <- choice(nsupp.infile, nsupp.asoption, "number of supported data", "",, check.equi(dets))
-	
+
   if(n.supp == 0 && ra.case==0)
-	stop("If ra.case=0 (no radium measurements), then n.supp should be 1 or more")
+    stop("If ra.case=0 (no radium measurements), then n.supp should be 1 or more")
 
   if(length(Bqkg) == 0 || !(Bqkg %in% c(0, 1))) {
     message("Assuming that the Pb units are in Bq/kg, Bqkg=1")
@@ -420,7 +420,7 @@ Plum.cleanup <- function(set=get('info')) {
   files <- c(paste0(set$prefix, ".bacon"), paste0(set$prefix, ".out"),
     paste0(set$prefix, ".pdf"), paste0(set$prefix, "_ages.txt"),
     paste0(set$coredir,set$core, "/", set$core, "_settings.txt"))
-	
+
     safe_remove <- function(file) 
       tryCatch( if(file.exists(file)) file.remove(file),
         warning = function(w) 
@@ -428,16 +428,16 @@ Plum.cleanup <- function(set=get('info')) {
         error = function(e) 
           message("Error while trying to remove ", file, ": ", conditionMessage(e))
       )
-	
-	for(i in files) 
-	  if(file.exists(i)) {
+
+    for(i in files)
+      if(file.exists(i)) {
     #    result <- try(file.remove(i), silent = TRUE)
         result <- safe_remove(i)
         if(inherits(result, "try-error")) 
           message("Could not remove file: ", i) else 
         if(!result) 
           message("File does not exist or could not be deleted: ", file)
-	  }
+      }
   message("Previous Plum runs of core ", set$core, " with thick=", set$thick, " deleted. Now try running the core again")
 }
 
@@ -668,7 +668,7 @@ write.plum.file <- function(set=get('info'), younger.than=c(), older.than=c(), s
         firstentry <- "\nDetCensor "
       if(k %in% younger.than)
         firstentry <- "\nDetCensorE "
-	}	 	  
+    }
     cat(firstentry, i-1, " : ", as.character(dets[i,1]),
         " , ", dets[i,2], ", ", dets[i,3], ", ", dets[i,4],
         ", ", dets[i,5], ", ", dets[i,6], ", ", dets[i,7],
@@ -685,7 +685,7 @@ write.plum.file <- function(set=get('info'), younger.than=c(), older.than=c(), s
       set$acc.mean <- rep(set$acc.mean, length(hiatus.depths)+1)
     if(length(set$hiatus.max)==1)
       set$hiatus.max <- rep(set$hiatus.max, length(hiatus.depths))    
-	if(save.info)
+    if(save.info)
       assign_to_global("info", set)
     cat("\n\n### Depths and priors for fixed hiatuses, in descending order",
       "\n##### cm  alpha beta      ha     hb", file=fl)
@@ -721,7 +721,7 @@ write.plum.file <- function(set=get('info'), younger.than=c(), older.than=c(), s
       for(j in 1:2) 
         cat(supportedData[i,j], " ", file=fl)
       cat("\n", file=fl)
-    }	
+    }
   close(fl)
   # we have to check that there are no NAs in the .plum file
 }

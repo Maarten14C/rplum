@@ -572,7 +572,7 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
     plum.its(ssize, info) # new June 2021
     txt <- paste0(info$prefix, ".bacon")
     ssize <- as.integer(ssize)
-    rbacon::bacon(txt, outfile, ssize, cc.dir)
+    bacon(txt, outfile, ssize, cc.dir)
     rbacon::scissors(burnin, info, save.info=save.info)
 
     agedepth(info, BCAD=BCAD, depths.file=depths.file, depths=depths, verbose=TRUE, age.unit=age.unit, depth.unit=depth.unit, remove.tail=remove.tail, save.info=save.info, ...)

@@ -1,13 +1,14 @@
 # rplum 1.1.0
-* now depends on rbacon 4.0.0 and imports all its functions for usage in rplum sessions. 
-* added accept.suggestions as option in the `Plum` command (as is done in rbacon's `Bacon` command).
-* cleaned up 'orphan' variables.
-* the default age-scale for rplum is now `BCAD=TRUE` (rbacon's default remains `cal BP`).
-* new option `fast`, which enables (TRUE; default) or disables (FALSE) the use of the fread and fwrite functions within the data.table R package to speed up reading/writing to files. Disabling can help with issues in reading files in uncommon encoding (e.g. Latin-1).
-* better plotting of greyscales if ra.case=2. 
+* now depends on rbacon 4.0.0 and imports all its functions for usage in rplum sessions
+* added accept.suggestions as option in the `Plum` command (as is done in rbacon's `Bacon` command)
+* cleaned up 'orphan' variables
+* the default age-scale for rplum is now `BCAD=TRUE` (rbacon's default remains `cal BP`)
+* new option `fast`, which enables (TRUE; default) or disables (FALSE) the use of the fread and fwrite functions within the data.table R package to speed up reading/writing to files. Disabling can help with issues in reading files in uncommon encoding (e.g. Latin-1)
+* more accurate plotting of greyscales if ra.case=2
+* model-date overlaps are now reported correctly
 
 # rplum 1.0.0
-* updated to rbacon 3.5.2 (which changes how greyscale images are plotted). Removed temporary code copied from rbacon code that caused issues with plotting.
+* updated to rbacon 3.5.2 (which changes how greyscale images are plotted). Removed temporary code copied from rbacon code that caused issues with plotting
 
 # rplum 0.5.2
 * it is now an error if no radium measurements are provided (ra.case=0) while n.supp is set to 0

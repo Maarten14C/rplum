@@ -4,7 +4,7 @@ require(rbacon)
 
 # these functions run c++ code and are unexported
 events <- utils::getFromNamespace("events", "rbacon")
-#bacon <- utils::getFromNamespace("bacon", "rbacon") # since already called like this within the Plum function
+bacon <- utils::getFromNamespace("bacon", "rbacon") # since already called like this within the Plum function
 
 # these functions are loaded through import rbacon
 #agedepth <- rbacon::agedepth
