@@ -627,20 +627,22 @@ Plum <- function(core="HP1C", thick=1, otherdates=NA, coredir="", phi.shape=2, p
 #' @details To plot mass accumulation rates as greyscalethe measured densities and depth of the core's .csv file are taken and applied to the function `flux.age.ghost`. 
 #' @param set Detailed information of the current run, stored within this session's memory as variable info.
 #' @param acc.lab Axis labels. Defaults to \code{flux.lab="flux"}.
-#' @param ... any additional parmeters to be transferred to the function flux.age.ghost
+#' @param age.rev Whether or not to reverse the age axis. Defaults to TRUE.
+#' @param clip.prob By default, the axis limits of the mass accumulation rate take the 99.5\% range of all accumulation rate values - not 100\%, because that could include some stray unlikely values. 
+#' @param ... any additional parmeters to be transferred to the function flux.age.ghost.
 #' @author Maarten Blaauw
-#' @return A plot of mass accumulation rates, and the underlying greyscales, means, medians and ranges (invisibly).
+#' @return A plot of mass accumulation rates, and (invisibly) the underlying values for the greyscales, means (red), medians (blue) and ranges (grey).
 #' @examples
 #' \dontrun{
 #'   Plum(run=FALSE, coredir=tempfile())
 #'   agedepth(yr.res=50)
-#'   mass.age.ghost()
+#'   mass.acc.ghost()
 #' }
 #' @export
-mass.acc.ghost <- function(set=get("info"), acc.lab="mass accumulation (g/yr)", ...) {
+mass.acc.ghost <- function(set=get("info"), acc.lab="mass accumulation (g/yr)", age.rev=TRUE, clip.prob=.995, ...) {
   dens <- set$detsPlum[,c(4,6)]
   dens <- dens[which(dens[,1] <= set$d.max),]
-  myflux <- flux.age.ghost(flux=dens, flux.lab=acc.lab, ...)
+  myflux <- flux.age.ghost(flux=dens, flux.lab=acc.lab, age.rev=age.rev, clip.prob=clip.prob, ...)
   
   summ <- cbind(myflux$ranges, median=myflux$medians[,2], mean=myflux$means[,2])
   rbacon:::fastwrite(summ, paste0(set$prefix, "_massacc.csv", sep=","), row.names=FALSE, quote=FALSE)

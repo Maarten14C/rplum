@@ -4,17 +4,27 @@
 \alias{mass.acc.ghost}
 \title{plot mass accumulation rate}
 \usage{
-mass.acc.ghost(set = get("info"), acc.lab = "mass accumulation (g/yr)", ...)
+mass.acc.ghost(
+  set = get("info"),
+  acc.lab = "mass accumulation (g/yr)",
+  age.rev = TRUE,
+  clip.prob = 0.995,
+  ...
+)
 }
 \arguments{
 \item{set}{Detailed information of the current run, stored within this session's memory as variable info.}
 
 \item{acc.lab}{Axis labels. Defaults to \code{flux.lab="flux"}.}
 
-\item{...}{any additional parmeters to be transferred to the function flux.age.ghost}
+\item{age.rev}{Whether or not to reverse the age axis. Defaults to TRUE.}
+
+\item{clip.prob}{By default, the axis limits of the mass accumulation rate take the 99.5\% range of all accumulation rate values - not 100\%, because that could include some stray unlikely values.}
+
+\item{...}{any additional parmeters to be transferred to the function flux.age.ghost.}
 }
 \value{
-A plot of mass accumulation rates, and the underlying greyscales, means, medians and ranges (invisibly).
+A plot of mass accumulation rates, and (invisibly) the underlying values for the greyscales, means (red), medians (blue) and ranges (grey).
 }
 \description{
 Plot a grey-scale representation of mass accumulation rates against calendar age.
@@ -26,7 +36,7 @@ To plot mass accumulation rates as greyscalethe measured densities and depth of 
 \dontrun{
   Plum(run=FALSE, coredir=tempfile())
   agedepth(yr.res=50)
-  mass.age.ghost()
+  mass.acc.ghost()
 }
 }
 \author{

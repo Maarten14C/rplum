@@ -624,7 +624,8 @@ write.plum.file <- function(set=get('info'), younger.than=c(), older.than=c(), s
     dets[1,depthColumn] <- set$d.min
     bg <- set$supportedData[,3] # now reassign depths of the data in the tail
     # tail measurements do not require depths, so we reassign them to dummy depths
-    if(set$ra.case < 2) # or <2?
+    #if(set$ra.case < 2)
+    if(set$ra.case == 0)	
       for(i in 1:length(bg)) {
         d_i <- which(dets[,depthColumn] == bg[i])
         dets[d_i,depthColumn] <- set$d.min-10 # dummy depths, outside of the range of the core depths
